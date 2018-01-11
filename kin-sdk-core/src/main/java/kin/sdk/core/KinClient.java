@@ -2,18 +2,16 @@ package kin.sdk.core;
 
 import android.content.Context;
 
-import org.ethereum.geth.Account;
-import org.ethereum.geth.Accounts;
-
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.EthereumClientException;
+import org.stellar.sdk.KeyPair;
 
 public class KinClient {
 
     private KinAccount kinAccount;
-    private EthClientWrapper ethClient;
+    private ClientWrapper ethClient;
 
     /**
      * KinClient is an account manager for a single {@link KinAccount} on
@@ -25,7 +23,7 @@ public class KinClient {
      * smart-contract problems.
      */
     public KinClient(Context context, ServiceProvider provider) throws EthereumClientException {
-        this.ethClient = new EthClientWrapper(context, provider);
+        this.ethClient = new ClientWrapper(context, provider);
     }
 
     /**
@@ -35,7 +33,7 @@ public class KinClient {
      * be accessed again via the {@link #getAccount()} method.
      *
      * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
-     * @return KinAccount the account created
+     * @return {@link KinAccount} the account created
      * @throws CreateAccountException if go-ethereum was unable to generate the account (unable to generate new key or
      * store the key).
      */
@@ -60,30 +58,21 @@ public class KinClient {
         if (kinAccount != null) {
             return kinAccount;
         } else {
-            Accounts accounts = ethClient.getKeyStore().getAccounts();
-            Account account;
-            try {
-                account = accounts.get(0);
-            } catch (Exception e) {
-                //There is no account
-                return null;
+            String seed = ethClient.getSeed(KinConsts.ACCOUNT_SEED);
+            if (seed != null) {
+                KeyPair account = KeyPair.fromSecretSeed(seed);
+                kinAccount = new KinAccountImpl(ethClient, account);
             }
-            // The Account is not null
-            kinAccount = new KinAccountImpl(ethClient, account);
+            return kinAccount;
         }
-        return kinAccount;
     }
 
-    /**
-     * @return true if there is an existing account
-     */
+        /**
+         * @return true if there is an existing account
+         */
+
     public boolean hasAccount() {
-        if (kinAccount != null) {
-            return true;
-        } else {
-            Accounts accounts = ethClient.getKeyStore().getAccounts();
-            return accounts != null && accounts.size() > 0;
-        }
+        return kinAccount != null || ethClient.getSeed(KinConsts.ACCOUNT_SEED) != null;
     }
 
     /**
@@ -95,7 +84,7 @@ public class KinClient {
     public void deleteAccount(String passphrase) throws DeleteAccountException {
         KinAccountImpl account = (KinAccountImpl) getAccount();
         if (account != null) {
-            account.delete(passphrase);
+            ethClient.removeSeed(KinConsts.ACCOUNT_SEED);
             kinAccount = null;
         }
     }
@@ -118,11 +107,17 @@ public class KinClient {
     }
 
     KinAccount importAccount(String privateEcdsaKey, String passphrase) throws OperationFailedException {
-        Account account = ethClient.importAccount(privateEcdsaKey, passphrase);
         KinAccount kinAccount = null;
-        if (account != null) {
+        try {
+            KeyPair account = KeyPair.fromSecretSeed(privateEcdsaKey);
             kinAccount = new KinAccountImpl(ethClient, account);
+        } catch (Exception e) {
+            return kinAccount;
         }
         return kinAccount;
+    }
+
+    public void getKin() {
+        ethClient.getKin();
     }
 }

@@ -8,13 +8,13 @@ import kin.sdk.core.exception.EthereumClientException;
 public class KinClientSampleApplication extends Application {
 
     //based on parity
-    private final String ROPSTEN_TEST_NET_URL = "http://parity.rounds.video:8545";
-    private final String MAIN_NET_URL = "http://mainnet.rounds.video:8545";
+    private final String TEST_NET_URL = "https://horizon-testnet.stellar.org";
+    private final String MAIN_NET_URL = "https://horizon.stellar.org";
 
 
     public enum NetWorkType {
         MAIN,
-        ROPSTEN;
+        TEST
     }
 
     private KinClient kinClient = null;
@@ -27,13 +27,13 @@ public class KinClientSampleApplication extends Application {
                 providerUrl = MAIN_NET_URL;
                 netWorkId = ServiceProvider.NETWORK_ID_MAIN;
                 break;
-            case ROPSTEN:
-                providerUrl = ROPSTEN_TEST_NET_URL;
-                netWorkId = ServiceProvider.NETWORK_ID_ROPSTEN;
+            case TEST:
+                providerUrl = TEST_NET_URL;
+                netWorkId = ServiceProvider.NETWORK_ID_TEST;
                 break;
             default:
-                providerUrl = ROPSTEN_TEST_NET_URL;
-                netWorkId = ServiceProvider.NETWORK_ID_ROPSTEN;
+                providerUrl = TEST_NET_URL;
+                netWorkId = ServiceProvider.NETWORK_ID_TEST;
         }
         try {
             kinClient = new KinClient(this,

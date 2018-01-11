@@ -34,6 +34,7 @@ android {
 dependencies {
 
     implementation ('kinfoundation.ethereum:geth:1.0.2@aar')
+    implementation ('com.github.yosriz:android-stellar-sdk:c8d9dbb6c870730f5c6087e61e7af44d9c945320')
 
     implementation supportDependencies.appCompat
 

@@ -95,7 +95,7 @@ final class PendingBalance {
         // see https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#events
         Topics topics = Geth.newTopicsEmpty();
         Hashes hashes = Geth.newHashesEmpty();
-        hashes.append(Geth.newHashFromHex(KinConsts.TOPIC_EVENT_NAME_SHA3_TRANSFER));
+
         topics.append(hashes);
         hashes = Geth.newHashesEmpty();
         if (fromHexAddress != null) {

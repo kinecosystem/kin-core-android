@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -123,8 +124,9 @@ public class ExportKeystoreActivity extends BaseActivity {
             throw new AccountDeletedException();
         }
         String jsonString = account.exportKeyStore(getPassphrase(), passphraseInput.getText().toString());
-        JSONObject jsonObject = new JSONObject(jsonString);
-        return jsonObject.toString(1);
+//        JSONObject jsonObject = new JSONObject(jsonString);
+        Log.i(TAG, "generatePrivateKeyStoreJsonFormat: " + jsonString);
+        return jsonString;
     }
 
     private void updateOutput(String outputString) {

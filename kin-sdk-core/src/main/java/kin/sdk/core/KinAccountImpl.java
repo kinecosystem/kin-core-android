@@ -5,48 +5,49 @@ import kin.sdk.core.exception.AccountDeletedException;
 import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
-import org.ethereum.geth.Account;
-import org.ethereum.geth.KeyStore;
+import org.stellar.sdk.KeyPair;
+
 
 final class KinAccountImpl extends AbstractKinAccount {
 
-    private KeyStore keyStore;
-    private EthClientWrapper ethClient;
-    private Account account;
+    private ClientWrapper ethClient;
+    private KeyPair account;
     private boolean isDeleted;
 
     /**
-     * Creates a new {@link Account}.
+     * Creates a new {@link KeyPair}.
      *
-     * @param ethClientWrapper that will be use to call to Kin smart-contract.
+     * @param clientWrapper that will be use to call to Kin smart-contract.
      * @param passphrase that will be used to store the account private key securely.
      * @throws Exception if go-ethereum was unable to generate the account (unable to generate new key or store the
      * key).
      */
-    KinAccountImpl(EthClientWrapper ethClientWrapper, String passphrase) throws Exception {
-        this.keyStore = ethClientWrapper.getKeyStore();
-        this.account = keyStore.newAccount(passphrase);
-        this.ethClient = ethClientWrapper;
+    KinAccountImpl(ClientWrapper clientWrapper, String passphrase) throws Exception {
+        this.account = KeyPair.random();
+        this.ethClient = clientWrapper;
+        this.ethClient.saveSeed(KinConsts.ACCOUNT_SEED, account.getSecretSeed());
+        if(this.ethClient.getServiceProvider().isMainNet()) {
+            this.ethClient.createAccountAndGetXLM(account);
+        }
         isDeleted = false;
     }
 
     /**
-     * Creates a {@link KinAccount} from existing {@link Account}
+     * Creates a {@link KinAccount} from existing {@link KeyPair}
      *
-     * @param ethClientWrapper that will be use to call to Kin smart-contract.
+     * @param clientWrapper that will be use to call to Kin smart-contract.
      * @param account the existing Account.
      */
-    KinAccountImpl(EthClientWrapper ethClientWrapper, Account account) {
-        this.keyStore = ethClientWrapper.getKeyStore();
+    KinAccountImpl(ClientWrapper clientWrapper, KeyPair account) {
         this.account = account;
-        this.ethClient = ethClientWrapper;
+        this.ethClient = clientWrapper;
         isDeleted = false;
     }
 
     @Override
     public String getPublicAddress() {
         if (!isDeleted) {
-            return account.getAddress().getHex();
+            return account.getAccountId();
         }
         return "";
     }
@@ -55,21 +56,14 @@ final class KinAccountImpl extends AbstractKinAccount {
     public String exportKeyStore(String passphrase, String newPassphrase)
         throws PassphraseException, OperationFailedException {
         checkValidAccount();
-        String jsonKeyStore;
-        try {
-            byte[] keyInBytes = keyStore.exportKey(account, passphrase, newPassphrase);
-            jsonKeyStore = new String(keyInBytes, "UTF-8");
-        } catch (Exception e) {
-            throw new PassphraseException();
-        }
-        return jsonKeyStore;
+        return new String(account.getSecretSeed());
     }
 
     @Override
     public TransactionId sendTransactionSync(String publicAddress, String passphrase, BigDecimal amount)
         throws OperationFailedException, PassphraseException {
         checkValidAccount();
-        return ethClient.sendTransaction(account, passphrase, publicAddress, amount);
+        return ethClient.sendTransaction(account, publicAddress, amount);
     }
 
     @Override
@@ -81,7 +75,8 @@ final class KinAccountImpl extends AbstractKinAccount {
     @Override
     public Balance getPendingBalanceSync() throws OperationFailedException {
         checkValidAccount();
-        return ethClient.getPendingBalance(account);
+        //TODO remove or change !?@
+        return ethClient.getBalance(account);
     }
 
     void delete(String passphrase) throws DeleteAccountException {

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import kin.sdk.core.KinClient;
 
 /**
- * User is given a choice to create or use an account on the MAIN or ROPSTEN(test) ethereum networks
+ * User is given a choice to create or use an account on the MAIN or TEST(test) ethereum networks
  */
 public class ChooseNetworkActivity extends BaseActivity {
 
@@ -42,7 +42,7 @@ public class ChooseNetworkActivity extends BaseActivity {
             view -> createKinClient(KinClientSampleApplication.NetWorkType.MAIN));
 
         findViewById(R.id.btn_test_net).setOnClickListener(
-            view -> createKinClient(KinClientSampleApplication.NetWorkType.ROPSTEN));
+            view -> createKinClient(KinClientSampleApplication.NetWorkType.TEST));
     }
 
     private void createKinClient(KinClientSampleApplication.NetWorkType netWorkType) {

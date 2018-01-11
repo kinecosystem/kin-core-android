@@ -47,7 +47,7 @@ public class BaseTest {
             ex.printStackTrace();
         }
         config = new Gson().fromJson(json, Config.class);
-        // Set environment var of token contract address, to be used in EthClientWrapper;
+        // Set environment var of token contract address, to be used in ClientWrapper;
         System.setProperty("TOKEN_CONTRACT_ADDRESS", config.getContractAddress());
     }
 
