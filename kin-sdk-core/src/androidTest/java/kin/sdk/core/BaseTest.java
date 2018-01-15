@@ -17,7 +17,8 @@ public class BaseTest {
      * The Computer localhost on Android Studio emulator is 10.0.2.2
      * The Computer localhost on Genymotion emulator is 10.0.3.2
      */
-    private final String TESTRPC_PROVIDER_URL = "http://10.0.2.2:8545";
+    private static final String TESTRPC_PROVIDER_URL = "http://10.0.2.2:8545";
+    private static final int TESTRPC_NETWORK_ID = 9 ; //truffle network id
 
     private Context context;
     private ServiceProvider serviceProvider;
@@ -27,7 +28,7 @@ public class BaseTest {
     @Before
     public void setUp() throws Exception {
         context = InstrumentationRegistry.getContext();
-        serviceProvider = new ServiceProvider(TESTRPC_PROVIDER_URL, ServiceProvider.NETWORK_ID_TRUFFLE);
+        serviceProvider = new ServiceProvider(TESTRPC_PROVIDER_URL, TESTRPC_NETWORK_ID);
         getConfigFile();
         clearKeyStore();
         kinClient = new KinClient(context, serviceProvider);

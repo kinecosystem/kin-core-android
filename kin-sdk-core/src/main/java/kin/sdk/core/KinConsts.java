@@ -1,41 +1,38 @@
 package kin.sdk.core;
 
 
-final class KinConsts {
+import org.stellar.sdk.KeyPair;
 
-    public static final String ACCOUNT_SEED = "account_seed";
-    public static final String ISSUER_SEED = "issuer_seed";
+final class KinConsts {
 
     private KinConsts() {
     }
 
-    static String getNetworkUrl(ServiceProvider provider) {
-        return NetworkConstants.fromProvider(provider).networkUrl;
+    static final String KIN_ASSET_CODE = "KIN";
+
+    static KeyPair getKinIssuer(ServiceProvider provider) {
+        return NetworkConstants.fromProvider(provider).issuer;
     }
 
     /* #enumsmatter */
-    enum NetworkConstants {
-        NETWORK_MAIN(ServiceProvider.NETWORK_ID_MAIN, "https://horizon.stellar.org"),
-        NETWORK_TEST(ServiceProvider.NETWORK_ID_TEST,  "https://horizon-testnet.stellar.org");
+    private enum NetworkConstants {
+        NETWORK_MAIN(ServiceProvider.NETWORK_ID_MAIN, "GBGFNADX2FTYVCLDCVFY5ZRTVEMS4LV6HKMWOY7XJKVXMBIWVDESCJW5"),
+        NETWORK_TEST(ServiceProvider.NETWORK_ID_TEST, "GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM");
 
-        int networkId;
-        String networkUrl;
+        final int networkId;
+        final KeyPair issuer;
 
-        NetworkConstants(int id, String address){
+        NetworkConstants(int id, String issuerAccountId) {
             networkId = id;
-            networkUrl = address;
+            this.issuer = KeyPair.fromAccountId(issuerAccountId);
         }
 
-        // This is used only for testing
-        NetworkConstants(int id){
-            this(id, System.getProperty("TOKEN_CONTRACT_ADDRESS"));
-        }
-
-        static NetworkConstants fromProvider(ServiceProvider provider){
+        static NetworkConstants fromProvider(ServiceProvider provider) {
             switch (provider.getNetworkId()) {
-                case (ServiceProvider.NETWORK_ID_MAIN) :
+                case (ServiceProvider.NETWORK_ID_MAIN):
                     return NETWORK_MAIN;
-                default: return NETWORK_TEST;
+                default:
+                    return NETWORK_TEST;
             }
         }
     }

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import kin.sdk.core.KinClient;
 
 /**
- * User is given a choice to create or use an account on the MAIN or TEST(test) ethereum networks
+ * User is given a choice to create or use an account on the MAIN or TEST(test) networks
  */
 public class ChooseNetworkActivity extends BaseActivity {
 

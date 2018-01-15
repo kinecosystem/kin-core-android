@@ -12,8 +12,8 @@ public class ServiceProvider {
      */
     public static final int NETWORK_ID_TEST = 2;
 
-    private String providerUrl;
-    private int networkId;
+    private final String providerUrl;
+    private final int networkId;
 
     /**
      * A ServiceProvider used to connect to an horizon network.

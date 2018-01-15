@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import kin.sdk.core.Balance;
 import kin.sdk.core.KinAccount;
 import kin.sdk.core.exception.DeleteAccountException;
@@ -100,23 +104,22 @@ public class WalletActivity extends BaseActivity {
 
     private void getKin() {
         final KinAccount account = getKinClient().getAccount();
-        getKinClient().getKin();
-//        if (account != null) {
-//            final String publicAddress = account.getPublicAddress();
-//            final String url = URL_GET_KIN + publicAddress;
-//            final RequestQueue queue = Volley.newRequestQueue(this);
-//            final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                response -> {
-//                    updatePendingBalance();
-//                    getKinBtn.setClickable(true);
-//                },
-//                e -> {
-//                    KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
-//                    getKinBtn.setClickable(true);
-//                });
-//            stringRequest.setShouldCache(false);
-//            queue.add(stringRequest);
-//        }
+        if (account != null) {
+            final String publicAddress = account.getPublicAddress();
+            final String url = URL_GET_KIN + publicAddress;
+            final RequestQueue queue = Volley.newRequestQueue(this);
+            final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    updatePendingBalance();
+                    getKinBtn.setClickable(true);
+                },
+                e -> {
+                    KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
+                    getKinBtn.setClickable(true);
+                });
+            stringRequest.setShouldCache(false);
+            queue.add(stringRequest);
+        }
     }
 
     private void updatePublicKey() {
