@@ -5,11 +5,9 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.EthereumClientException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
-import org.ethereum.geth.Account;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
@@ -65,7 +63,7 @@ final class ClientWrapper {
         return new KeyStore(context);
     }
 
-    public String getKeyStorePath() {
+    private String getKeyStorePath() {
         return new StringBuilder(context.getFilesDir().getAbsolutePath())
             .append(File.separator)
             .append("kin")
@@ -76,7 +74,7 @@ final class ClientWrapper {
             .toString();
     }
 
-    public void wipeoutAccount() throws EthereumClientException {
+    void wipeoutAccount() throws EthereumClientException {
         File keystoreDir = new File(getKeyStorePath());
         if (keystoreDir.exists()) {
             deleteRecursive(keystoreDir);
@@ -93,7 +91,7 @@ final class ClientWrapper {
     /**
      * Transfer amount of kinIssuer from account to the specified public address.
      *
-     * @param from the sender {@link Account}
+     * @param from the sender {@link EncryptedAccount}
      * @param publicAddress the address to send the kinIssuer to
      * @param amount the amount of kinIssuer to send
      * @return {@link TransactionId} of the transaction
@@ -116,7 +114,7 @@ final class ClientWrapper {
     }
 
     private void checkAddressNotEmpty(@NonNull String publicAddress) throws OperationFailedException {
-        if (publicAddress == null || publicAddress.isEmpty()) {
+        if (publicAddress.isEmpty()) {
             throw new OperationFailedException("Addressee not valid - public address can't be null or empty");
         }
     }
@@ -138,7 +136,7 @@ final class ClientWrapper {
     }
 
     private void verifyPayToAddress(KeyPair addressee) throws OperationFailedException {
-        AccountResponse addresseeAccount = null;
+        AccountResponse addresseeAccount;
         try {
             addresseeAccount = server.accounts().account(addressee);
         } catch (IOException e) {
@@ -198,6 +196,7 @@ final class ClientWrapper {
             for (AccountResponse.Balance assetBalance : accountResponse.getBalances()) {
                 if (KinConsts.KIN_ASSET_CODE.equals(assetBalance.getAssetCode())) {
                     balance = new BalanceImpl(new BigDecimal(assetBalance.getBalance()));
+                    break;
                 }
             }
         } catch (IOException e) {
