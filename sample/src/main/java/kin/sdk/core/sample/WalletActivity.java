@@ -1,6 +1,5 @@
 package kin.sdk.core.sample;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -131,7 +130,6 @@ public class WalletActivity extends BaseActivity {
         publicKey.setText(publicKeyStr);
     }
 
-    @SuppressLint("SetTextI18n")
     private void updateBalance() {
         balanceProgress.setVisibility(View.VISIBLE);
         KinAccount account = getKinClient().getAccount();
@@ -140,7 +138,7 @@ public class WalletActivity extends BaseActivity {
             balanceRequest.run(new DisplayCallback<Balance>(balanceProgress, balance) {
                 @Override
                 public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value().toString());
+                    ((TextView) view).setText(result.value().toPlainString());
                 }
             });
         } else {
@@ -148,7 +146,6 @@ public class WalletActivity extends BaseActivity {
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private void updatePendingBalance() {
         pendingBalanceProgress.setVisibility(View.VISIBLE);
         KinAccount account = getKinClient().getAccount();
@@ -157,7 +154,7 @@ public class WalletActivity extends BaseActivity {
             pendingBalanceRequest.run(new DisplayCallback<Balance>(pendingBalanceProgress, pendingBalance) {
                 @Override
                 public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value().toString());
+                    ((TextView) view).setText(result.value().toPlainString());
                 }
             });
         } else {
