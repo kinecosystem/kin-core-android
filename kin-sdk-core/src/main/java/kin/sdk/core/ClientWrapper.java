@@ -86,7 +86,7 @@ final class ClientWrapper {
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull EncryptedAccount from, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
         @NonNull BigDecimal amount) throws OperationFailedException, PassphraseException {
         return transactionSender.sendTransaction(from, publicAddress, amount);
     }
@@ -98,7 +98,7 @@ final class ClientWrapper {
      * @return the account {@link Balance}
      * @throws OperationFailedException if could not retrieve balance
      */
-    Balance getBalance(EncryptedAccount account) throws OperationFailedException {
+    Balance getBalance(Account account) throws OperationFailedException {
         Balance balance = null;
         try {
             AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));

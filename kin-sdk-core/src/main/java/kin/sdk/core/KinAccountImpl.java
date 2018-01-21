@@ -11,7 +11,7 @@ import org.stellar.sdk.KeyPair;
 final class KinAccountImpl extends AbstractKinAccount {
 
     private final ClientWrapper clientWrapper;
-    private final EncryptedAccount account;
+    private final Account account;
     private boolean isDeleted = false;
 
     /**
@@ -33,7 +33,7 @@ final class KinAccountImpl extends AbstractKinAccount {
      * @param clientWrapper that will be use to call to Kin smart-contract.
      * @param account the existing Account.
      */
-    KinAccountImpl(ClientWrapper clientWrapper, EncryptedAccount account) {
+    KinAccountImpl(ClientWrapper clientWrapper, Account account) {
         this.account = account;
         this.clientWrapper = clientWrapper;
     }
@@ -88,7 +88,4 @@ final class KinAccountImpl extends AbstractKinAccount {
         }
     }
 
-    EncryptedAccount encryptedAccount() {
-        return account;
-    }
 }

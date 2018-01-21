@@ -25,18 +25,18 @@ class KeyStore {
             .apply();
     }
 
-    void deleteAccount(EncryptedAccount keyPair, String passphrase) {
+    void deleteAccount(Account keyPair, String passphrase) {
         sharedPref.edit()
             .remove(PREF_KEY_SECRET_SEED)
             .apply();
     }
 
     @NonNull
-    List<EncryptedAccount> loadAccounts() {
+    List<Account> loadAccounts() {
         KeyPair keyPair = loadKeyPair();
         if (keyPair != null) {
             return Collections.singletonList(
-                new EncryptedAccount(String.valueOf(keyPair.getSecretSeed()), keyPair.getAccountId())
+                new Account(String.valueOf(keyPair.getSecretSeed()), keyPair.getAccountId())
             );
         }
         return Collections.emptyList();
@@ -52,18 +52,18 @@ class KeyStore {
     }
 
 
-    EncryptedAccount newAccount(String passphrase) {
+    Account newAccount(String passphrase) {
         KeyPair newAccount = KeyPair.random();
         addKeyPair(newAccount, passphrase);
-        return new EncryptedAccount(String.valueOf(newAccount.getSecretSeed()), newAccount.getAccountId());
+        return new Account(String.valueOf(newAccount.getSecretSeed()), newAccount.getAccountId());
     }
 
     @Nullable
-    String exportAccount(@NonNull EncryptedAccount account, @NonNull String passphrase) {
+    String exportAccount(@NonNull Account account, @NonNull String passphrase) {
         return account.getEncryptedData();
     }
 
-    KeyPair decryptAccount(EncryptedAccount account) {
+    KeyPair decryptAccount(Account account) {
         return KeyPair.fromSecretSeed(account.getEncryptedData());
     }
 }

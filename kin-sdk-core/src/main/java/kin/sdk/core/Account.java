@@ -1,12 +1,12 @@
 package kin.sdk.core;
 
 
-class EncryptedAccount {
+class Account {
 
     private final String encryptedData;
     private final String accountId;
 
-    EncryptedAccount(String encryptedSeed, String accountId) {
+    Account(String encryptedSeed, String accountId) {
         this.encryptedData = encryptedSeed;
         this.accountId = accountId;
     }

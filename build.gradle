@@ -23,9 +23,6 @@ allprojects {
         flatDir {
             dirs project(projectName).file('libs')
         }
-        maven {
-            url "https://dl.bintray.com/kinfoundation/go-ethereum"
-        }
         maven { url 'https://jitpack.io' }
     }
 }

@@ -1,12 +1,11 @@
 package kin.sdk.core;
 
 import android.content.Context;
-
 import java.util.List;
-import kin.sdk.core.exception.OperationFailedException;
-import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.CreateAccountException;
+import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.EthereumClientException;
+import kin.sdk.core.exception.OperationFailedException;
 
 public class KinClient {
 
@@ -58,9 +57,9 @@ public class KinClient {
         if (kinAccount != null) {
             return kinAccount;
         } else {
-            List<EncryptedAccount> encryptedAccounts = clientWrapper.getKeyStore().loadAccounts();
-            if (!encryptedAccounts.isEmpty()) {
-                kinAccount = new KinAccountImpl(clientWrapper, encryptedAccounts.get(0));
+            List<Account> accounts = clientWrapper.getKeyStore().loadAccounts();
+            if (!accounts.isEmpty()) {
+                kinAccount = new KinAccountImpl(clientWrapper, accounts.get(0));
             }
             return kinAccount;
         }
@@ -82,7 +81,7 @@ public class KinClient {
     public void deleteAccount(String passphrase) throws DeleteAccountException {
         KinAccountImpl account = (KinAccountImpl) getAccount();
         if (account != null) {
-            clientWrapper.getKeyStore().deleteAccount(account.encryptedAccount(), passphrase);
+            account.delete(passphrase);
             kinAccount = null;
         }
     }

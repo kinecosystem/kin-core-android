@@ -31,7 +31,7 @@ class TransactionSender {
     /**
      * Transfer amount of kinIssuer from account to the specified public address.
      *
-     * @param from the sender {@link EncryptedAccount}
+     * @param from the sender {@link Account}
      * @param publicAddress the address to send the kinIssuer to
      * @param amount the amount of kinIssuer to send
      * @return {@link TransactionId} of the transaction
@@ -39,7 +39,7 @@ class TransactionSender {
      * @throws OperationFailedException another error occurred
      */
     @NonNull
-    TransactionId sendTransaction(@NonNull EncryptedAccount from, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
         throws OperationFailedException, PassphraseException {
 
