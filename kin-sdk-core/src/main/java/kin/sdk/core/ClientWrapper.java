@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import kin.sdk.core.exception.EthereumClientException;
+import kin.sdk.core.exception.AccountNotFoundException;
+import kin.sdk.core.exception.ClientException;
+import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import org.stellar.sdk.Asset;
@@ -13,6 +15,7 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.responses.AccountResponse;
+import org.stellar.sdk.responses.HttpResponseException;
 
 
 /**
@@ -29,7 +32,7 @@ final class ClientWrapper {
     private final TransactionSender transactionSender;
 
     ClientWrapper(Context context, ServiceProvider serviceProvider)
-        throws EthereumClientException {
+        throws ClientException {
         this.serviceProvider = serviceProvider;
         this.context = context.getApplicationContext();
         server = initServer();
@@ -54,9 +57,9 @@ final class ClientWrapper {
      * The keystore path is unique to each network id,
      * for example Ropsten network will be: ../data/kin/keystore/3/
      *
-     * @throws EthereumClientException if could not create directory to save the keystore.
+     * @throws ClientException if could not create directory to save the keystore.
      */
-    private KeyStore initKeyStore() throws EthereumClientException {
+    private KeyStore initKeyStore() throws ClientException {
         return new KeyStore(context);
     }
 
@@ -71,7 +74,7 @@ final class ClientWrapper {
             .toString();
     }
 
-    void wipeoutAccount() throws EthereumClientException {
+    void wipeoutAccount() throws ClientException {
         File keystoreDir = new File(getKeyStorePath());
         if (keystoreDir.exists()) {
             deleteRecursive(keystoreDir);
@@ -108,11 +111,17 @@ final class ClientWrapper {
                     break;
                 }
             }
+        } catch (HttpResponseException httpError) {
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(account.getAccountId());
+            } else {
+                throw new OperationFailedException(httpError);
+            }
         } catch (IOException e) {
-            throw new OperationFailedException("Could not retrieve balance");
+            throw new OperationFailedException(e);
         }
         if (balance == null) {
-            throw new OperationFailedException("Kin asset not found");
+            throw new NoKinTrustException(account.getAccountId());
         }
 
         return balance;

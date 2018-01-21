@@ -4,15 +4,21 @@ package kin.sdk.core;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import kin.sdk.core.exception.AccountNotFoundException;
+import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
+import kin.sdk.core.exception.TransactionFailedException;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
 import org.stellar.sdk.responses.AccountResponse;
+import org.stellar.sdk.responses.HttpResponseException;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
+import org.stellar.sdk.responses.SubmitTransactionResponse.Extras.ResultCodes;
 
 class TransactionSender {
 
@@ -49,6 +55,7 @@ class TransactionSender {
         verifyPayToAddress(addressee);
         KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
+        checkKinTrust(sourceAccount);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount);
         return sendTransaction(transaction);
     }
@@ -68,6 +75,7 @@ class TransactionSender {
     @NonNull
     private Transaction buildTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
         AccountResponse sourceAccount) {
+
         Transaction transaction = new Transaction.Builder(sourceAccount)
             .addOperation(new PaymentOperation.Builder(addressee, kinAsset, amount.toString()).build())
             .build();
@@ -79,13 +87,23 @@ class TransactionSender {
         AccountResponse addresseeAccount;
         try {
             addresseeAccount = server.accounts().account(addressee);
+
+        } catch (HttpResponseException httpError) {
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(addressee.getAccountId());
+            } else {
+                throw new OperationFailedException(httpError);
+            }
         } catch (IOException e) {
-            throw new OperationFailedException("Addressee not found");
+            throw new OperationFailedException(e);
         }
 
-        // Second, check the addressee has trustline with kinIssuer.
-        if (checkKinTrust(addresseeAccount)) {
-            throw new OperationFailedException("Addressee don't have Kin asset trust");
+        checkKinTrust(addresseeAccount);
+    }
+
+    private void checkKinTrust(AccountResponse accountResponse) throws NoKinTrustException {
+        if (!doesHasKinBalance(accountResponse)) {
+            throw new NoKinTrustException(accountResponse.getKeypair().getAccountId());
         }
     }
 
@@ -93,23 +111,19 @@ class TransactionSender {
         AccountResponse sourceAccount;
         try {
             sourceAccount = server.accounts().account(from);
+        } catch (HttpResponseException httpError) {
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(from.getAccountId());
+            } else {
+                throw new OperationFailedException(httpError);
+            }
         } catch (IOException e) {
-            throw new OperationFailedException(e.getMessage());
+            throw new OperationFailedException(e);
         }
         return sourceAccount;
     }
 
-    @NonNull
-    private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
-        try {
-            SubmitTransactionResponse response = server.submitTransaction(transaction);
-            return new TransactionIdImpl(response.getHash());
-        } catch (Exception e) {
-            throw new OperationFailedException(e.getMessage());
-        }
-    }
-
-    private boolean checkKinTrust(AccountResponse addresseeAccount) {
+    private boolean doesHasKinBalance(AccountResponse addresseeAccount) {
         AccountResponse.Balance balances[] = addresseeAccount.getBalances();
         boolean hasTrust = false;
         for (AccountResponse.Balance balance : balances) {
@@ -120,5 +134,26 @@ class TransactionSender {
             }
         }
         return hasTrust;
+    }
+
+    @NonNull
+    private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
+        try {
+            SubmitTransactionResponse response = server.submitTransaction(transaction);
+            if (response.isSuccess()) {
+                return new TransactionIdImpl(response.getHash());
+            } else {
+                ArrayList<String> operationsResultCodes = null;
+                String transactionResultCode = null;
+                if (response.getExtras() != null && response.getExtras().getResultCodes() != null) {
+                    ResultCodes resultCodes = response.getExtras().getResultCodes();
+                    operationsResultCodes = resultCodes.getOperationsResultCodes();
+                    transactionResultCode = resultCodes.getTransactionResultCode();
+                }
+                throw new TransactionFailedException(transactionResultCode, operationsResultCodes);
+            }
+        } catch (IOException e) {
+            throw new OperationFailedException(e);
+        }
     }
 }

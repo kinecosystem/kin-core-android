@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import kin.sdk.core.exception.EthereumClientException;
+import kin.sdk.core.exception.ClientException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,7 +26,7 @@ public class KinClientTest extends BaseTest {
 
     @Test
     public void testWrongServiceProvider() throws Exception {
-        expectedEx.expect(EthereumClientException.class);
+        expectedEx.expect(ClientException.class);
         expectedEx.expectMessage("provider - could not establish connection to the provider");
         Context context = InstrumentationRegistry.getContext();
         ServiceProvider wrongProvider = new ServiceProvider("wrongProvider", 12);
