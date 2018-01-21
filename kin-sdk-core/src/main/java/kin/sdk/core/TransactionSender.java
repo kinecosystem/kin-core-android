@@ -32,14 +32,14 @@ class TransactionSender {
      * Transfer amount of kinIssuer from account to the specified public address.
      *
      * @param from the sender {@link Account}
-     * @param publicAddress the address to send the kinIssuer to
-     * @param amount the amount of kinIssuer to send
-     * @return {@link TransactionId} of the transaction
+     * @param passphrase
+     *@param publicAddress the address to send the kinIssuer to
+     * @param amount the amount of kinIssuer to send   @return {@link TransactionId} of the transaction
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws OperationFailedException another error occurred
      */
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, String passphrase, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
         throws OperationFailedException, PassphraseException {
 
@@ -47,7 +47,7 @@ class TransactionSender {
         checkForNegativeAMount(amount);
         KeyPair addressee = KeyPair.fromAccountId(publicAddress);
         verifyPayToAddress(addressee);
-        KeyPair secretSeedKeyPair = keyStore.decryptAccount(from);
+        KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount);
         return sendTransaction(transaction);

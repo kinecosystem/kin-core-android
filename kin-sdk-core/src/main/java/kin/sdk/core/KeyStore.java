@@ -63,7 +63,7 @@ class KeyStore {
         return account.getEncryptedData();
     }
 
-    KeyPair decryptAccount(Account account) {
+    KeyPair decryptAccount(Account account, String passphrase) {
         return KeyPair.fromSecretSeed(account.getEncryptedData());
     }
 }

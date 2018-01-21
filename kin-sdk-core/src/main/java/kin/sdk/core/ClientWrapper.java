@@ -86,9 +86,9 @@ final class ClientWrapper {
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, String passphrase, @NonNull String publicAddress,
         @NonNull BigDecimal amount) throws OperationFailedException, PassphraseException {
-        return transactionSender.sendTransaction(from, publicAddress, amount);
+        return transactionSender.sendTransaction(from, passphrase, publicAddress, amount);
     }
 
     /**
