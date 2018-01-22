@@ -1,0 +1,82 @@
+apply plugin: 'com.android.library'
+
+// maven plugin and group definition
+// needed for jitpack support
+apply plugin: 'maven'
+group = 'com.github.kinfoundation'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation ('kinfoundation.ethereum:geth:1.0.2@aar')
+
+    implementation supportDependencies.appCompat
+
+    testImplementation testingDependencies.junit
+
+    androidTestImplementation testingDependencies.mockitoAndroid
+    androidTestImplementation testingDependencies.junitParams
+    androidTestImplementation testingDependencies.gson
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+}
+
+task prepareRPC {
+    doFirst {
+        def testRpcOutput = new ByteArrayOutputStream()
+        exec {
+            workingDir '../'
+            commandLine 'make', 'prepare-tests'
+            standardOutput = testRpcOutput
+        }
+        testRpcOutput = testRpcOutput.toString().trim()
+        printf("\n****** Prepare RPC ******\n" + testRpcOutput)
+    }
+}
+
+task cleanRPC {
+    doLast {
+        def cleanRpcOutput = new ByteArrayOutputStream()
+        exec {
+            workingDir '../'
+            commandLine 'make', 'testrpc-kill'
+            standardOutput = cleanRpcOutput
+        }
+        cleanRpcOutput = cleanRpcOutput.toString().trim()
+        printf("\n****** Clean RPC ******\n" + cleanRpcOutput)
+    }
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn prepareRPC
+    connectedDebugAndroidTest.finalizedBy cleanRPC
+}
+
+
+

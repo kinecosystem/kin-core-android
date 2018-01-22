@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/grey</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="kinRed">#FF3636</color>
+    <color name="kinRedSelected">#B03535</color>
+    <color name="kinBlue">#26BEFF</color>
+    <color name="kinBlueSelected">#1392C9</color>
+    <color name="kinOrange">#FF8A00</color>
+    <color name="kinOrangeSelected">#D07100</color>
+    <color name="grey">#696969</color>
+    <color name="white">#fff</color>
+    <color name="disable">#D1D1D1</color>
+</resources>

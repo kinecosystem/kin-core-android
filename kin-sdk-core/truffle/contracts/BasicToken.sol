@@ -1,0 +1,1 @@
+../kin-token/contracts/BasicToken.sol

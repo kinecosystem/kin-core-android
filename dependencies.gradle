@@ -1,0 +1,31 @@
+ext {
+
+    //Version
+    supportVersion = '26.+'
+    junitVersion = '4.12'
+    mockitoVersion = '2.10.0'
+    jUnitParamsVersion = '1.1.1'
+    gsonVersion = '2.8.2'
+
+    //Packages
+    supportPackage = 'com.android.support'
+    mockitoPackage = 'org.mockito'
+    junitPackage = 'junit'
+    jUnitParamsPackage = 'pl.pragmatists'
+    gsonPackage = 'com.google.code.gson'
+
+    supportDependencies = [
+            appCompat: buildDependency(supportPackage, 'appcompat-v7', supportVersion),
+    ]
+
+    testingDependencies = [
+            junit         : buildDependency(junitPackage, 'junit', junitVersion),
+            mockitoAndroid: buildDependency(mockitoPackage, "mockito-android", mockitoVersion),
+            junitParams   : buildDependency(jUnitParamsPackage, "JUnitParams", jUnitParamsVersion),
+            gson          : buildDependency(gsonPackage, "gson", gsonVersion),
+    ]
+}
+
+static String buildDependency(String pack, String dependency, String version) {
+    return "${pack}:${dependency}:${version}"
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_padding"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="kin.sdk.core.sample.CreateWalletActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/btn_create_wallet"
+        style="@style/KinButtonStyle.TestNet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_wallet"
+        />
+
+</LinearLayout>

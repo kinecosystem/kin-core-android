@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Kin Sample App</string>
+    <string name="kin_foundation">Kin Foundation</string>
+    <string name="test_net">Test Net</string>
+    <string name="main_net">Main Net</string>
+    <string name="reveal">Reveal</string>
+    <string name="refresh">Refresh</string>
+    <string name="public_address">Public Address:</string>
+    <string name="amount">Amount:</string>
+    <string name="copy_to_clipboard">Copy to clipboard</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="export_key_store">Export Key Store</string>
+    <string name="enter_passphrase">Enter Your Passphrase</string>
+    <string name="balance">Balance</string>
+    <string name="transaction">Transaction</string>
+    <string name="send_transaction">Send Transaction</string>
+    <string name="get_kin">Get KIN</string>
+    <string name="delete_wallet">Delete Wallet</string>
+    <string name="delete_wallet_warning">Are you sure you want to delete your wallet?\n\nDeleting without backed up will cause permanent funds lost!</string>
+    <string name="delete">Delete</string>
+    <string name="create_wallet">Create Wallet</string>
+    <string name="error_no_message">Some error occurred - no message</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+</resources>

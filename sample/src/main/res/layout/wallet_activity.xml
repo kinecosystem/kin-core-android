@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    tools:context="kin.sdk.core.sample.WalletActivity"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_padding"
+        android:orientation="vertical"
+        >
+
+
+        <TextView
+            style="@style/KinText.Title.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="getPublicAddress:"/>
+
+        <TextView
+            android:id="@+id/public_key"
+            style="@style/KinText.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sub_text_margin"
+            android:textIsSelectable="true"
+            tools:text="public key"/>
+
+        <Button
+            android:id="@+id/export_key_store_btn"
+            style="@style/KinButtonStyle.TestNet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/button_margin"
+            android:layout_gravity="right"
+            android:text="@string/export_key_store"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/delim_margin"
+            android:background="@color/grey"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            >
+
+            <Button
+                android:id="@+id/refresh_btn"
+                style="@style/KinButtonStyle.TestNet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center"
+                android:text="@string/refresh"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/KinText.Title.Bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="getBalance:"/>
+
+                    <ProgressBar
+                        android:id="@+id/balance_progress"
+                        android:layout_width="@dimen/progress_size"
+                        android:layout_height="@dimen/progress_size"
+                        android:layout_marginLeft="@dimen/progress_margin"
+                        android:layout_gravity="bottom"
+                        android:visibility="gone"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/balance"
+                    style="@style/KinText.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/sub_text_margin"
+                    android:gravity="left"
+                    tools:text="123.0"/>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/KinText.Title.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/button_margin"
+                android:gravity="center|left"
+                android:text="getPendingBalance:"/>
+
+            <ProgressBar
+                android:id="@+id/pending_balance_progress"
+                android:layout_width="@dimen/progress_size"
+                android:layout_height="@dimen/progress_size"
+                android:layout_marginLeft="@dimen/progress_margin"
+                android:layout_gravity="bottom"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/pending_balance"
+            style="@style/KinText.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sub_text_margin"
+            tools:text="555.5"/>
+
+        <View
+            android:id="@+id/spacer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="@dimen/button_margin"
+            />
+
+        <Button
+            android:id="@+id/send_transaction_btn"
+            style="@style/KinButtonStyle.TestNet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/send_transaction"/>
+
+        <Button
+            android:id="@+id/get_kin_btn"
+            style="@style/KinButtonStyle.TestNet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/button_margin"
+            android:text="@string/get_kin"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/delete_account_btn"
+            style="@style/KinButtonStyle.Red"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/button_margin"
+            android:text="@string/delete_wallet"
+            />
+
+    </LinearLayout>
+
+
+</ScrollView>

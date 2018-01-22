@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="font_small">16sp</dimen>
+    <dimen name="sub_text_margin">10dp</dimen>
+    <dimen name="progress_size">20dp</dimen>
+    <dimen name="progress_margin">10dp</dimen>
+    <dimen name="delim_margin">10dp</dimen>
+</resources>

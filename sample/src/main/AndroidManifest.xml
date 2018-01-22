@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="kin.sdk.core.sample">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:name=".KinClientSampleApplication"
+        android:roundIcon="@mipmap/ic_launcher_rounded"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".ChooseNetworkActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CreateWalletActivity"
+            android:parentActivityName=".ChooseNetworkActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".WebWrapperActivity"
+            android:parentActivityName=".ChooseNetworkActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".WalletActivity"
+            android:parentActivityName=".ChooseNetworkActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".TransactionActivity"
+            android:parentActivityName=".WalletActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
+        <activity
+            android:name=".ExportKeystoreActivity"
+            android:parentActivityName=".WalletActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing"/>
+
+    </application>
+
+</manifest>
