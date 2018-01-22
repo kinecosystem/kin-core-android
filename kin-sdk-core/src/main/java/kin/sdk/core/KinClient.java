@@ -104,13 +104,7 @@ public class KinClient {
     }
 
     KinAccount importAccount(String privateEcdsaKey, String passphrase) throws OperationFailedException {
-        KinAccount kinAccount = null;
-     /*   try {
-            KeyPair account = KeyPair.fromSecretSeed(privateEcdsaKey);
-            kinAccount = new KinAccountImpl(clientWrapper, account);
-        } catch (Exception e) {
-            return kinAccount;
-        }*/
+        //TODO
         return kinAccount;
     }
 
