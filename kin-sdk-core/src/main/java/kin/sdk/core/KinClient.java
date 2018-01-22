@@ -1,19 +1,16 @@
 package kin.sdk.core;
 
 import android.content.Context;
-
-import org.ethereum.geth.Account;
-import org.ethereum.geth.Accounts;
-
-import kin.sdk.core.exception.OperationFailedException;
-import kin.sdk.core.exception.DeleteAccountException;
+import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
+import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.EthereumClientException;
+import kin.sdk.core.exception.OperationFailedException;
 
 public class KinClient {
 
     private KinAccount kinAccount;
-    private EthClientWrapper ethClient;
+    private ClientWrapper clientWrapper;
 
     /**
      * KinClient is an account manager for a single {@link KinAccount} on
@@ -25,7 +22,7 @@ public class KinClient {
      * smart-contract problems.
      */
     public KinClient(Context context, ServiceProvider provider) throws EthereumClientException {
-        this.ethClient = new EthClientWrapper(context, provider);
+        this.clientWrapper = new ClientWrapper(context, provider);
     }
 
     /**
@@ -35,14 +32,14 @@ public class KinClient {
      * be accessed again via the {@link #getAccount()} method.
      *
      * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
-     * @return KinAccount the account created
+     * @return {@link KinAccount} the account created
      * @throws CreateAccountException if go-ethereum was unable to generate the account (unable to generate new key or
      * store the key).
      */
     public KinAccount createAccount(String passphrase) throws CreateAccountException {
         if (!hasAccount()) {
             try {
-                kinAccount = new KinAccountImpl(ethClient, passphrase);
+                kinAccount = new KinAccountImpl(clientWrapper, passphrase);
             } catch (Exception e) {
                 throw new CreateAccountException(e);
             }
@@ -60,30 +57,19 @@ public class KinClient {
         if (kinAccount != null) {
             return kinAccount;
         } else {
-            Accounts accounts = ethClient.getKeyStore().getAccounts();
-            Account account;
-            try {
-                account = accounts.get(0);
-            } catch (Exception e) {
-                //There is no account
-                return null;
+            List<Account> accounts = clientWrapper.getKeyStore().loadAccounts();
+            if (!accounts.isEmpty()) {
+                kinAccount = new KinAccountImpl(clientWrapper, accounts.get(0));
             }
-            // The Account is not null
-            kinAccount = new KinAccountImpl(ethClient, account);
+            return kinAccount;
         }
-        return kinAccount;
     }
 
     /**
      * @return true if there is an existing account
      */
     public boolean hasAccount() {
-        if (kinAccount != null) {
-            return true;
-        } else {
-            Accounts accounts = ethClient.getKeyStore().getAccounts();
-            return accounts != null && accounts.size() > 0;
-        }
+        return getAccount() != null;
     }
 
     /**
@@ -105,7 +91,7 @@ public class KinClient {
      * WARNING - if you don't export your account before deleting it, you will lose all your Kin.
      */
     public void wipeoutAccount() throws EthereumClientException {
-        ethClient.wipeoutAccount();
+        clientWrapper.wipeoutAccount();
         KinAccount account = getAccount();
         if (account != null && account instanceof KinAccountImpl) {
             ((KinAccountImpl) account).markAsDeleted();
@@ -114,15 +100,12 @@ public class KinClient {
     }
 
     public ServiceProvider getServiceProvider() {
-        return ethClient.getServiceProvider();
+        return clientWrapper.getServiceProvider();
     }
 
     KinAccount importAccount(String privateEcdsaKey, String passphrase) throws OperationFailedException {
-        Account account = ethClient.importAccount(privateEcdsaKey, passphrase);
-        KinAccount kinAccount = null;
-        if (account != null) {
-            kinAccount = new KinAccountImpl(ethClient, account);
-        }
+        //TODO
         return kinAccount;
     }
+
 }

@@ -15,7 +15,6 @@ import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Enter passphrase to generate Json content that can be used to access the current account
@@ -88,8 +87,8 @@ public class ExportKeystoreActivity extends BaseActivity {
             exportBtn.setEnabled(false);
             hideKeyboard(exportBtn);
             try {
-                String jsonFormatString = generatePrivateKeyStoreJsonFormat();
-                updateOutput(jsonFormatString);
+                String privateKeyString = generatePrivateKeyStoreString();
+                updateOutput(privateKeyString);
                 copyBtn.setEnabled(true);
             } catch (PassphraseException e) {
                 clearAll();
@@ -116,15 +115,13 @@ public class ExportKeystoreActivity extends BaseActivity {
         outputTextView.setSelectAllOnFocus(false);
     }
 
-    private String generatePrivateKeyStoreJsonFormat()
+    private String generatePrivateKeyStoreString()
         throws PassphraseException, JSONException, OperationFailedException {
         KinAccount account = getKinClient().getAccount();
         if (account == null) {
             throw new AccountDeletedException();
         }
-        String jsonString = account.exportKeyStore(getPassphrase(), passphraseInput.getText().toString());
-        JSONObject jsonObject = new JSONObject(jsonString);
-        return jsonObject.toString(1);
+        return account.exportKeyStore(getPassphrase(), passphraseInput.getText().toString());
     }
 
     private void updateOutput(String outputString) {

@@ -24,16 +24,15 @@ public class WalletActivity extends BaseActivity {
 
     public static final String TAG = WalletActivity.class.getSimpleName();
     public static final String URL_GET_KIN = "http://kin-faucet.rounds.video/send?public_address=";
-
-    public static Intent getIntent(Context context) {
-        return new Intent(context, WalletActivity.class);
-    }
-
     private TextView balance, pendingBalance, publicKey;
     private View getKinBtn;
     private View balanceProgress, pendingBalanceProgress;
     private kin.sdk.core.Request<Balance> pendingBalanceRequest;
     private kin.sdk.core.Request<Balance> balanceRequest;
+
+    public static Intent getIntent(Context context) {
+        return new Intent(context, WalletActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +138,7 @@ public class WalletActivity extends BaseActivity {
             balanceRequest.run(new DisplayCallback<Balance>(balanceProgress, balance) {
                 @Override
                 public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value(0));
+                    ((TextView) view).setText(result.value().toPlainString());
                 }
             });
         } else {
@@ -155,7 +154,7 @@ public class WalletActivity extends BaseActivity {
             pendingBalanceRequest.run(new DisplayCallback<Balance>(pendingBalanceProgress, pendingBalance) {
                 @Override
                 public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value(0));
+                    ((TextView) view).setText(result.value().toPlainString());
                 }
             });
         } else {

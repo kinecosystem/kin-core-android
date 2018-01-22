@@ -88,7 +88,7 @@
                 <TextView
                     android:id="@+id/balance"
                     style="@style/KinText.Title"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/sub_text_margin"
                     android:gravity="left"
