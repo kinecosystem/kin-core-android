@@ -1,6 +1,8 @@
 package kin.sdk.core;
 
 import java.math.BigDecimal;
+import kin.sdk.core.exception.AccountNotFoundException;
+import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 
@@ -23,7 +25,7 @@ public interface KinAccount {
 
     /**
      * Create {@link Request} for signing and sending a transaction of the given amount in kin to the specified public
-     * address Ethereum gas will be handled internally.
+     * address
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
@@ -33,13 +35,15 @@ public interface KinAccount {
 
     /**
      * Create, sign and send a transaction of the given amount in kin to the specified public address
-     * Ethereum gas will be handled internally.
-     * The method will accesses a blockchain
-     * node on the network and should not be called on the android main thread.
+     * The method will accesses a horizon server on the network and should not be called on the android main thread.
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
      * @return TransactionId the transaction identifier
+     * @throws PassphraseException if the transaction could not be signed with the passphrase specified
+     * @throws AccountNotFoundException if the sender or destination account not created yet
+     * @throws NoKinTrustException if the sender or destination account has no Kin trust
+     * @throws OperationFailedException other error occurred
      */
     TransactionId sendTransactionSync(String publicAddress, String passphrase, BigDecimal amount)
         throws OperationFailedException, PassphraseException;
@@ -53,10 +57,12 @@ public interface KinAccount {
 
     /**
      * Get the current confirmed balance in kin
-     * The method will accesses a blockchain
-     * node on the network and should not be called on the android main thread.
+     * The method will accesses a horizon node on the network and should not be called on the android main thread.
      *
      * @return Balance the balance in kin
+     * @throws AccountNotFoundException if account not created yet
+     * @throws NoKinTrustException if account has no Kin trust
+     * @throws OperationFailedException any other error
      */
     Balance getBalanceSync() throws OperationFailedException;
 

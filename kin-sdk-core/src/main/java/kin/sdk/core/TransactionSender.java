@@ -33,13 +33,15 @@ class TransactionSender {
     }
 
     /**
-     * Transfer amount of kinIssuer from account to the specified public address.
+     * Transfer amount of kin from account to the specified public address.
      *
      * @param from the sender {@link Account}
      * @param publicAddress the address to send the kinIssuer to
      * @param amount the amount of kinIssuer to send   @return {@link TransactionId} of the transaction
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
-     * @throws OperationFailedException another error occurred
+     * @throws AccountNotFoundException if the sender or destination account not created yet
+     * @throws NoKinTrustException if the sender or destination account has no Kin trust
+     * @throws OperationFailedException other error occurred
      */
     @NonNull
     TransactionId sendTransaction(@NonNull Account from, String passphrase, @NonNull String publicAddress,
@@ -47,8 +49,8 @@ class TransactionSender {
         throws OperationFailedException, PassphraseException {
 
         checkAddressNotEmpty(publicAddress);
-        checkForNegativeAMount(amount);
-        KeyPair addressee = KeyPair.fromAccountId(publicAddress);
+        checkForNegativeAmount(amount);
+        KeyPair addressee = validateAndGetAddresseeKeyPair(publicAddress);
         verifyPayToAddress(addressee);
         KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
@@ -63,9 +65,18 @@ class TransactionSender {
         }
     }
 
-    private void checkForNegativeAMount(@NonNull BigDecimal amount) throws OperationFailedException {
+    private void checkForNegativeAmount(@NonNull BigDecimal amount) throws OperationFailedException {
         if (amount.signum() == -1) {
             throw new OperationFailedException("Amount can't be negative");
+        }
+    }
+
+    @NonNull
+    private KeyPair validateAndGetAddresseeKeyPair(@NonNull String publicAddress) throws OperationFailedException {
+        try {
+            return KeyPair.fromAccountId(publicAddress);
+        } catch (Exception e) {
+            throw new OperationFailedException("Invalid addressee public address format");
         }
     }
 

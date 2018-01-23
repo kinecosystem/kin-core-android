@@ -71,7 +71,9 @@ final class ClientWrapper {
      *
      * @param account the {@link KeyPair} to check balance
      * @return the account {@link Balance}
-     * @throws OperationFailedException if could not retrieve balance
+     * @throws AccountNotFoundException if account not created yet
+     * @throws NoKinTrustException if account has no Kin trust
+     * @throws OperationFailedException any other error
      */
     Balance getBalance(Account account) throws OperationFailedException {
         Balance balance = null;
