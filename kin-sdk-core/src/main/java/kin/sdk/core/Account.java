@@ -3,18 +3,24 @@ package kin.sdk.core;
 
 class Account {
 
-    private final String encryptedData;
+    private final String encryptedSeed;
     private final String accountId;
 
     Account(String encryptedSeed, String accountId) {
-        this.encryptedData = encryptedSeed;
+        this.encryptedSeed = encryptedSeed;
         this.accountId = accountId;
     }
 
-    String getEncryptedData() {
-        return encryptedData;
+    /**
+     * Save secrete seed encrypted, decrypt it on demand only using the KeyStore
+     */
+    String getEncryptedSeed() {
+        return encryptedSeed;
     }
 
+    /**
+     * return account id (public key)
+     */
     String getAccountId() {
         return accountId;
     }

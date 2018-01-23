@@ -60,10 +60,10 @@ class KeyStore {
 
     @Nullable
     String exportAccount(@NonNull Account account, @NonNull String passphrase) {
-        return account.getEncryptedData();
+        return account.getEncryptedSeed();
     }
 
     KeyPair decryptAccount(Account account, String passphrase) {
-        return KeyPair.fromSecretSeed(account.getEncryptedData());
+        return KeyPair.fromSecretSeed(account.getEncryptedSeed());
     }
 }

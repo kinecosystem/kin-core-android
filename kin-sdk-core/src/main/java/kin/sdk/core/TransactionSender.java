@@ -5,12 +5,12 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import kin.sdk.core.exception.TransactionFailedException;
-import org.stellar.sdk.Asset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
@@ -24,13 +24,11 @@ class TransactionSender {
 
     private final Server server;
     private final KeyStore keyStore;
-    private final KeyPair issuer;
-    private final Asset kinAsset;
+    private final KinAsset kinAsset;
 
-    TransactionSender(Server server, KeyStore keyStore, KeyPair issuer, Asset kinAsset) {
+    TransactionSender(Server server, KeyStore keyStore, KinAsset kinAsset) {
         this.server = server;
         this.keyStore = keyStore;
-        this.issuer = issuer;
         this.kinAsset = kinAsset;
     }
 
@@ -38,8 +36,7 @@ class TransactionSender {
      * Transfer amount of kinIssuer from account to the specified public address.
      *
      * @param from the sender {@link Account}
-     * @param passphrase
-     *@param publicAddress the address to send the kinIssuer to
+     * @param publicAddress the address to send the kinIssuer to
      * @param amount the amount of kinIssuer to send   @return {@link TransactionId} of the transaction
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws OperationFailedException another error occurred
@@ -77,7 +74,8 @@ class TransactionSender {
         AccountResponse sourceAccount) {
 
         Transaction transaction = new Transaction.Builder(sourceAccount)
-            .addOperation(new PaymentOperation.Builder(addressee, kinAsset, amount.toString()).build())
+            .addOperation(
+                new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build())
             .build();
         transaction.sign(from);
         return transaction;
@@ -127,9 +125,7 @@ class TransactionSender {
         AccountResponse.Balance balances[] = addresseeAccount.getBalances();
         boolean hasTrust = false;
         for (AccountResponse.Balance balance : balances) {
-            if (KinConsts.KIN_ASSET_CODE.equals(balance.getAssetCode()) &&
-                balance.getAssetIssuer() != null &&
-                issuer.getAccountId().equals(balance.getAssetIssuer().getAccountId())) {
+            if (kinAsset.isKinBalance(balance)) {
                 hasTrust = true;
             }
         }
