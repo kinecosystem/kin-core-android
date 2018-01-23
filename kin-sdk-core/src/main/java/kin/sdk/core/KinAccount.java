@@ -5,6 +5,7 @@ import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
+import kin.sdk.core.exception.TransactionFailedException;
 
 public interface KinAccount {
 
@@ -43,6 +44,7 @@ public interface KinAccount {
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws AccountNotFoundException if the sender or destination account not created yet
      * @throws NoKinTrustException if the sender or destination account has no Kin trust
+     * @throws TransactionFailedException if stellar transaction failed, contains stellar horizon error codes
      * @throws OperationFailedException other error occurred
      */
     TransactionId sendTransactionSync(String publicAddress, String passphrase, BigDecimal amount)
