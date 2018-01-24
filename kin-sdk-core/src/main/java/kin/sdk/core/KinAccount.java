@@ -27,6 +27,7 @@ public interface KinAccount {
     /**
      * Create {@link Request} for signing and sending a transaction of the given amount in kin to the specified public
      * address
+     * <p> See {@link KinAccount#sendTransactionSync(String, String, BigDecimal)} for possibles errors</p>
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
@@ -52,6 +53,7 @@ public interface KinAccount {
 
     /**
      * Create {@link Request} for getting the current confirmed balance in kin
+     * <p> See {@link KinAccount#getBalanceSync()} for possibles errors</p>
      *
      * @return {@code Request<Balance>} Balance - the balance in kin
      */

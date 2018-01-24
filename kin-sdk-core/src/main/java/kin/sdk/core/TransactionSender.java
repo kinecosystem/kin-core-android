@@ -51,11 +51,10 @@ class TransactionSender {
 
         checkAddressNotEmpty(publicAddress);
         checkForNegativeAmount(amount);
-        KeyPair addressee = validateAndGetAddresseeKeyPair(publicAddress);
-        verifyPayToAddress(addressee);
+        KeyPair addressee = generateAddresseeKeyPair(publicAddress);
+        verifyAddresseeAccount(addressee);
         KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
-        checkKinTrust(sourceAccount);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount);
         return sendTransaction(transaction);
     }
@@ -73,7 +72,7 @@ class TransactionSender {
     }
 
     @NonNull
-    private KeyPair validateAndGetAddresseeKeyPair(@NonNull String publicAddress) throws OperationFailedException {
+    private KeyPair generateAddresseeKeyPair(@NonNull String publicAddress) throws OperationFailedException {
         try {
             return KeyPair.fromAccountId(publicAddress);
         } catch (Exception e) {
@@ -93,31 +92,13 @@ class TransactionSender {
         return transaction;
     }
 
-    private void verifyPayToAddress(KeyPair addressee) throws OperationFailedException {
+    private void verifyAddresseeAccount(KeyPair addressee) throws OperationFailedException {
         AccountResponse addresseeAccount;
-        try {
-            addresseeAccount = server.accounts().account(addressee);
-
-        } catch (HttpResponseException httpError) {
-            if (httpError.getStatusCode() == 404) {
-                throw new AccountNotFoundException(addressee.getAccountId());
-            } else {
-                throw new OperationFailedException(httpError);
-            }
-        } catch (IOException e) {
-            throw new OperationFailedException(e);
-        }
-
+        addresseeAccount = loadAccount(addressee);
         checkKinTrust(addresseeAccount);
     }
 
-    private void checkKinTrust(AccountResponse accountResponse) throws NoKinTrustException {
-        if (!doesHasKinBalance(accountResponse)) {
-            throw new NoKinTrustException(accountResponse.getKeypair().getAccountId());
-        }
-    }
-
-    private AccountResponse loadSourceAccount(@NonNull KeyPair from) throws OperationFailedException {
+    private AccountResponse loadAccount(@NonNull KeyPair from) throws OperationFailedException {
         AccountResponse sourceAccount;
         try {
             sourceAccount = server.accounts().account(from);
@@ -133,7 +114,20 @@ class TransactionSender {
         return sourceAccount;
     }
 
-    private boolean doesHasKinBalance(AccountResponse addresseeAccount) {
+    private void checkKinTrust(AccountResponse accountResponse) throws NoKinTrustException {
+        if (!hasKinBalance(accountResponse)) {
+            throw new NoKinTrustException(accountResponse.getKeypair().getAccountId());
+        }
+    }
+
+    private AccountResponse loadSourceAccount(@NonNull KeyPair from) throws OperationFailedException {
+        AccountResponse sourceAccount;
+        sourceAccount = loadAccount(from);
+        checkKinTrust(sourceAccount);
+        return sourceAccount;
+    }
+
+    private boolean hasKinBalance(AccountResponse addresseeAccount) {
         AccountResponse.Balance balances[] = addresseeAccount.getBalances();
         boolean hasTrust = false;
         for (AccountResponse.Balance balance : balances) {

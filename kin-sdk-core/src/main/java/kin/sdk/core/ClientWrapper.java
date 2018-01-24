@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.ClientException;
 import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
@@ -29,8 +28,7 @@ final class ClientWrapper {
     private final Server server;
     private final TransactionSender transactionSender;
 
-    ClientWrapper(Context context, ServiceProvider serviceProvider)
-        throws ClientException {
+    ClientWrapper(Context context, ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
         this.context = context.getApplicationContext();
         server = initServer();
@@ -47,11 +45,11 @@ final class ClientWrapper {
         return new Server(serviceProvider.getProviderUrl());
     }
 
-    private KeyStore initKeyStore() throws ClientException {
+    private KeyStore initKeyStore() {
         return new KeyStore(context);
     }
 
-    void wipeoutAccount() throws ClientException {
+    void wipeoutAccount() {
         //TODO
     }
 
@@ -86,6 +84,8 @@ final class ClientWrapper {
                 }
             }
         } catch (HttpResponseException httpError) {
+            //account that is not created yet will get 404
+            //https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html#possible-errors
             if (httpError.getStatusCode() == 404) {
                 throw new AccountNotFoundException(account.getAccountId());
             } else {

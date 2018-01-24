@@ -3,7 +3,6 @@ package kin.sdk.core.sample;
 import android.app.Application;
 import kin.sdk.core.KinClient;
 import kin.sdk.core.ServiceProvider;
-import kin.sdk.core.exception.ClientException;
 
 public class KinClientSampleApplication extends Application {
 
@@ -28,12 +27,8 @@ public class KinClientSampleApplication extends Application {
                 providerUrl = TEST_NET_URL;
                 netWorkId = ServiceProvider.NETWORK_ID_TEST;
         }
-        try {
-            kinClient = new KinClient(this,
-                new ServiceProvider(providerUrl, netWorkId));
-        } catch (ClientException e) {
-            e.printStackTrace();
-        }
+        kinClient = new KinClient(this,
+            new ServiceProvider(providerUrl, netWorkId));
         return kinClient;
     }
 
