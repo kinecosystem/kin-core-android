@@ -35,6 +35,9 @@ dependencies {
     implementation supportDependencies.appCompat
 
     testImplementation testingDependencies.junit
+    testImplementation testingDependencies.mockitoAndroid
+    testImplementation testingDependencies.mockWebServer
+    testImplementation testingDependencies.robolectric
 
     androidTestImplementation testingDependencies.mockitoAndroid
     androidTestImplementation testingDependencies.androidTestRunner
