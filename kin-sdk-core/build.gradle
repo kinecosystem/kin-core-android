@@ -16,7 +16,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -32,49 +31,12 @@ android {
 }
 
 dependencies {
-    implementation'com.github.kinfoundation:android-stellar-sdk:master-SNAPSHOT'
+    implementation 'com.github.kinfoundation:android-stellar-sdk:master-SNAPSHOT'
     implementation supportDependencies.appCompat
 
     testImplementation testingDependencies.junit
 
     androidTestImplementation testingDependencies.mockitoAndroid
-    androidTestImplementation testingDependencies.junitParams
-    androidTestImplementation testingDependencies.gson
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    androidTestImplementation testingDependencies.androidTestRunner
+    androidTestImplementation testingDependencies.androidTestRules
 }
-
-task prepareRPC {
-    doFirst {
-        def testRpcOutput = new ByteArrayOutputStream()
-        exec {
-            workingDir '../'
-            commandLine 'make', 'prepare-tests'
-            standardOutput = testRpcOutput
-        }
-        testRpcOutput = testRpcOutput.toString().trim()
-        printf("\n****** Prepare RPC ******\n" + testRpcOutput)
-    }
-}
-
-task cleanRPC {
-    doLast {
-        def cleanRpcOutput = new ByteArrayOutputStream()
-        exec {
-            workingDir '../'
-            commandLine 'make', 'testrpc-kill'
-            standardOutput = cleanRpcOutput
-        }
-        cleanRpcOutput = cleanRpcOutput.toString().trim()
-        printf("\n****** Clean RPC ******\n" + cleanRpcOutput)
-    }
-}
-
-gradle.projectsEvaluated {
-    preBuild.dependsOn prepareRPC
-    connectedDebugAndroidTest.finalizedBy cleanRPC
-}
-
-
-
