@@ -69,4 +69,24 @@ public interface KinAccount {
      * @throws OperationFailedException any other error
      */
     Balance getBalanceSync() throws OperationFailedException;
+
+    /**
+     * Create {@link Request} for activating this account, should be done after account was created
+     * <p> See {@link KinAccount#activateSync(String)} for possibles errors</p>
+     *
+     * @param passphrase the passphrase used to create the account
+     * @return {@code Request<Void>}
+     */
+    Request<Void> activate(String passphrase);
+
+    /**
+     * Activate this account, should be done after account was created
+     * The method will accesses a horizon node on the network and should not be called on the android main thread.
+     *
+     * @param passphrase the passphrase used to create the account
+     * @throws AccountNotFoundException if account not created yet
+     * @throws TransactionFailedException if activation transaction failed, contains stellar horizon error codes
+     * @throws OperationFailedException any other error
+     */
+    void activateSync(String passphrase) throws OperationFailedException;
 }
