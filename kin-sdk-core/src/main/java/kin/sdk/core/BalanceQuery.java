@@ -1,6 +1,9 @@
 package kin.sdk.core;
 
 
+import static kin.sdk.core.Utils.checkNotNull;
+
+import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.ServiceProvider.KinAsset;
@@ -32,7 +35,8 @@ class BalanceQuery {
      * @throws NoKinTrustException if account has no Kin trust
      * @throws OperationFailedException any other error
      */
-    Balance getBalance(Account account) throws OperationFailedException {
+    Balance getBalance(@NonNull Account account) throws OperationFailedException {
+        checkNotNull(account, "account");
         Balance balance = null;
         try {
             AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));

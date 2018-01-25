@@ -1,7 +1,7 @@
 ext {
 
     //Version
-    supportVersion = '26.+'
+    supportVersion = '27.0.2'
     junitVersion = '4.12'
     mockitoVersion = '2.10.0'
     androidTestVersion = '1.0.1'
@@ -17,7 +17,7 @@ ext {
     robolectricPackage = 'org.robolectric'
 
     supportDependencies = [
-            appCompat: buildDependency(supportPackage, 'appcompat-v7', supportVersion),
+            supportAnnotations : buildDependency(supportPackage, 'support-annotations', supportVersion)
     ]
 
     testingDependencies = [

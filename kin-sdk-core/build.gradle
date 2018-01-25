@@ -32,7 +32,7 @@ android {
 
 dependencies {
     implementation 'com.github.kinfoundation:android-stellar-sdk:master-SNAPSHOT'
-    implementation supportDependencies.appCompat
+    implementation supportDependencies.supportAnnotations
 
     testImplementation testingDependencies.junit
     testImplementation testingDependencies.mockitoAndroid

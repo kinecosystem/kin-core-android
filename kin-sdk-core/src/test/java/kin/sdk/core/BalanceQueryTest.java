@@ -14,23 +14,16 @@ import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.hamcrest.CustomMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.hamcrest.beans.HasPropertyWithValue;
-import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.stellar.sdk.Server;
-import org.stellar.sdk.requests.AccountsRequestBuilder;
 import org.stellar.sdk.responses.HttpResponseException;
 
 @RunWith(RobolectricTestRunner.class)
@@ -120,6 +113,18 @@ public class BalanceQueryTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(instanceOf(HttpResponseException.class));
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void getBalance_NullInput() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(500)
+        );
+        expectedEx.expect(IllegalArgumentException.class);
+        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
+        balanceQuery.getBalance(null);
     }
 
     private Balance getBalance(String issuerAccountId, String accountId) throws OperationFailedException {
