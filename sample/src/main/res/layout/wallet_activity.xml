@@ -97,36 +97,6 @@
             </LinearLayout>
         </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/KinText.Title.Bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/button_margin"
-                android:gravity="center|left"
-                android:text="getPendingBalance:"/>
-
-            <ProgressBar
-                android:id="@+id/pending_balance_progress"
-                android:layout_width="@dimen/progress_size"
-                android:layout_height="@dimen/progress_size"
-                android:layout_marginLeft="@dimen/progress_margin"
-                android:layout_gravity="bottom"
-                android:visibility="gone"/>
-        </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/pending_balance"
-            style="@style/KinText.Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/sub_text_margin"
-            tools:text="555.5"/>
 
         <View
             android:id="@+id/spacer"
