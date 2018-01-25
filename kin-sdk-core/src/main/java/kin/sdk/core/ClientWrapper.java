@@ -4,13 +4,15 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
-import kin.sdk.core.exception.EthereumClientException;
+import kin.sdk.core.exception.AccountNotFoundException;
+import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.responses.AccountResponse;
+import org.stellar.sdk.responses.HttpResponseException;
 
 
 /**
@@ -26,8 +28,7 @@ final class ClientWrapper {
     private final Server server;
     private final TransactionSender transactionSender;
 
-    ClientWrapper(Context context, ServiceProvider serviceProvider)
-        throws EthereumClientException {
+    ClientWrapper(Context context, ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
         this.context = context.getApplicationContext();
         server = initServer();
@@ -44,11 +45,11 @@ final class ClientWrapper {
         return new Server(serviceProvider.getProviderUrl());
     }
 
-    private KeyStore initKeyStore() throws EthereumClientException {
+    private KeyStore initKeyStore() {
         return new KeyStore(context);
     }
 
-    void wipeoutAccount() throws EthereumClientException {
+    void wipeoutAccount() {
         //TODO
     }
 
@@ -68,7 +69,9 @@ final class ClientWrapper {
      *
      * @param account the {@link KeyPair} to check balance
      * @return the account {@link Balance}
-     * @throws OperationFailedException if could not retrieve balance
+     * @throws AccountNotFoundException if account not created yet
+     * @throws NoKinTrustException if account has no Kin trust
+     * @throws OperationFailedException any other error
      */
     Balance getBalance(Account account) throws OperationFailedException {
         Balance balance = null;
@@ -80,11 +83,19 @@ final class ClientWrapper {
                     break;
                 }
             }
+        } catch (HttpResponseException httpError) {
+            //account that is not created yet will get 404
+            //https://www.stellar.org/developers/horizon/reference/endpoints/accounts-single.html#possible-errors
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(account.getAccountId());
+            } else {
+                throw new OperationFailedException(httpError);
+            }
         } catch (IOException e) {
-            throw new OperationFailedException("Could not retrieve balance");
+            throw new OperationFailedException(e);
         }
         if (balance == null) {
-            throw new OperationFailedException("Kin asset not found");
+            throw new NoKinTrustException(account.getAccountId());
         }
 
         return balance;

@@ -3,14 +3,12 @@ package kin.sdk.core.sample;
 import android.app.Application;
 import kin.sdk.core.KinClient;
 import kin.sdk.core.ServiceProvider;
-import kin.sdk.core.exception.EthereumClientException;
 
 public class KinClientSampleApplication extends Application {
 
     //based on parity
     private final String TEST_NET_URL = "https://horizon-testnet.stellar.org";
     private final String MAIN_NET_URL = "https://horizon.stellar.org";
-
 
     public enum NetWorkType {
         MAIN,
@@ -35,12 +33,8 @@ public class KinClientSampleApplication extends Application {
                 providerUrl = TEST_NET_URL;
                 netWorkId = ServiceProvider.NETWORK_ID_TEST;
         }
-        try {
-            kinClient = new KinClient(this,
-                new ServiceProvider(providerUrl, netWorkId));
-        } catch (EthereumClientException e) {
-            e.printStackTrace();
-        }
+        kinClient = new KinClient(this,
+            new ServiceProvider(providerUrl, netWorkId));
         return kinClient;
     }
 
