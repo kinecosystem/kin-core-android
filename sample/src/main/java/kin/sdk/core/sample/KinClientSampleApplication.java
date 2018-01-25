@@ -9,6 +9,12 @@ public class KinClientSampleApplication extends Application {
     //based on parity
     private final String TEST_NET_URL = "https://horizon-testnet.stellar.org";
     private final String MAIN_NET_URL = "https://horizon.stellar.org";
+
+    public enum NetWorkType {
+        MAIN,
+        TEST
+    }
+
     private KinClient kinClient = null;
 
     public KinClient createKinClient(NetWorkType type) {
@@ -34,10 +40,5 @@ public class KinClientSampleApplication extends Application {
 
     public KinClient getKinClient() {
         return kinClient;
-    }
-
-    public enum NetWorkType {
-        MAIN,
-        TEST
     }
 }
