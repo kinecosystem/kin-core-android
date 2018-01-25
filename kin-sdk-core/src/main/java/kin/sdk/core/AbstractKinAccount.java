@@ -16,11 +16,6 @@ abstract class AbstractKinAccount implements KinAccount {
     }
 
     @Override
-    public Request<Balance> getPendingBalance() {
-        return new Request<>(this::getPendingBalanceSync);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

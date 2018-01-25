@@ -16,7 +16,7 @@ import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 
 /**
  * Responsible for presenting details about the account
- * Public address, account balance, account pending balance
+ * Public address, account balance, account balance
  * and in future we will add here button to backup the account (show usage of exportKeyStore)
  * In addition there is "Send Transaction" button here that will navigate to TransactionActivity
  */
@@ -24,10 +24,9 @@ public class WalletActivity extends BaseActivity {
 
     public static final String TAG = WalletActivity.class.getSimpleName();
     public static final String URL_GET_KIN = "http://kin-faucet.rounds.video/send?public_address=";
-    private TextView balance, pendingBalance, publicKey;
+    private TextView balance, publicKey;
     private View getKinBtn;
-    private View balanceProgress, pendingBalanceProgress;
-    private kin.sdk.core.Request<Balance> pendingBalanceRequest;
+    private View balanceProgress;
     private kin.sdk.core.Request<Balance> balanceRequest;
 
     public static Intent getIntent(Context context) {
@@ -46,16 +45,13 @@ public class WalletActivity extends BaseActivity {
         super.onResume();
         updatePublicKey();
         updateBalance();
-        updatePendingBalance();
     }
 
     private void initWidgets() {
         balance = (TextView) findViewById(R.id.balance);
-        pendingBalance = (TextView) findViewById(R.id.pending_balance);
         publicKey = (TextView) findViewById(R.id.public_key);
 
         balanceProgress = findViewById(R.id.balance_progress);
-        pendingBalanceProgress = findViewById(R.id.pending_balance_progress);
 
         final View transaction = findViewById(R.id.send_transaction_btn);
         final View refresh = findViewById(R.id.refresh_btn);
@@ -79,10 +75,7 @@ public class WalletActivity extends BaseActivity {
         deleteAccount.setOnClickListener(view -> showDeleteAlert());
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
-        refresh.setOnClickListener(view -> {
-            updateBalance();
-            updatePendingBalance();
-        });
+        refresh.setOnClickListener(view -> updateBalance());
 
         exportKeyStore.setOnClickListener(view -> startActivity(ExportKeystoreActivity.getIntent(this)));
     }
@@ -109,7 +102,7 @@ public class WalletActivity extends BaseActivity {
             final RequestQueue queue = Volley.newRequestQueue(this);
             final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 response -> {
-                    updatePendingBalance();
+                    updateBalance();
                     getKinBtn.setClickable(true);
                 },
                 e -> {
@@ -146,22 +139,6 @@ public class WalletActivity extends BaseActivity {
         }
     }
 
-    private void updatePendingBalance() {
-        pendingBalanceProgress.setVisibility(View.VISIBLE);
-        KinAccount account = getKinClient().getAccount();
-        if (account != null) {
-            pendingBalanceRequest = getKinClient().getAccount().getPendingBalance();
-            pendingBalanceRequest.run(new DisplayCallback<Balance>(pendingBalanceProgress, pendingBalance) {
-                @Override
-                public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value().toPlainString());
-                }
-            });
-        } else {
-            pendingBalance.setText("");
-        }
-    }
-
     @Override
     Intent getBackIntent() {
         return ChooseNetworkActivity.getIntent(this);
@@ -175,13 +152,9 @@ public class WalletActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (pendingBalanceRequest != null) {
-            pendingBalanceRequest.cancel(true);
-        }
         if (balanceRequest != null) {
             balanceRequest.cancel(true);
         }
-        pendingBalance = null;
         balance = null;
     }
 }

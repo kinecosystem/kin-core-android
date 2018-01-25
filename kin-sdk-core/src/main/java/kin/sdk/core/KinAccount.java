@@ -69,20 +69,4 @@ public interface KinAccount {
      * @throws OperationFailedException any other error
      */
     Balance getBalanceSync() throws OperationFailedException;
-
-    /**
-     * Create {@link Request} for getting the pending balance in kin
-     *
-     * @return {@code Request<Balance>} Balance - the pending balance in kin
-     */
-    Request<Balance> getPendingBalance();
-
-    /**
-     * Get the pending balance in kin
-     * The method will accesses a blockchain
-     * node on the network and should not be called on the android main thread.
-     *
-     * @return Balance the balance amount in kin
-     */
-    Balance getPendingBalanceSync() throws OperationFailedException;
 }

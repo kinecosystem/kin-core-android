@@ -208,22 +208,4 @@ public class KinAccountTest extends BaseTest {
         assertEquals("0", balance.value(0));
         assertEquals("0.0", balance.value(1));
     }
-
-    @Test
-    public void getPendingBalanceSync_withNoTransaction() throws Exception {
-        Balance balance = kinAccount.getBalanceSync();
-        Balance pendingBalance = kinAccount.getPendingBalanceSync();
-
-        assertNotNull(pendingBalance);
-        assertEquals(balance.value(), pendingBalance.value());
-    }
-
-    @Test
-    public void getPendingBalanceSync() throws Exception {
-        KinAccount senderAccount = importedAccounts.get(0);
-        senderAccount.sendTransactionSync(kinAccount.getPublicAddress(), PASSPHRASE, new BigDecimal(10));
-        Balance kinAccountPendingBalance = kinAccount.getPendingBalanceSync();
-
-        assertNotNull(kinAccountPendingBalance);
-    }
 }
