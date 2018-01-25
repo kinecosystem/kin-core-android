@@ -55,14 +55,3 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
-
-# test related files (ethereum testrpc):
-
-kin-sdk-core/truffle/node_modules
-kin-sdk-core/truffle/build
-
-kin-sdk-core/truffle/testrpc.log
-kin-sdk-core/truffle/testrpc.pid
-
-kin-sdk-core/truffle/truffle.log
-kin-sdk-core/truffle/token-contract-address

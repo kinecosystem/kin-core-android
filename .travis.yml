@@ -30,15 +30,6 @@ android:
   - sys-img-armeabi-v7a-android-$ANDROID_API_LEVEL
   - sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
 
-before_install:
-  # install node (npm), truffle, testrpc
-  - rm -rf ~/.nvm
-  - git clone https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh
-  - nvm install 8.9.1
-  - node --version
-  - cd kin-sdk-core/truffle && npm install && cd ../../
-
 before_script:
   # setup android emulator
   - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi armeabi-v7a
@@ -47,12 +38,8 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - make test
-
-after_script:
-  # print truffle and testrpc logs
-  - cat kin-sdk-core/truffle/truffle.log
-  - cat kin-sdk-core/truffle/testrpc.log
+  - ./gradlew :sample:assembleDebug
+  - ./gradlew :kin-sdk-core:connectedAndroidTest
 
 deploy:
   skip_cleanup: true

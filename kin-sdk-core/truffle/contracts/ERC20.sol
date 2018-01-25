@@ -1,1 +1,0 @@
-../kin-token/contracts/ERC20.sol

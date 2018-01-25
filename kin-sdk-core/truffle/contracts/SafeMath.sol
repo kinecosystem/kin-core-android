@@ -1,1 +1,0 @@
-../kin-token/contracts/SafeMath.sol
