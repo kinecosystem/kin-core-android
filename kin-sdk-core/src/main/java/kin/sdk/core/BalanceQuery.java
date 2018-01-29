@@ -40,6 +40,9 @@ class BalanceQuery {
         Balance balance = null;
         try {
             AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
+            if (accountResponse == null) {
+                throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
+            }
             for (AccountResponse.Balance assetBalance : accountResponse.getBalances()) {
                 if (kinAsset.isKinBalance(assetBalance)) {
                     balance = new BalanceImpl(new BigDecimal(assetBalance.getBalance()));

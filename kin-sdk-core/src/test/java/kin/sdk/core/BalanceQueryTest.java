@@ -1,5 +1,6 @@
 package kin.sdk.core;
 
+import static kin.sdk.core.TestUtils.enqueueEmptyResponse;
 import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -82,6 +83,16 @@ public class BalanceQueryTest {
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
+
+        getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @Test
+    public void getBalance_NullResponse() throws Exception {
+        enqueueEmptyResponse(mockWebServer);
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectMessage(ACCOUNT_ID);
 
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
     }

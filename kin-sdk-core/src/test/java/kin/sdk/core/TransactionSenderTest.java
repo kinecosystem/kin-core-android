@@ -2,6 +2,7 @@ package kin.sdk.core;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static kin.sdk.core.TestUtils.enqueueEmptyResponse;
 import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -15,6 +16,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.NoKinTrustException;
@@ -34,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.stellar.sdk.FormatException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
@@ -72,17 +76,17 @@ public class TransactionSenderTest {
         account = new Account(SECRET_SEED_FROM, ACCOUNT_ID_FROM);
     }
 
-    private void mockKeyStoreResponse() {
-        when(mockKeyStore.decryptAccount(any(Account.class), anyString()))
-            .thenAnswer(
-                invocation -> KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed()));
-    }
-
     private void mockServer() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         String url = mockWebServer.url("").toString();
         server = new Server(url);
+    }
+
+    private void mockKeyStoreResponse() {
+        when(mockKeyStore.decryptAccount(any(Account.class), anyString()))
+            .thenAnswer(
+                invocation -> KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed()));
     }
 
     @Test
@@ -219,6 +223,55 @@ public class TransactionSenderTest {
         transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
+    @Test(timeout = 500)
+    public void sendTransaction_changeTimeOut() throws Exception {
+        String url = mockWebServer.url("").toString();
+        server = new Server(url, 100, TimeUnit.MILLISECONDS);
+        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        transactionSender = new TransactionSender(server, mockKeyStore, kinAsset);
+
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(isA(SocketTimeoutException.class));
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    public void sendTransaction_FirstQuery_NullResponse() throws Exception {
+        enqueueEmptyResponse(mockWebServer);
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectMessage(ACCOUNT_ID_TO);
+
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    public void sendTransaction_SecondQuery_NullResponse() throws Exception {
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        enqueueEmptyResponse(mockWebServer);
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectMessage(ACCOUNT_ID_FROM);
+
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    public void sendTransaction_ThirdQuery_NullResponse() throws Exception {
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        enqueueEmptyResponse(mockWebServer);
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectMessage("transaction");
+
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
     @Test
     @SuppressWarnings("ConstantConditions")
     public void sendTransaction_NullAccount() throws Exception {
@@ -244,6 +297,7 @@ public class TransactionSenderTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void sendTransaction_NullAmount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("amount");
@@ -262,6 +316,25 @@ public class TransactionSenderTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Amount");
         transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("-200"));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void sendTransaction_InvalidPublicIdLength() throws Exception {
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(isA(FormatException.class));
+        expectedEx.expectMessage("public address");
+        transactionSender.sendTransaction(account, "", "ABCDEF", new BigDecimal("200"));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void sendTransaction_InvalidChecksumPublicId() throws Exception {
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(isA(FormatException.class));
+        expectedEx.expectMessage("public address");
+        transactionSender.sendTransaction(account, "", "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OG3",
+            new BigDecimal("200"));
     }
 
     @SuppressWarnings("SameParameterValue")

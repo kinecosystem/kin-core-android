@@ -85,7 +85,7 @@ class TransactionSender {
         try {
             return KeyPair.fromAccountId(publicAddress);
         } catch (Exception e) {
-            throw new OperationFailedException("Invalid addressee public address format");
+            throw new OperationFailedException("Invalid addressee public address format", e);
         }
     }
 
@@ -120,6 +120,9 @@ class TransactionSender {
         } catch (IOException e) {
             throw new OperationFailedException(e);
         }
+        if (sourceAccount == null) {
+            throw new OperationFailedException("can't retrieve data for account " + from.getAccountId());
+        }
         return sourceAccount;
     }
 
@@ -140,12 +143,18 @@ class TransactionSender {
     private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
         try {
             SubmitTransactionResponse response = server.submitTransaction(transaction);
+            if (response == null) {
+                throw new OperationFailedException("can't get transaction response");
+            }
             if (response.isSuccess()) {
                 return new TransactionIdImpl(response.getHash());
             } else {
                 throw Utils.createTransactionException(response);
             }
-        } catch (IOException e) {
+        } catch (
+            IOException e)
+
+        {
             throw new OperationFailedException(e);
         }
     }
