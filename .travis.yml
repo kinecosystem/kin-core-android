@@ -39,6 +39,7 @@ before_script:
 
 script:
   - ./gradlew :sample:assembleDebug
+  - ./gradlew :kin-sdk-core:test
   - ./gradlew :kin-sdk-core:connectedAndroidTest
 
 deploy:
