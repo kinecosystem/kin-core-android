@@ -1,5 +1,6 @@
 package kin.sdk.core;
 
+import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -7,13 +8,13 @@ import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 import org.hamcrest.beans.HasPropertyWithValue;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,10 +51,7 @@ public class BalanceQueryTest {
 
     @Test
     public void getBalance_Success() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-            .setBody(loadResource("balance_res_success.json"))
-            .setResponseCode(200)
-        );
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "balance_res_success.json"));
 
         Balance balance = getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
 
@@ -62,10 +60,7 @@ public class BalanceQueryTest {
 
     @Test
     public void getBalance_VerifyQueryAccountID() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-            .setBody(loadResource("balance_res_success.json"))
-            .setResponseCode(200)
-        );
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "balance_res_success.json"));
 
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
 
@@ -74,10 +69,7 @@ public class BalanceQueryTest {
 
     @Test
     public void getBalance_NoKinTrust() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-            .setBody(loadResource("balance_res_no_kin_trust.json"))
-            .setResponseCode(200)
-        );
+        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
         expectedEx.expect(NoKinTrustException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID)));
 
@@ -86,7 +78,8 @@ public class BalanceQueryTest {
 
     @Test
     public void getBalance_IOException() throws Exception {
-        server = new Server(mockWebServer.url("").toString() + "/not_real_address");
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
@@ -132,13 +125,6 @@ public class BalanceQueryTest {
         BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
         Account account = new Account("", accountId);
         return balanceQuery.getBalance(account);
-    }
-
-    private String loadResource(String res) {
-        InputStream is = this.getClass().getClassLoader()
-            .getResourceAsStream(res);
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
     }
 
 }

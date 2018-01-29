@@ -35,7 +35,7 @@ dependencies {
     implementation supportDependencies.supportAnnotations
 
     testImplementation testingDependencies.junit
-    testImplementation testingDependencies.mockitoAndroid
+    testImplementation testingDependencies.mockito
     testImplementation testingDependencies.mockWebServer
     testImplementation testingDependencies.robolectric
 
