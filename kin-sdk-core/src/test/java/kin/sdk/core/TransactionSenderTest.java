@@ -184,17 +184,6 @@ public class TransactionSenderTest {
     }
 
     @Test
-    public void sendTransaction_ThirdQuery_HttpResponseError() throws Exception {
-        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
-        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
-        mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(500)
-        );
-
-        testHttpResponseCode(500);
-    }
-
-    @Test
     public void sendTransaction_FirstQuery_ConnectionException() throws Exception {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
