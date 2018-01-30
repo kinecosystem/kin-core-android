@@ -41,11 +41,3 @@ script:
   - ./gradlew :sample:assembleDebug
   - ./gradlew :kin-sdk-core:connectedAndroidTest
 
-deploy:
-  skip_cleanup: true
-  provider: script
-  script:
-    secure: ./testfairy-uploader.sh ./sample/build/outputs/apk/debug/sample-debug.apk
-  on:
-    branch: dev
-
