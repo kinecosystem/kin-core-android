@@ -1,6 +1,7 @@
 package kin.sdk.core;
 
 
+import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import kin.sdk.core.exception.TransactionFailedException;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
@@ -12,7 +13,7 @@ final class Utils {
         //not instances
     }
 
-    static TransactionFailedException createTransactionException(SubmitTransactionResponse response)
+    static TransactionFailedException createTransactionException(@NonNull SubmitTransactionResponse response)
         throws TransactionFailedException {
         ArrayList<String> operationsResultCodes = null;
         String transactionResultCode = null;

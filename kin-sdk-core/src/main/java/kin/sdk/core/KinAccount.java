@@ -71,7 +71,7 @@ public interface KinAccount {
     Balance getBalanceSync() throws OperationFailedException;
 
     /**
-     * Create {@link Request} for activating this account, should be done after account was created
+     * Create {@link Request} for allow an account to receive kin.
      * <p> See {@link KinAccount#activateSync(String)} for possibles errors</p>
      *
      * @param passphrase the passphrase used to create the account
@@ -80,7 +80,7 @@ public interface KinAccount {
     Request<Void> activate(String passphrase);
 
     /**
-     * Activate this account, should be done after account was created
+     * Allow an account to receive kin.
      * The method will accesses a horizon node on the network and should not be called on the android main thread.
      *
      * @param passphrase the passphrase used to create the account
