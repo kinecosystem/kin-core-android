@@ -6,11 +6,13 @@ import static kin.sdk.core.TestUtils.enqueueEmptyResponse;
 import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
 import static kin.sdk.core.TestUtils.loadResource;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -53,6 +55,7 @@ public class TransactionSenderTest {
     private static final String SECRET_SEED_FROM = "SB6PCLT2WUQF44HVOTEGCXIDYNX2U4BJUPWUX453ODRGD4CXGPJP3HUX";
     private static final String ACCOUNT_ID_TO = "GDJOJJVIWI6YVPUI3PX4BQCC4SQUZTRYIAMV2YBT6QVL54QGQUQSFKGM";
     private static final String SECRET_SEED_TO = "SCJFLXKUY6VQT2LYSP6XDP23WNEP5OITSC3LZEJUJO7GFZM7QLDF2BCN";
+    private static final String TX_BODY = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAA0uSmqLI9ir6I2%2B%2FAwELkoUzOOEAZXWAz9Cq%2B8gaFISIAAAABS0lOAAAAAABBq58xoA5F8Hm%2F7tPH51hBTD4tUsenooq1dLrUnnJnxgAAAAAA5OHAAAAAAAAAAAFtBVodAAAAQLLn6OJYeSG1KEki6SL%2FKYPX01Dzdid5aTNTMYTJ%2FO7cMQC1n%2FAWSmyVXJdm5zQCtn9vAzTVZpIbBmKKyHjtfw4%3D";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -100,7 +103,13 @@ public class TransactionSenderTest {
 
         TransactionId transactionId = transactionSender
             .sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
+
+        //verify sent requests data
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
+        assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
     }
 
     @Test

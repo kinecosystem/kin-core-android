@@ -1,5 +1,7 @@
 package kin.sdk.core;
 
+import static kin.sdk.core.Utils.checkNotNull;
+
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import kin.sdk.core.ServiceProvider.KinAsset;
@@ -29,22 +31,15 @@ class AccountActivator {
     }
 
     void activate(@NonNull Account account, @NonNull String passphrase) throws OperationFailedException {
+        verifyParams(account, passphrase);
         AccountResponse accountResponse;
         try {
-            accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
-            if (accountResponse == null) {
-                throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
-            }
+            accountResponse = getAccountDetails(account);
             if (kinAsset.hasKinTrust(accountResponse)) {
                 return;
             }
             SubmitTransactionResponse response = sendAllowKinTrustOperation(account, passphrase, accountResponse);
-            if (response == null) {
-                throw new OperationFailedException("can't get transaction response");
-            }
-            if (!response.isSuccess()) {
-                throw Utils.createTransactionException(response);
-            }
+            handleTransactionResponse(response);
         } catch (HttpResponseException httpError) {
             if (httpError.getStatusCode() == 404) {
                 throw new AccountNotFoundException(account.getAccountId());
@@ -56,6 +51,21 @@ class AccountActivator {
         }
     }
 
+    private void verifyParams(@NonNull Account account, @NonNull String passphrase) {
+        checkNotNull(account, "account");
+        checkNotNull(passphrase, "passphrase");
+    }
+
+    @NonNull
+    private AccountResponse getAccountDetails(@NonNull Account account) throws IOException, OperationFailedException {
+        AccountResponse accountResponse;
+        accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
+        if (accountResponse == null) {
+            throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
+        }
+        return accountResponse;
+    }
+
     private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, String passphrase,
         AccountResponse accountResponse) throws IOException {
         Transaction allowKinTrustTransaction = new Transaction.Builder(accountResponse).addOperation(
@@ -65,5 +75,14 @@ class AccountActivator {
             .build();
         allowKinTrustTransaction.sign(keyStore.decryptAccount(account, passphrase));
         return server.submitTransaction(allowKinTrustTransaction);
+    }
+
+    private void handleTransactionResponse(SubmitTransactionResponse response) throws OperationFailedException {
+        if (response == null) {
+            throw new OperationFailedException("can't get transaction response");
+        }
+        if (!response.isSuccess()) {
+            throw Utils.createTransactionException(response);
+        }
     }
 }
