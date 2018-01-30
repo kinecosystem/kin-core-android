@@ -25,8 +25,9 @@ final class ClientWrapper {
     private final Context context;
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
-    private final Server server;
+    private final Server server; //horizon server
     private final TransactionSender transactionSender;
+    private final AccountActivator accountActivator;
 
     ClientWrapper(Context context, ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
@@ -34,6 +35,7 @@ final class ClientWrapper {
         server = initServer();
         keyStore = initKeyStore();
         transactionSender = new TransactionSender(server, keyStore, serviceProvider.getKinAsset());
+        accountActivator = new AccountActivator(server, keyStore, serviceProvider.getKinAsset());
     }
 
     private Server initServer() {
@@ -101,9 +103,11 @@ final class ClientWrapper {
         return balance;
     }
 
+    void activateAccount(Account account, String passphrase) throws OperationFailedException {
+        accountActivator.activate(account, passphrase);
+    }
 
     ServiceProvider getServiceProvider() {
         return serviceProvider;
     }
-
 }

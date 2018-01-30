@@ -16,6 +16,14 @@ abstract class AbstractKinAccount implements KinAccount {
     }
 
     @Override
+    public Request<Void> activate(String passphrase) {
+        return new Request<>(() -> {
+            activateSync(passphrase);
+            return null;
+        });
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

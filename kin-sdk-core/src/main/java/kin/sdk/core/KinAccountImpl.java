@@ -67,6 +67,11 @@ final class KinAccountImpl extends AbstractKinAccount {
         return clientWrapper.getBalance(account);
     }
 
+    @Override
+    public void activateSync(String passphrase) throws OperationFailedException {
+        clientWrapper.activateAccount(account, passphrase);
+    }
+
     void delete(String passphrase) throws DeleteAccountException {
         clientWrapper.getKeyStore().deleteAccount(account, passphrase);
         markAsDeleted();

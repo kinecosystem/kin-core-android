@@ -4,7 +4,6 @@ package kin.sdk.core;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.NoKinTrustException;
@@ -18,11 +17,10 @@ import org.stellar.sdk.Transaction;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
-import org.stellar.sdk.responses.SubmitTransactionResponse.Extras.ResultCodes;
 
 class TransactionSender {
 
-    private final Server server;
+    private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
 
@@ -115,7 +113,7 @@ class TransactionSender {
     }
 
     private void checkKinTrust(AccountResponse accountResponse) throws NoKinTrustException {
-        if (!hasKinBalance(accountResponse)) {
+        if (!kinAsset.hasKinTrust(accountResponse)) {
             throw new NoKinTrustException(accountResponse.getKeypair().getAccountId());
         }
     }
@@ -127,17 +125,6 @@ class TransactionSender {
         return sourceAccount;
     }
 
-    private boolean hasKinBalance(AccountResponse addresseeAccount) {
-        AccountResponse.Balance balances[] = addresseeAccount.getBalances();
-        boolean hasTrust = false;
-        for (AccountResponse.Balance balance : balances) {
-            if (kinAsset.isKinBalance(balance)) {
-                hasTrust = true;
-            }
-        }
-        return hasTrust;
-    }
-
     @NonNull
     private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
         try {
@@ -145,14 +132,7 @@ class TransactionSender {
             if (response.isSuccess()) {
                 return new TransactionIdImpl(response.getHash());
             } else {
-                ArrayList<String> operationsResultCodes = null;
-                String transactionResultCode = null;
-                if (response.getExtras() != null && response.getExtras().getResultCodes() != null) {
-                    ResultCodes resultCodes = response.getExtras().getResultCodes();
-                    operationsResultCodes = resultCodes.getOperationsResultCodes();
-                    transactionResultCode = resultCodes.getTransactionResultCode();
-                }
-                throw new TransactionFailedException(transactionResultCode, operationsResultCodes);
+                throw Utils.createTransactionException(response);
             }
         } catch (IOException e) {
             throw new OperationFailedException(e);
