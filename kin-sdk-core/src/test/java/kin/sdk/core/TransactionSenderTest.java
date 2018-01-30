@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 import static kin.sdk.core.TestUtils.enqueueEmptyResponse;
 import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
+import static kin.sdk.core.TestUtils.loadResource;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -152,7 +153,10 @@ public class TransactionSenderTest {
     public void sendTransaction_UnderfundStellarError() throws Exception {
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
-        mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_failure_res_underfund.json"));
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(loadResource(this.getClass(), "tx_failure_res_underfund.json"))
+            .setResponseCode(400)
+        );
 
         expectedEx.expect(TransactionFailedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("transactionResultCode", equalTo("tx_failed")));
