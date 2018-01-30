@@ -1,5 +1,6 @@
 package kin.sdk.core;
 
+import android.support.annotation.NonNull;
 import java.io.IOException;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
@@ -17,7 +18,7 @@ class AccountActivator {
     //unlimited trust, The largest amount unit possible in Stellar
     //see https://www.stellar.org/developers/guides/concepts/assets.html
     private static final String TRUST_NO_LIMIT_VALUE = "922337203685.4775807";
-    private final Server server;
+    private final Server server; //horizon server
     private final KinAsset kinAsset;
     private final KeyStore keyStore;
 
@@ -27,14 +28,20 @@ class AccountActivator {
         this.keyStore = keyStore;
     }
 
-    void activate(Account account, String passphrase) throws OperationFailedException {
+    void activate(@NonNull Account account, @NonNull String passphrase) throws OperationFailedException {
         AccountResponse accountResponse;
         try {
             accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
+            if (accountResponse == null) {
+                throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
+            }
             if (kinAsset.hasKinTrust(accountResponse)) {
                 return;
             }
             SubmitTransactionResponse response = sendAllowKinTrustOperation(account, passphrase, accountResponse);
+            if (response == null) {
+                throw new OperationFailedException("can't get transaction response");
+            }
             if (!response.isSuccess()) {
                 throw Utils.createTransactionException(response);
             }

@@ -25,7 +25,7 @@ final class ClientWrapper {
     private final Context context;
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
-    private final Server server;
+    private final Server server; //horizon server
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
 

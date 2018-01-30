@@ -20,7 +20,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
-    private final Server server;
+    private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
 
