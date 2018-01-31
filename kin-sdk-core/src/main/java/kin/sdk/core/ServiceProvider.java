@@ -25,6 +25,7 @@ public class ServiceProvider {
     private static final String TEST_NETWORK_ISSUER = "GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM";
 
     private final String providerUrl;
+    @NetworkId
     private final int networkId;
     private final KinAsset kinAsset;
 

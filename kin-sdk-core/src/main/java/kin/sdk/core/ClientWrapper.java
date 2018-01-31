@@ -2,6 +2,7 @@ package kin.sdk.core;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import java.math.BigDecimal;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
@@ -14,9 +15,8 @@ import org.stellar.sdk.Server;
  * Responsible for account creation/storage/retrieval, connection to Kin contract
  * retrieving balance and sending transactions
  */
-final class ClientWrapper {
+class ClientWrapper {
 
-    private final Context context;
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
@@ -25,12 +25,21 @@ final class ClientWrapper {
 
     ClientWrapper(Context context, ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
-        this.context = context.getApplicationContext();
         Server server = initServer();
-        keyStore = initKeyStore();
+        keyStore = initKeyStore(context.getApplicationContext());
         transactionSender = new TransactionSender(server, keyStore, serviceProvider.getKinAsset());
         accountActivator = new AccountActivator(server, keyStore, serviceProvider.getKinAsset());
         balanceQuery = new BalanceQuery(server, serviceProvider.getKinAsset());
+    }
+
+    @VisibleForTesting
+    ClientWrapper(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
+        AccountActivator accountActivator, BalanceQuery balanceQuery) {
+        this.serviceProvider = serviceProvider;
+        this.keyStore = keyStore;
+        this.transactionSender = transactionSender;
+        this.accountActivator = accountActivator;
+        this.balanceQuery = balanceQuery;
     }
 
     private Server initServer() {
@@ -42,8 +51,8 @@ final class ClientWrapper {
         return new Server(serviceProvider.getProviderUrl());
     }
 
-    private KeyStore initKeyStore() {
-        return new KeyStore(context);
+    private KeyStore initKeyStore(Context context) {
+        return new KeyStoreImpl(context);
     }
 
     void wipeoutAccount() {

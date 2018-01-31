@@ -69,6 +69,7 @@ final class KinAccountImpl extends AbstractKinAccount {
 
     @Override
     public void activateSync(String passphrase) throws OperationFailedException {
+        checkValidAccount();
         clientWrapper.activateAccount(account, passphrase);
     }
 
