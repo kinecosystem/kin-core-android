@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import org.stellar.sdk.KeyPair;
@@ -72,7 +72,7 @@ final class ClientWrapper {
      * @param account the {@link KeyPair} to check balance
      * @return the account {@link Balance}
      * @throws AccountNotFoundException if account not created yet
-     * @throws NoKinTrustException if account has no Kin trust
+     * @throws AccountNotActivatedException if account has no Kin trust
      * @throws OperationFailedException any other error
      */
     Balance getBalance(Account account) throws OperationFailedException {
@@ -97,7 +97,7 @@ final class ClientWrapper {
             throw new OperationFailedException(e);
         }
         if (balance == null) {
-            throw new NoKinTrustException(account.getAccountId());
+            throw new AccountNotActivatedException(account.getAccountId());
         }
 
         return balance;
