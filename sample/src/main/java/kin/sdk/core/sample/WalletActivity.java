@@ -11,6 +11,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import kin.sdk.core.Balance;
 import kin.sdk.core.KinAccount;
+import kin.sdk.core.ResultCallback;
 import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 
@@ -44,25 +45,23 @@ public class WalletActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         updatePublicKey();
-        updateBalance();
+        updateBalance(false);
     }
 
     private void initWidgets() {
-        balance = (TextView) findViewById(R.id.balance);
-        publicKey = (TextView) findViewById(R.id.public_key);
+        balance = findViewById(R.id.balance);
+        publicKey = findViewById(R.id.public_key);
 
         balanceProgress = findViewById(R.id.balance_progress);
 
         final View transaction = findViewById(R.id.send_transaction_btn);
         final View refresh = findViewById(R.id.refresh_btn);
         getKinBtn = findViewById(R.id.get_kin_btn);
-        final View exportKeyStore = findViewById(R.id.export_key_store_btn);
         final View deleteAccount = findViewById(R.id.delete_account_btn);
 
         if (isMainNet()) {
             transaction.setBackgroundResource(R.drawable.button_main_network_bg);
             refresh.setBackgroundResource(R.drawable.button_main_network_bg);
-            exportKeyStore.setBackgroundResource(R.drawable.button_main_network_bg);
             getKinBtn.setVisibility(View.GONE);
         } else {
             getKinBtn.setVisibility(View.VISIBLE);
@@ -75,9 +74,7 @@ public class WalletActivity extends BaseActivity {
         deleteAccount.setOnClickListener(view -> showDeleteAlert());
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
-        refresh.setOnClickListener(view -> updateBalance());
-
-        exportKeyStore.setOnClickListener(view -> startActivity(ExportKeystoreActivity.getIntent(this)));
+        refresh.setOnClickListener(view -> updateBalance(true));
     }
 
     private void showDeleteAlert() {
@@ -102,7 +99,7 @@ public class WalletActivity extends BaseActivity {
             final RequestQueue queue = Volley.newRequestQueue(this);
             final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 response -> {
-                    updateBalance();
+                    updateBalance(true);
                     getKinBtn.setClickable(true);
                 },
                 e -> {
@@ -123,19 +120,35 @@ public class WalletActivity extends BaseActivity {
         publicKey.setText(publicKeyStr);
     }
 
-    private void updateBalance() {
+    private void updateBalance(boolean showDialog) {
         balanceProgress.setVisibility(View.VISIBLE);
         KinAccount account = getKinClient().getAccount();
         if (account != null) {
             balanceRequest = account.getBalance();
-            balanceRequest.run(new DisplayCallback<Balance>(balanceProgress, balance) {
-                @Override
-                public void displayResult(Context context, View view, Balance result) {
-                    ((TextView) view).setText(result.value().toPlainString());
-                }
-            });
+            if (showDialog) {
+                balanceRequest.run(new DisplayCallback<Balance>(balanceProgress, balance) {
+                    @Override
+                    public void displayResult(Context context, View view, Balance result) {
+                        ((TextView) view).setText(result.value().toPlainString());
+                    }
+                });
+            } else {
+                balanceRequest.run(new ResultCallback<Balance>() {
+                    @Override
+                    public void onResult(Balance result) {
+                        balance.setText(result.value().toPlainString());
+                        balanceProgress.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        balance.setText(R.string.balance_error);
+                        balanceProgress.setVisibility(View.GONE);
+                    }
+                });
+            }
         } else {
-            balance.setText("");
+            balance.setText(R.string.balance_error);
         }
     }
 
