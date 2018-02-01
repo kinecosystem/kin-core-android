@@ -23,7 +23,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.TransactionFailedException;
 import okhttp3.mockwebserver.MockResponse;
@@ -129,7 +129,7 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to_no_kin.json"));
 
-        expectedEx.expect(NoKinTrustException.class);
+        expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_TO)));
 
         transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
@@ -152,7 +152,7 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "tx_account_from_no_kin.json"));
 
-        expectedEx.expect(NoKinTrustException.class);
+        expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
         transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));

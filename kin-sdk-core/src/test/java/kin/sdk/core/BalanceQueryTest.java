@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.OperationFailedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -71,7 +71,7 @@ public class BalanceQueryTest {
     @Test
     public void getBalance_NoKinTrust() throws Exception {
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
-        expectedEx.expect(NoKinTrustException.class);
+        expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID)));
 
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
