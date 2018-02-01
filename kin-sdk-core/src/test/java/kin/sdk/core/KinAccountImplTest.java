@@ -39,13 +39,6 @@ public class KinAccountImplTest {
     }
 
     @Test
-    public void getPublicAddress() throws Exception {
-        kinAccount = new KinAccountImpl(mockClientWrapper, PASSPHRASE);
-
-        assertEquals(fakeKeyStore.loadAccounts().get(0).getAccountId(), kinAccount.getPublicAddress());
-    }
-
-    @Test
     public void getPublicAddress_ExistingAccount() throws Exception {
         initWithRandomAccount();
 
@@ -121,7 +114,7 @@ public class KinAccountImplTest {
 
     @Test
     public void getPublicAddress_DeletedAccount_Empty() throws Exception {
-        kinAccount = new KinAccountImpl(mockClientWrapper, PASSPHRASE);
+        initWithRandomAccount();
         kinAccount.markAsDeleted();
 
         assertThat(kinAccount.getPublicAddress(), isEmptyString());

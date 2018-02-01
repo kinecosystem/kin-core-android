@@ -55,7 +55,7 @@ class ClientWrapper {
         return new KeyStoreImpl(context);
     }
 
-    void wipeoutAccount() {
+    void wipeoutAccounts() {
         //TODO
     }
 

@@ -7,10 +7,10 @@ import org.stellar.sdk.KeyPair;
 
 interface KeyStore {
 
-    void deleteAccount(Account keyPair, String passphrase);
-
     @NonNull
     List<Account> loadAccounts();
+
+    void deleteAccount(int index, String passphrase);
 
     Account newAccount(String passphrase);
 

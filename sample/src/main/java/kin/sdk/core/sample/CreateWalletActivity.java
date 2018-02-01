@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import kin.sdk.core.KinClient;
-import kin.sdk.core.exception.CreateAccountException;
-import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 
 /**
  * This activity is displayed only if there is no existing account stored on device for the given network
@@ -36,13 +34,9 @@ public class CreateWalletActivity extends BaseActivity {
     }
 
     private void createAccount() {
-        try {
-            final KinClient kinClient = getKinClient();
-            kinClient.createAccount(getPassphrase());
-            startActivity(WalletActivity.getIntent(this));
-        } catch (CreateAccountException e) {
-            KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
-        }
+        final KinClient kinClient = getKinClient();
+        kinClient.createAccount(getPassphrase());
+        startActivity(WalletActivity.getIntent(this));
     }
 
     @Override
