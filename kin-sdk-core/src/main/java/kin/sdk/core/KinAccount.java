@@ -1,8 +1,8 @@
 package kin.sdk.core;
 
 import java.math.BigDecimal;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import kin.sdk.core.exception.TransactionFailedException;
@@ -44,7 +44,7 @@ public interface KinAccount {
      * @return TransactionId the transaction identifier
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws AccountNotFoundException if the sender or destination account not created yet
-     * @throws NoKinTrustException if the sender or destination account has no Kin trust
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
      * @throws TransactionFailedException if stellar transaction failed, contains stellar horizon error codes
      * @throws OperationFailedException other error occurred
      */
@@ -65,7 +65,7 @@ public interface KinAccount {
      *
      * @return Balance the balance in kin
      * @throws AccountNotFoundException if account not created yet
-     * @throws NoKinTrustException if account has no Kin trust
+     * @throws AccountNotActivatedException if account is not activated
      * @throws OperationFailedException any other error
      */
     Balance getBalanceSync() throws OperationFailedException;

@@ -31,15 +31,6 @@
             android:textIsSelectable="true"
             tools:text="public key"/>
 
-        <Button
-            android:id="@+id/export_key_store_btn"
-            style="@style/KinButtonStyle.TestNet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/button_margin"
-            android:layout_gravity="right"
-            android:text="@string/export_key_store"/>
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

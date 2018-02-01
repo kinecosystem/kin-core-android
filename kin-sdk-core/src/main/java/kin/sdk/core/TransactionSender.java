@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.ServiceProvider.KinAsset;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import kin.sdk.core.exception.TransactionFailedException;
@@ -40,7 +40,7 @@ class TransactionSender {
      * @param amount the amount of kinIssuer to send   @return {@link TransactionId} of the transaction
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws AccountNotFoundException if the sender or destination account not created yet
-     * @throws NoKinTrustException if the sender or destination account has no Kin trust
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
      * @throws TransactionFailedException if stellar transaction failed, contains stellar horizon error codes
      * @throws OperationFailedException other error occurred
      */
@@ -126,9 +126,9 @@ class TransactionSender {
         return sourceAccount;
     }
 
-    private void checkKinTrust(AccountResponse accountResponse) throws NoKinTrustException {
+    private void checkKinTrust(AccountResponse accountResponse) throws AccountNotActivatedException {
         if (!kinAsset.hasKinTrust(accountResponse)) {
-            throw new NoKinTrustException(accountResponse.getKeypair().getAccountId());
+            throw new AccountNotActivatedException(accountResponse.getKeypair().getAccountId());
         }
     }
 

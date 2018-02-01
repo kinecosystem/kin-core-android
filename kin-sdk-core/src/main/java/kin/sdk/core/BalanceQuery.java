@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.ServiceProvider.KinAsset;
 import kin.sdk.core.exception.AccountNotFoundException;
-import kin.sdk.core.exception.NoKinTrustException;
+import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.OperationFailedException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Server;
@@ -32,7 +32,7 @@ class BalanceQuery {
      * @param account the {@link KeyPair} to check balance
      * @return the account {@link Balance}
      * @throws AccountNotFoundException if account not created yet
-     * @throws NoKinTrustException if account has no Kin trust
+     * @throws AccountNotActivatedException if account has no Kin trust
      * @throws OperationFailedException any other error
      */
     Balance getBalance(@NonNull Account account) throws OperationFailedException {
@@ -59,7 +59,7 @@ class BalanceQuery {
             throw new OperationFailedException(e);
         }
         if (balance == null) {
-            throw new NoKinTrustException(account.getAccountId());
+            throw new AccountNotActivatedException(account.getAccountId());
         }
 
         return balance;
