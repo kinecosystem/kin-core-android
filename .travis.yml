@@ -40,5 +40,7 @@ before_script:
 script:
   - ./gradlew :sample:assembleDebug
   - ./gradlew :kin-sdk-core:test
-  - ./gradlew :kin-sdk-core:connectedAndroidTest
+  - ./gradlew kin-sdk-core:assembleDebugAndroidTest
+  - adb install -r ./kin-sdk-core/build/outputs/apk/androidTest/debug/kin-sdk-core-debug-androidTest.apk
+  - adb shell am instrument -w -e notAnnotation android.support.test.filters.LargeTest  kin.sdk.core.test/android.support.test.runner.AndroidJUnitRunner
 

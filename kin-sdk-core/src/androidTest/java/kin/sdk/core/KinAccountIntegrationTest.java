@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyString;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.LargeTest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.exception.AccountDeletedException;
@@ -42,6 +43,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void getBalanceSync_AccountNotCreated_AccountNotFoundException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
 
@@ -51,6 +53,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void getBalanceSync_AccountNotActivated_AccountNotActivatedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
@@ -61,6 +64,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void getBalanceSync_FundedAccount_GotBalance() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
@@ -73,6 +77,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void activateSync_AccountNotCreated_AccountNotFoundException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
 
@@ -82,6 +87,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
@@ -99,6 +105,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction_ReceiverAccountNotCreated_AccountNotFoundException() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
@@ -111,6 +118,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction_SenderAccountNotCreated_AccountNotFoundException() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
@@ -124,6 +132,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction_ReceiverAccountNotActivated_AccountNotFoundException() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
@@ -139,6 +148,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction_SenderAccountNotActivated_AccountNotFoundException() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
@@ -154,6 +164,7 @@ public class KinAccountIntegrationTest {
     }
 
     @Test
+    @LargeTest
     public void sendTransaction_NotEnoughKin_TransactionFailedException() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
