@@ -116,6 +116,8 @@ public class AccountActivatorTest {
         mockWebServer.enqueue(generateSuccessMockResponse(this.getClass(), "activate_account.json"));
 
         accountActivator.activate(account, "");
+
+        assertThat(mockWebServer.getRequestCount(), equalTo(1));
     }
 
     @Test

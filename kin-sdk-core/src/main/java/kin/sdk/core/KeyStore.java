@@ -18,4 +18,6 @@ interface KeyStore {
     String exportAccount(@NonNull Account account, @NonNull String passphrase);
 
     KeyPair decryptAccount(Account account, String passphrase);
+
+    void clearAllAccounts();
 }

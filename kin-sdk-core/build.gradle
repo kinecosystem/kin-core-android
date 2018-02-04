@@ -42,4 +42,5 @@ dependencies {
     androidTestImplementation testingDependencies.mockitoAndroid
     androidTestImplementation testingDependencies.androidTestRunner
     androidTestImplementation testingDependencies.androidTestRules
+    androidTestImplementation testingDependencies.hamcrest
 }

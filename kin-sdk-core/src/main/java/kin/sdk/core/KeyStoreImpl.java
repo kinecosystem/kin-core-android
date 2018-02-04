@@ -45,11 +45,13 @@ class KeyStoreImpl implements KeyStore {
 
     private JSONArray loadJsonArray() {
         String seedsJson = sharedPref.getString(PREF_KEY_SECRET_SEEDS, null);
-        try {
-            JSONObject json = new JSONObject(seedsJson);
-            return json.getJSONArray(JSON_SEEDS);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (seedsJson != null) {
+            try {
+                JSONObject json = new JSONObject(seedsJson);
+                return json.getJSONArray(JSON_SEEDS);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -66,7 +68,7 @@ class KeyStoreImpl implements KeyStore {
                         newJsonArray.put(jsonArray.get(i));
                     }
                 }
-                json.put(JSON_SEEDS, jsonArray);
+                json.put(JSON_SEEDS, newJsonArray);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -110,5 +112,10 @@ class KeyStoreImpl implements KeyStore {
     @Override
     public KeyPair decryptAccount(Account account, String passphrase) {
         return KeyPair.fromSecretSeed(account.getEncryptedSeed());
+    }
+
+    @Override
+    public void clearAllAccounts() {
+        sharedPref.edit().clear().apply();
     }
 }

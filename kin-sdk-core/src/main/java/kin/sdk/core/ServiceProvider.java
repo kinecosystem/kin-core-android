@@ -4,6 +4,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import java.lang.annotation.Retention;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.AssetTypeCreditAlphaNum;
@@ -46,6 +47,13 @@ public class ServiceProvider {
         this.providerUrl = providerUrl;
         this.networkId = networkId;
         this.kinAsset = new KinAsset(isMainNet() ? MAIN_NETWORK_ISSUER : TEST_NETWORK_ISSUER);
+    }
+
+    @VisibleForTesting
+    ServiceProvider(String providerUrl, String issuerAccountId) {
+        this.providerUrl = providerUrl;
+        this.networkId = NETWORK_ID_TEST;
+        this.kinAsset = new KinAsset(issuerAccountId);
     }
 
     public String getProviderUrl() {

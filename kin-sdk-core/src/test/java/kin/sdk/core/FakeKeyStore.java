@@ -51,4 +51,9 @@ class FakeKeyStore implements KeyStore {
     public KeyPair decryptAccount(Account account, String passphrase) {
         return KeyPair.fromSecretSeed(account.getEncryptedSeed());
     }
+
+    @Override
+    public void clearAllAccounts() {
+        accounts.clear();
+    }
 }

@@ -8,6 +8,7 @@ ext {
     androidTestVersion = '1.0.1'
     mockWebServerVersion = '3.8.1'
     robolectricVersion = '3.6.1'
+    hamcrestVersion = '1.3'
 
     //Packages
     supportPackage = 'com.android.support'
@@ -16,6 +17,7 @@ ext {
     androidTestPackage = 'com.android.support.test'
     okHttpPackage = 'com.squareup.okhttp3'
     robolectricPackage = 'org.robolectric'
+    hamcrestPackage = 'org.hamcrest'
 
     supportDependencies = [
             supportAnnotations : buildDependency(supportPackage, 'support-annotations', supportVersion)
@@ -28,7 +30,8 @@ ext {
             androidTestRunner : buildDependency(androidTestPackage, "runner", androidTestVersion),
             androidTestRules : buildDependency(androidTestPackage, "rules", androidTestVersion),
             mockWebServer : buildDependency(okHttpPackage, "mockwebserver", mockWebServerVersion),
-            robolectric   : buildDependency(robolectricPackage, "robolectric", robolectricVersion)
+            robolectric   : buildDependency(robolectricPackage, "robolectric", robolectricVersion),
+            hamcrest   : buildDependency(hamcrestPackage, "hamcrest-library", hamcrestVersion)
     ]
 }
 
