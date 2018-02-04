@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.github.kinfoundation:android-stellar-sdk:transaction_increase_timeout_fix_error_handling-SNAPSHOT'
+    implementation 'com.github.kinfoundation:android-stellar-sdk:support_below_api19-SNAPSHOT'
     implementation supportDependencies.supportAnnotations
 
     testImplementation testingDependencies.junit
