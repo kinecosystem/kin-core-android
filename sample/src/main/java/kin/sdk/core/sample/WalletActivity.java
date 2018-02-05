@@ -5,14 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import kin.sdk.core.Balance;
 import kin.sdk.core.KinAccount;
 import kin.sdk.core.ResultCallback;
 import kin.sdk.core.exception.DeleteAccountException;
+import kin.sdk.core.sample.OnBoarding.Callbacks;
 import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 
 /**
@@ -24,7 +21,7 @@ import kin.sdk.core.sample.kin.sdk.core.sample.dialog.KinAlertDialog;
 public class WalletActivity extends BaseActivity {
 
     public static final String TAG = WalletActivity.class.getSimpleName();
-    public static final String URL_GET_KIN = "http://kin-faucet.rounds.video/send?public_address=";
+
     private TextView balance, publicKey;
     private View getKinBtn;
     private View balanceProgress;
@@ -94,22 +91,25 @@ public class WalletActivity extends BaseActivity {
     private void getKin() {
         final KinAccount account = getKinClient().getAccount();
         if (account != null) {
-            final String publicAddress = account.getPublicAddress();
-            final String url = URL_GET_KIN + publicAddress;
-            final RequestQueue queue = Volley.newRequestQueue(this);
-            final StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
+            balance.setText(null);
+            balanceProgress.setVisibility(View.VISIBLE);
+            OnBoarding onBoarding = new OnBoarding();
+            onBoarding.onBoard(account, PASSPHRASE1, new Callbacks() {
+                @Override
+                public void onSuccess() {
                     updateBalance(true);
                     getKinBtn.setClickable(true);
-                },
-                e -> {
-                    KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    KinAlertDialog.createErrorDialog(WalletActivity.this, e.getMessage()).show();
                     getKinBtn.setClickable(true);
-                });
-            stringRequest.setShouldCache(false);
-            queue.add(stringRequest);
+                }
+            });
         }
     }
+
 
     private void updatePublicKey() {
         String publicKeyStr = "";
