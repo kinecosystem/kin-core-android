@@ -1,7 +1,7 @@
 ext {
 
     //Version
-    supportVersion = '27.0.2'
+    supportVersion = '26.1.0'
     junitVersion = '4.12'
     mockitoAndroidVersion = '2.10.0'
     mockitoVersion = '2.13.0'
@@ -23,12 +23,12 @@ ext {
 
     testingDependencies = [
             junit         : buildDependency(junitPackage, 'junit', junitVersion),
-            mockitoAndroid: buildDependency(mockitoPackage, "mockito-android", mockitoAndroidVersion),
-            mockito       : buildDependency(mockitoPackage, "mockito-core", mockitoVersion),
-            androidTestRunner : buildDependency(androidTestPackage, "runner", androidTestVersion),
-            androidTestRules : buildDependency(androidTestPackage, "rules", androidTestVersion),
-            mockWebServer : buildDependency(okHttpPackage, "mockwebserver", mockWebServerVersion),
-            robolectric   : buildDependency(robolectricPackage, "robolectric", robolectricVersion)
+            mockitoAndroid: buildDependency(mockitoPackage,'mockito-android', mockitoAndroidVersion),
+            mockito       : buildDependency(mockitoPackage, 'mockito-core', mockitoVersion),
+            androidTestRunner : buildDependency(androidTestPackage, 'runner', androidTestVersion),
+            androidTestRules : buildDependency(androidTestPackage, 'rules', androidTestVersion),
+            mockWebServer : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
+            robolectric   : buildDependency(robolectricPackage, 'robolectric', robolectricVersion)
     ]
 }
 

@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.sdk.core.ServiceProvider.KinAsset;
-import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.AccountNotActivatedException;
+import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.OperationFailedException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Server;
@@ -16,7 +16,6 @@ import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
 
 class BalanceQuery {
-
 
     private final Server server;
     private final KinAsset kinAsset;
