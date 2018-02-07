@@ -1,10 +1,10 @@
 package kin.sdk.core;
 
 import android.content.Context;
+import android.support.annotation.VisibleForTesting;
 import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
-import kin.sdk.core.exception.OperationFailedException;
 
 public class KinClient {
 
@@ -20,6 +20,11 @@ public class KinClient {
      */
     public KinClient(Context context, ServiceProvider provider) {
         this.clientWrapper = new ClientWrapper(context, provider);
+    }
+
+    @VisibleForTesting
+    KinClient(ClientWrapper clientWrapper) {
+        this.clientWrapper = clientWrapper;
     }
 
     /**
@@ -98,11 +103,6 @@ public class KinClient {
 
     public ServiceProvider getServiceProvider() {
         return clientWrapper.getServiceProvider();
-    }
-
-    KinAccount importAccount(String privateEcdsaKey, String passphrase) throws OperationFailedException {
-        //TODO
-        return kinAccount;
     }
 
 }

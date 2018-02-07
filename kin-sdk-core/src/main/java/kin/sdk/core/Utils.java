@@ -10,7 +10,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse.Extras.ResultCodes;
 final class Utils {
 
     private Utils() {
-
+        //no instances
     }
 
     static TransactionFailedException createTransactionException(@NonNull SubmitTransactionResponse response)
@@ -23,5 +23,11 @@ final class Utils {
             transactionResultCode = resultCodes.getTransactionResultCode();
         }
         return new TransactionFailedException(transactionResultCode, operationsResultCodes);
+    }
+
+    static void checkNotNull(Object obj, String paramName) {
+        if (obj == null) {
+            throw new IllegalArgumentException(paramName + " == null");
+        }
     }
 }

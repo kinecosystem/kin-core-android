@@ -1,0 +1,64 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK"
+    },
+    "transactions": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/transactions{?cursor,limit,order}",
+      "templated": true
+    },
+    "operations": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/operations{?cursor,limit,order}",
+      "templated": true
+    },
+    "payments": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/payments{?cursor,limit,order}",
+      "templated": true
+    },
+    "effects": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "offers": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/offers{?cursor,limit,order}",
+      "templated": true
+    },
+    "trades": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/trades{?cursor,limit,order}",
+      "templated": true
+    },
+    "data": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK/data/{key}",
+      "templated": true
+    }
+  },
+  "id": "GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK",
+  "paging_token": "",
+  "account_id": "GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK",
+  "sequence": "29361903968976896",
+  "subentry_count": 0,
+  "thresholds": {
+    "low_threshold": 0,
+    "med_threshold": 0,
+    "high_threshold": 0
+  },
+  "flags": {
+    "auth_required": false,
+    "auth_revocable": false
+  },
+  "balances": [
+    {
+      "balance": "30.0000000",
+      "asset_type": "native"
+    }
+  ],
+  "signers": [
+    {
+      "public_key": "GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK",
+      "weight": 1,
+      "key": "GCKPNUWNJVGFPRXDKYIYM6ANNMV5E6HHUSPEVISGS36G6QAQT7X2CZPK",
+      "type": "ed25519_public_key"
+    }
+  ],
+  "data": {}
+}

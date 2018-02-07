@@ -1,26 +1,34 @@
 ext {
 
     //Version
-    supportVersion = '26.+'
+    supportVersion = '26.1.0'
     junitVersion = '4.12'
-    mockitoVersion = '2.10.0'
+    mockitoAndroidVersion = '2.10.0'
+    mockitoVersion = '2.13.0'
     androidTestVersion = '1.0.1'
+    mockWebServerVersion = '3.8.1'
+    robolectricVersion = '3.6.1'
 
     //Packages
     supportPackage = 'com.android.support'
     mockitoPackage = 'org.mockito'
     junitPackage = 'junit'
     androidTestPackage = 'com.android.support.test'
+    okHttpPackage = 'com.squareup.okhttp3'
+    robolectricPackage = 'org.robolectric'
 
     supportDependencies = [
-            appCompat: buildDependency(supportPackage, 'appcompat-v7', supportVersion),
+            supportAnnotations : buildDependency(supportPackage, 'support-annotations', supportVersion)
     ]
 
     testingDependencies = [
             junit         : buildDependency(junitPackage, 'junit', junitVersion),
-            mockitoAndroid: buildDependency(mockitoPackage, "mockito-android", mockitoVersion),
-            androidTestRunner : buildDependency(androidTestPackage, "runner", androidTestVersion),
-            androidTestRules : buildDependency(androidTestPackage, "rules", androidTestVersion),
+            mockitoAndroid: buildDependency(mockitoPackage,'mockito-android', mockitoAndroidVersion),
+            mockito       : buildDependency(mockitoPackage, 'mockito-core', mockitoVersion),
+            androidTestRunner : buildDependency(androidTestPackage, 'runner', androidTestVersion),
+            androidTestRules : buildDependency(androidTestPackage, 'rules', androidTestVersion),
+            mockWebServer : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
+            robolectric   : buildDependency(robolectricPackage, 'robolectric', robolectricVersion)
     ]
 }
 

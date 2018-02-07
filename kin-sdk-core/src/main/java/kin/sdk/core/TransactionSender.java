@@ -1,6 +1,8 @@
 package kin.sdk.core;
 
 
+import static kin.sdk.core.Utils.checkNotNull;
+
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -43,12 +45,11 @@ class TransactionSender {
      * @throws OperationFailedException other error occurred
      */
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, String passphrase, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
         throws OperationFailedException, PassphraseException {
 
-        checkAddressNotEmpty(publicAddress);
-        checkForNegativeAmount(amount);
+        checkParams(from, passphrase, publicAddress, amount);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
         KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
@@ -57,15 +58,25 @@ class TransactionSender {
         return sendTransaction(transaction);
     }
 
-    private void checkAddressNotEmpty(@NonNull String publicAddress) throws OperationFailedException {
-        if (publicAddress.isEmpty()) {
-            throw new OperationFailedException("Addressee not valid - public address can't be null or empty");
+    private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
+        @NonNull BigDecimal amount) {
+        checkNotNull(from, "account");
+        checkNotNull(passphrase, "passphrase");
+        checkNotNull(amount, "amount");
+        checkAddressNotEmpty(publicAddress);
+        checkForNegativeAmount(amount);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void checkAddressNotEmpty(@NonNull String publicAddress) {
+        if (publicAddress == null || publicAddress.isEmpty()) {
+            throw new IllegalArgumentException("Addressee not valid - public address can't be null or empty");
         }
     }
 
-    private void checkForNegativeAmount(@NonNull BigDecimal amount) throws OperationFailedException {
+    private void checkForNegativeAmount(@NonNull BigDecimal amount) {
         if (amount.signum() == -1) {
-            throw new OperationFailedException("Amount can't be negative");
+            throw new IllegalArgumentException("Amount can't be negative");
         }
     }
 
@@ -74,7 +85,7 @@ class TransactionSender {
         try {
             return KeyPair.fromAccountId(publicAddress);
         } catch (Exception e) {
-            throw new OperationFailedException("Invalid addressee public address format");
+            throw new OperationFailedException("Invalid addressee public address format", e);
         }
     }
 
@@ -109,6 +120,9 @@ class TransactionSender {
         } catch (IOException e) {
             throw new OperationFailedException(e);
         }
+        if (sourceAccount == null) {
+            throw new OperationFailedException("can't retrieve data for account " + from.getAccountId());
+        }
         return sourceAccount;
     }
 
@@ -129,6 +143,9 @@ class TransactionSender {
     private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
         try {
             SubmitTransactionResponse response = server.submitTransaction(transaction);
+            if (response == null) {
+                throw new OperationFailedException("can't get transaction response");
+            }
             if (response.isSuccess()) {
                 return new TransactionIdImpl(response.getHash());
             } else {
