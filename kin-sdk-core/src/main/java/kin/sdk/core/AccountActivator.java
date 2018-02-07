@@ -46,7 +46,7 @@ class AccountActivator {
             } else {
                 throw new OperationFailedException(httpError);
             }
-        } catch (IOException e) {
+        } catch (IOException | CryptoException e) {
             throw new OperationFailedException(e);
         }
     }
@@ -67,13 +67,13 @@ class AccountActivator {
     }
 
     private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, String passphrase,
-        AccountResponse accountResponse) throws IOException {
+        AccountResponse accountResponse) throws IOException, CryptoException {
         Transaction allowKinTrustTransaction = new Transaction.Builder(accountResponse).addOperation(
             new ChangeTrustOperation.Builder(kinAsset.getStellarAsset(), TRUST_NO_LIMIT_VALUE)
                 .build()
         )
             .build();
-        allowKinTrustTransaction.sign(keyStore.decryptAccount(account, passphrase));
+        allowKinTrustTransaction.sign(keyStore.decryptAccount(account));
         return server.submitTransaction(allowKinTrustTransaction);
     }
 

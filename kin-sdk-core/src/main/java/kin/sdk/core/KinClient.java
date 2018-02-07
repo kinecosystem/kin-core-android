@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
+import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
+import kin.sdk.core.exception.LoadAccountException;
 
 public class KinClient {
 
@@ -44,9 +46,9 @@ public class KinClient {
      */
     @SuppressWarnings("deprecation")
     @Deprecated
-    public KinAccount createAccount(String passphrase) {
+    public KinAccount createAccount(String passphrase) throws CreateAccountException {
         if (!hasAccount()) {
-            Account account = keyStore.newAccount(passphrase);
+            Account account = keyStore.newAccount();
             kinAccounts.add(new KinAccountImpl(clientWrapper, account));
         }
         return getAccount();
@@ -60,11 +62,11 @@ public class KinClient {
      * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
      * @return {@link KinAccount} the account created store the key).
      */
-    public KinAccount addAccount(String passphrase) {
+    public KinAccount addAccount(String passphrase) throws CreateAccountException {
         if (kinAccounts.isEmpty()) {
             loadAccounts();
         }
-        Account account = keyStore.newAccount(passphrase);
+        Account account = keyStore.newAccount();
         KinAccountImpl newAccount = new KinAccountImpl(clientWrapper, account);
         kinAccounts.add(newAccount);
         return newAccount;
@@ -98,8 +100,13 @@ public class KinClient {
     }
 
     private void loadAccounts() {
-        List<Account> accounts = clientWrapper.getKeyStore().loadAccounts();
-        if (!accounts.isEmpty()) {
+        List<Account> accounts = null;
+        try {
+            accounts = clientWrapper.getKeyStore().loadAccounts();
+        } catch (LoadAccountException e) {
+            e.printStackTrace();
+        }
+        if (accounts != null && !accounts.isEmpty()) {
             for (Account account : accounts) {
                 kinAccounts.add(new KinAccountImpl(clientWrapper, account));
             }
@@ -140,7 +147,7 @@ public class KinClient {
      */
     public void deleteAccount(int index, String passphrase) throws DeleteAccountException {
         if (getAccountsCount() > index) {
-            keyStore.deleteAccount(index, passphrase);
+            keyStore.deleteAccount(index);
             KinAccountImpl removedAccount = kinAccounts.remove(index);
             removedAccount.markAsDeleted();
         }

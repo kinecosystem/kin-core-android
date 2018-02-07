@@ -15,13 +15,11 @@ public interface KinAccount {
     String getPublicAddress();
 
     /**
-     * Exports the keystore json file
+     * Deprecated, export will return null
      *
-     * @param passphrase the passphrase used to create the account
-     * @param newPassphrase the exported json will be encrypted using this new passphrase. The original keystore and
-     * passphrase will not change.
-     * @return String the json string
+     * @return null
      */
+    @Deprecated
     String exportKeyStore(String passphrase, String newPassphrase) throws PassphraseException, OperationFailedException;
 
     /**

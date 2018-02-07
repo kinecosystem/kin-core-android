@@ -29,8 +29,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     public String exportKeyStore(String passphrase, String newPassphrase)
         throws PassphraseException, OperationFailedException {
         checkValidAccount();
-        KeyStore keyStore = clientWrapper.getKeyStore();
-        return keyStore.exportAccount(account, passphrase);
+        return null;
     }
 
     @Override

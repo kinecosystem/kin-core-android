@@ -2,7 +2,6 @@ package kin.sdk.core;
 
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import org.stellar.sdk.KeyPair;
@@ -23,7 +22,7 @@ class FakeKeyStore implements KeyStore {
     }
 
     @Override
-    public void deleteAccount(int index, String passphrase) {
+    public void deleteAccount(int index) {
         accounts.remove(index);
     }
 
@@ -34,21 +33,16 @@ class FakeKeyStore implements KeyStore {
     }
 
     @Override
-    public Account newAccount(String passphrase) {
+    public Account newAccount() {
+
         KeyPair keyPair = KeyPair.random();
         Account account = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         accounts.add(account);
         return account;
     }
 
-    @Nullable
     @Override
-    public String exportAccount(@NonNull Account account, @NonNull String passphrase) {
-        return null;
-    }
-
-    @Override
-    public KeyPair decryptAccount(Account account, String passphrase) {
+    public KeyPair decryptAccount(Account account) {
         return KeyPair.fromSecretSeed(account.getEncryptedSeed());
     }
 
