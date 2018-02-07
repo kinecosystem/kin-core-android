@@ -10,7 +10,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse.Extras.ResultCodes;
 final class Utils {
 
     private Utils() {
-        //not instances
+        //no instances
     }
 
     static TransactionFailedException createTransactionException(@NonNull SubmitTransactionResponse response)
