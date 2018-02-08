@@ -88,7 +88,8 @@ class OnBoarding {
             .run(new ResultCallback<Void>() {
                 @Override
                 public void onResult(Void result) {
-                    fundAccount(account, callbacks);
+                    //This is not mandatory part of onboarding, account is now ready to send/receive kin
+                    fundAccountWithKin(account, callbacks);
                 }
 
                 @Override
@@ -98,7 +99,7 @@ class OnBoarding {
             });
     }
 
-    private void fundAccount(KinAccount account, @NonNull Callbacks callbacks) {
+    private void fundAccountWithKin(KinAccount account, @NonNull Callbacks callbacks) {
         Request request = new Request.Builder()
             .url(URL_FUND)
             .post(createRequestBody(account))
@@ -114,6 +115,7 @@ class OnBoarding {
                 public void onResponse(@NonNull Call call, @NonNull Response response)
                     throws IOException {
                     if (response.code() == 200) {
+                        //will trigger a call to get updated balance
                         fireOnSuccess(callbacks);
                     } else {
                         fireOnFailure(callbacks, new Exception("Fund account - response code is " + response.code()));

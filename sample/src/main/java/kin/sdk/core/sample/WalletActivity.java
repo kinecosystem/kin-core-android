@@ -93,6 +93,8 @@ public class WalletActivity extends BaseActivity {
         if (account != null) {
             balance.setText(null);
             balanceProgress.setVisibility(View.VISIBLE);
+            getKinBtn.setClickable(false);
+
             OnBoarding onBoarding = new OnBoarding();
             onBoarding.onBoard(account, PASSPHRASE1, new Callbacks() {
                 @Override
