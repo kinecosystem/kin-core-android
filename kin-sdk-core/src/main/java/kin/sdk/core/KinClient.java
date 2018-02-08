@@ -12,7 +12,7 @@ public class KinClient {
     private final KeyStore keyStore;
     private final ClientWrapper clientWrapper;
     @NonNull
-    private final List<KinAccountImpl> kinAccounts = new ArrayList<>();
+    private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
     /**
      * KinClient is an account manager for a single {@link KinAccount} on
@@ -40,6 +40,7 @@ public class KinClient {
     KinClient(ClientWrapper clientWrapper) {
         this.clientWrapper = clientWrapper;
         keyStore = clientWrapper.getKeyStore();
+        loadAccounts();
     }
 
     /**

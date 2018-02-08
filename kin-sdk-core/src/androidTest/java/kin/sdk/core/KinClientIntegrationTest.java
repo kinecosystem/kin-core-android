@@ -114,6 +114,13 @@ public class KinClientIntegrationTest {
 
 
     @Test
+    public void getAccount_NegativeIndex() throws Exception {
+        kinClient.addAccount(PASSPHRASE);
+
+        assertNull(kinClient.getAccount(-1));
+    }
+
+    @Test
     public void createAccount_ExistingAccount_SameAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
@@ -211,6 +218,18 @@ public class KinClientIntegrationTest {
     }
 
     @Test
+    public void deleteAccount_NegativeIndex() throws Exception {
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+
+        kinClient.deleteAccount(-1, PASSPHRASE);
+
+        assertNotNull(kinClient.getAccount(0));
+        assertNotNull(kinClient.getAccount(1));
+        assertThat(kinClient.getAccountsCount(), equalTo(2));
+    }
+
+    @Test
     public void getAccountCount() throws Exception {
         kinClient.addAccount(PASSPHRASE);
         kinClient.addAccount(PASSPHRASE);
@@ -225,6 +244,18 @@ public class KinClientIntegrationTest {
         assertThat(kinClient.getAccountsCount(), equalTo(2));
         kinClient.deleteAccount(1, PASSPHRASE);
         kinClient.deleteAccount(0, PASSPHRASE);
+        assertThat(kinClient.getAccountsCount(), equalTo(0));
+    }
+
+    @Test
+    public void wipeout() {
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
+
+        kinClient.wipeoutAccount();
+
         assertThat(kinClient.getAccountsCount(), equalTo(0));
     }
 

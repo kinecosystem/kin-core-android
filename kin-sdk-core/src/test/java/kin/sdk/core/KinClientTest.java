@@ -129,6 +129,14 @@ public class KinClientTest {
     }
 
     @Test
+    public void getAccount_NegativeIndex() throws Exception {
+        createKeyStoreWithRandomAccount();
+
+        kinClient = new KinClient(mockClientWrapper);
+        assertNull(kinClient.getAccount(-1));
+    }
+
+    @Test
     public void createAccount_ExistingAccount_SameAccount() throws Exception {
         Account account = createKeyStoreWithRandomAccount();
 
@@ -196,7 +204,6 @@ public class KinClientTest {
         Account account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
-        kinClient = new KinClient(mockClientWrapper);
 
         kinClient = new KinClient(mockClientWrapper);
         assertTrue(kinClient.hasAccount());
@@ -258,6 +265,21 @@ public class KinClientTest {
     }
 
     @Test
+    public void deleteAccount_NegativeIndex() throws Exception {
+        Account account1 = createRandomAccount();
+        Account account2 = createRandomAccount();
+
+        fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
+
+        kinClient = new KinClient(mockClientWrapper);
+        kinClient.deleteAccount(-1, PASSPHRASE);
+
+        assertNotNull(kinClient.getAccount(0));
+        assertNotNull(kinClient.getAccount(1));
+        assertThat(kinClient.getAccountsCount(), equalTo(2));
+    }
+
+    @Test
     public void getAccountCount() throws Exception {
         Account account1 = createRandomAccount();
         Account account2 = createRandomAccount();
@@ -278,11 +300,25 @@ public class KinClientTest {
     }
 
     @Test
+    public void wipeout() {
+        Account account1 = createRandomAccount();
+        Account account2 = createRandomAccount();
+        Account account3 = createRandomAccount();
+
+        fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
+        kinClient = new KinClient(mockClientWrapper);
+
+        kinClient.wipeoutAccount();
+
+        assertThat(kinClient.getAccountsCount(), equalTo(0));
+    }
+
+    @Test
     public void getServiceProvider() throws Exception {
         String url = "My awesome Horizon server";
         ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
         when(mockClientWrapper.getServiceProvider()).thenReturn(serviceProvider);
-
+        fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
         ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
 

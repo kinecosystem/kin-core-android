@@ -1,9 +1,9 @@
 package kin.sdk.core;
 
 
+import static junit.framework.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
@@ -212,7 +212,7 @@ public class KinAccountIntegrationTest {
     public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
         kinClient.deleteAccount(PASSPHRASE);
-        assertThat(kinAccount.getPublicAddress(), isEmptyString());
+        assertNull(kinAccount.getPublicAddress());
     }
 
 }
