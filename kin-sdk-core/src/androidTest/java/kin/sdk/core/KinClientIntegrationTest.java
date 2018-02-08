@@ -30,7 +30,7 @@ public class KinClientIntegrationTest {
 
     @Before
     public void setup() {
-        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, FakeKinIssuer.KIN_ISSUER_ACCOUNT_ID);
+        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
         kinClient.wipeoutAccount();
     }

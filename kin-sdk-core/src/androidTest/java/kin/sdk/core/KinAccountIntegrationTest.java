@@ -13,6 +13,7 @@ import kin.sdk.core.exception.AccountDeletedException;
 import kin.sdk.core.exception.AccountNotActivatedException;
 import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.TransactionFailedException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -37,8 +38,13 @@ public class KinAccountIntegrationTest {
 
     @Before
     public void setup() throws IOException {
-        ServiceProvider serviceProvider = new ServiceProvider(TEST_NETWORK_URL, FakeKinIssuer.KIN_ISSUER_ACCOUNT_ID);
+        ServiceProvider serviceProvider = new ServiceProvider(TEST_NETWORK_URL, fakeKinIssuer.getAccountId());
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
+        kinClient.wipeoutAccount();
+    }
+
+    @After
+    public void teardown() {
         kinClient.wipeoutAccount();
     }
 

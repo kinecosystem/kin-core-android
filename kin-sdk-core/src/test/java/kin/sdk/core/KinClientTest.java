@@ -43,7 +43,7 @@ public class KinClientTest {
     public void createAccount_NewAccount() throws Exception {
         fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.createAccount("123456");
+        KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
 
         assertNotNull(kinAccount);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
@@ -53,7 +53,7 @@ public class KinClientTest {
     public void createAccount_AddAccount() throws Exception {
         fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.addAccount("123456");
+        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
 
         assertNotNull(kinAccount);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
@@ -63,8 +63,8 @@ public class KinClientTest {
     public void createAccount_AddMultipleAccount() throws Exception {
         fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.addAccount("123456");
-        KinAccount kinAccount2 = kinClient.addAccount("123456");
+        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
 
         assertNotNull(kinAccount);
         assertNotNull(kinAccount2);
@@ -77,8 +77,8 @@ public class KinClientTest {
     public void getAccount_AddMultipleAccount() throws Exception {
         fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.addAccount("123456");
-        KinAccount kinAccount2 = kinClient.addAccount("123456");
+        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
 
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
@@ -97,8 +97,8 @@ public class KinClientTest {
 
         kinClient = new KinClient(mockClientWrapper);
 
-        KinAccount kinAccount2 = kinClient.addAccount("123456");
-        KinAccount kinAccount3 = kinClient.addAccount("123456");
+        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount3 = kinClient.addAccount(PASSPHRASE);
 
         KinAccount expectedAccount3 = kinClient.getAccount(2);
         KinAccount expectedAccount2 = kinClient.getAccount(1);
@@ -136,6 +136,7 @@ public class KinClientTest {
         KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
 
         assertEquals(account.getAccountId(), kinAccount.getPublicAddress());
+        assertThat(kinClient.getAccountsCount(), equalTo(1));
     }
 
     @NonNull

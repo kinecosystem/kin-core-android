@@ -42,5 +42,6 @@ script:
   - ./gradlew :kin-sdk-core:test
   - ./gradlew kin-sdk-core:assembleDebugAndroidTest
   - adb install -r ./kin-sdk-core/build/outputs/apk/androidTest/debug/kin-sdk-core-debug-androidTest.apk
+  #filter out @LargeTest annotated tests, these tests reach network and are flaky
   - adb shell am instrument -w -e notAnnotation android.support.test.filters.LargeTest  kin.sdk.core.test/android.support.test.runner.AndroidJUnitRunner
 

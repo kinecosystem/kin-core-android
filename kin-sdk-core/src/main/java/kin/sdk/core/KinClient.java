@@ -24,6 +24,16 @@ public class KinClient {
     public KinClient(Context context, ServiceProvider provider) {
         this.clientWrapper = new ClientWrapper(context, provider);
         keyStore = clientWrapper.getKeyStore();
+        loadAccounts();
+    }
+
+    private void loadAccounts() {
+        List<Account> accounts = clientWrapper.getKeyStore().loadAccounts();
+        if (!accounts.isEmpty()) {
+            for (Account account : accounts) {
+                kinAccounts.add(new KinAccountImpl(clientWrapper, account));
+            }
+        }
     }
 
     @VisibleForTesting
@@ -61,9 +71,6 @@ public class KinClient {
      * @return {@link KinAccount} the account created store the key).
      */
     public KinAccount addAccount(String passphrase) {
-        if (kinAccounts.isEmpty()) {
-            loadAccounts();
-        }
         Account account = keyStore.newAccount(passphrase);
         KinAccountImpl newAccount = new KinAccountImpl(clientWrapper, account);
         kinAccounts.add(newAccount);
@@ -88,38 +95,23 @@ public class KinClient {
      * @return the account at the input index or null if there is no such account
      */
     public KinAccount getAccount(int index) {
-        if (kinAccounts.isEmpty()) {
-            loadAccounts();
-        }
-        if (kinAccounts.size() > index) {
+        if (index >= 0 && kinAccounts.size() > index) {
             return kinAccounts.get(index);
         }
         return null;
-    }
-
-    private void loadAccounts() {
-        List<Account> accounts = clientWrapper.getKeyStore().loadAccounts();
-        if (!accounts.isEmpty()) {
-            for (Account account : accounts) {
-                kinAccounts.add(new KinAccountImpl(clientWrapper, account));
-            }
-        }
     }
 
     /**
      * @return true if there is an existing account
      */
     public boolean hasAccount() {
-        return getAccount(0) != null;
+        return getAccountsCount() != 0;
     }
 
     /**
      * Returns the number of existing accounts
      */
     public int getAccountsCount() {
-        if (kinAccounts.isEmpty()) {
-            loadAccounts();
-        }
         return kinAccounts.size();
     }
 
@@ -139,7 +131,7 @@ public class KinClient {
      * @param passphrase the passphrase used when the account was created
      */
     public void deleteAccount(int index, String passphrase) throws DeleteAccountException {
-        if (getAccountsCount() > index) {
+        if (index >= 0 && getAccountsCount() > index) {
             keyStore.deleteAccount(index, passphrase);
             KinAccountImpl removedAccount = kinAccounts.remove(index);
             removedAccount.markAsDeleted();
@@ -151,9 +143,6 @@ public class KinClient {
      * WARNING - if you don't export your account before deleting it, you will lose all your Kin.
      */
     public void wipeoutAccount() {
-        if (kinAccounts.isEmpty()) {
-            loadAccounts();
-        }
         clientWrapper.wipeoutAccounts();
         for (KinAccountImpl kinAccount : kinAccounts) {
             kinAccount.markAsDeleted();
