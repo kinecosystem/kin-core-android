@@ -113,16 +113,6 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void addAccount_ExistingAccount_SameAccount() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
-
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-
-        assertEquals(kinAccount1.getPublicAddress(), kinAccount.getPublicAddress());
-    }
-
-    @Test
     public void getAccount_EmptyKeyStore_Null() throws Exception {
         KinAccount kinAccount = kinClient.getAccount(0);
 
