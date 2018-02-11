@@ -81,7 +81,7 @@ public class WalletActivity extends BaseActivity {
 
     private void deleteAccount() {
         try {
-            getKinClient().deleteAccount(getPassphrase());
+            getKinClient().deleteAccount(0, getPassphrase());
             onBackPressed();
         } catch (DeleteAccountException e) {
             KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
@@ -89,7 +89,7 @@ public class WalletActivity extends BaseActivity {
     }
 
     private void getKin() {
-        final KinAccount account = getKinClient().getAccount();
+        final KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             balance.setText(null);
             balanceProgress.setVisibility(View.VISIBLE);
@@ -115,7 +115,7 @@ public class WalletActivity extends BaseActivity {
 
     private void updatePublicKey() {
         String publicKeyStr = "";
-        KinAccount account = getKinClient().getAccount();
+        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             publicKeyStr = account.getPublicAddress();
         }
@@ -124,7 +124,7 @@ public class WalletActivity extends BaseActivity {
 
     private void updateBalance(boolean showDialog) {
         balanceProgress.setVisibility(View.VISIBLE);
-        KinAccount account = getKinClient().getAccount();
+        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             balanceRequest = account.getBalance();
             if (showDialog) {
