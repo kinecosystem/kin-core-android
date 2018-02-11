@@ -124,6 +124,7 @@ public class AccountActivatorTest {
 
         accountActivator.activate(account, "");
 
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
         assertThat(mockWebServer.getRequestCount(), equalTo(1));
     }
 

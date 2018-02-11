@@ -10,7 +10,7 @@ import kin.sdk.core.exception.TransactionFailedException;
 public interface KinAccount {
 
     /**
-     * @return String the public address of the account
+     * @return String the public address of the account, or null if deleted
      */
     String getPublicAddress();
 

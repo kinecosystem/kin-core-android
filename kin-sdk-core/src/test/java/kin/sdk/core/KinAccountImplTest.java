@@ -1,8 +1,7 @@
 package kin.sdk.core;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
+import static junit.framework.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -118,6 +117,6 @@ public class KinAccountImplTest {
         initWithRandomAccount();
         kinAccount.markAsDeleted();
 
-        assertThat(kinAccount.getPublicAddress(), isEmptyString());
+        assertNull(kinAccount.getPublicAddress());
     }
 }

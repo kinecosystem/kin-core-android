@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import kin.sdk.core.exception.AccountDeletedException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
+import org.stellar.sdk.KeyPair;
 
 
 final class KinAccountImpl extends AbstractKinAccount {
@@ -12,6 +13,12 @@ final class KinAccountImpl extends AbstractKinAccount {
     private final Account account;
     private boolean isDeleted = false;
 
+    /**
+     * Creates a {@link KinAccount} from existing {@link KeyPair}
+     *
+     * @param clientWrapper that will be use to call to Kin smart-contract.
+     * @param account the existing Account.
+     */
     KinAccountImpl(ClientWrapper clientWrapper, Account account) {
         this.account = account;
         this.clientWrapper = clientWrapper;
@@ -22,7 +29,7 @@ final class KinAccountImpl extends AbstractKinAccount {
         if (!isDeleted) {
             return account.getAccountId();
         }
-        return "";
+        return null;
     }
 
     @Override
