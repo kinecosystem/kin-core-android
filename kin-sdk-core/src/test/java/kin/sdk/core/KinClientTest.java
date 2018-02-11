@@ -144,7 +144,7 @@ public class KinClientTest {
         KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
 
         assertEquals(account.getAccountId(), kinAccount.getPublicAddress());
-        assertThat(kinClient.getAccountsCount(), equalTo(1));
+        assertThat(kinClient.getAccountCount(), equalTo(1));
     }
 
     @NonNull
@@ -261,7 +261,7 @@ public class KinClientTest {
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
     }
 
     @Test
@@ -276,7 +276,7 @@ public class KinClientTest {
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
     }
 
     @Test
@@ -288,15 +288,15 @@ public class KinClientTest {
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
         kinClient = new KinClient(mockClientWrapper);
 
-        assertThat(kinClient.getAccountsCount(), equalTo(3));
+        assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2, PASSPHRASE);
         kinClient.deleteAccount(1, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(1));
+        assertThat(kinClient.getAccountCount(), equalTo(1));
         kinClient.addAccount(PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
         kinClient.deleteAccount(1, PASSPHRASE);
         kinClient.deleteAccount(0, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(0));
+        assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test
@@ -310,7 +310,7 @@ public class KinClientTest {
 
         kinClient.wipeoutAccount();
 
-        assertThat(kinClient.getAccountsCount(), equalTo(0));
+        assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test

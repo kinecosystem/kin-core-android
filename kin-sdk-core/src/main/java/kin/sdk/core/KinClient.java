@@ -106,13 +106,13 @@ public class KinClient {
      * @return true if there is an existing account
      */
     public boolean hasAccount() {
-        return getAccountsCount() != 0;
+        return getAccountCount() != 0;
     }
 
     /**
      * Returns the number of existing accounts
      */
-    public int getAccountsCount() {
+    public int getAccountCount() {
         return kinAccounts.size();
     }
 
@@ -132,7 +132,7 @@ public class KinClient {
      * @param passphrase the passphrase used when the account was created
      */
     public void deleteAccount(int index, String passphrase) throws DeleteAccountException {
-        if (index >= 0 && getAccountsCount() > index) {
+        if (index >= 0 && getAccountCount() > index) {
             keyStore.deleteAccount(index, passphrase);
             KinAccountImpl removedAccount = kinAccounts.remove(index);
             removedAccount.markAsDeleted();

@@ -214,7 +214,7 @@ public class KinClientIntegrationTest {
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class KinClientIntegrationTest {
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
     }
 
     @Test
@@ -236,15 +236,15 @@ public class KinClientIntegrationTest {
         kinClient.addAccount(PASSPHRASE);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        assertThat(kinClient.getAccountsCount(), equalTo(3));
+        assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2, PASSPHRASE);
         kinClient.deleteAccount(1, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(1));
+        assertThat(kinClient.getAccountCount(), equalTo(1));
         kinClient.addAccount(PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
         kinClient.deleteAccount(1, PASSPHRASE);
         kinClient.deleteAccount(0, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(0));
+        assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test
@@ -256,7 +256,7 @@ public class KinClientIntegrationTest {
 
         kinClient.wipeoutAccount();
 
-        assertThat(kinClient.getAccountsCount(), equalTo(0));
+        assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test
