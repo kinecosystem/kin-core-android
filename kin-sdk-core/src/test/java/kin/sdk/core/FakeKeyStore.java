@@ -15,7 +15,7 @@ class FakeKeyStore implements KeyStore {
     private List<Account> accounts;
 
     FakeKeyStore(List<Account> preloadedAccounts) {
-        accounts = preloadedAccounts;
+        accounts = new ArrayList<>(preloadedAccounts);
     }
 
     FakeKeyStore() {
@@ -23,8 +23,8 @@ class FakeKeyStore implements KeyStore {
     }
 
     @Override
-    public void deleteAccount(Account keyPair, String passphrase) {
-        accounts.remove(keyPair);
+    public void deleteAccount(int index, String passphrase) {
+        accounts.remove(index);
     }
 
     @NonNull
@@ -50,5 +50,10 @@ class FakeKeyStore implements KeyStore {
     @Override
     public KeyPair decryptAccount(Account account, String passphrase) {
         return KeyPair.fromSecretSeed(account.getEncryptedSeed());
+    }
+
+    @Override
+    public void clearAllAccounts() {
+        accounts.clear();
     }
 }

@@ -2,7 +2,6 @@ package kin.sdk.core;
 
 import java.math.BigDecimal;
 import kin.sdk.core.exception.AccountDeletedException;
-import kin.sdk.core.exception.DeleteAccountException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import org.stellar.sdk.KeyPair;
@@ -13,19 +12,6 @@ final class KinAccountImpl extends AbstractKinAccount {
     private final ClientWrapper clientWrapper;
     private final Account account;
     private boolean isDeleted = false;
-
-    /**
-     * Creates a new {@link KeyPair}.
-     *
-     * @param clientWrapper that will be use to call to Kin smart-contract.
-     * @param passphrase that will be used to store the account private key securely.
-     * @throws Exception if go-ethereum was unable to generate the account (unable to generate new key or store the
-     * key).
-     */
-    KinAccountImpl(ClientWrapper clientWrapper, String passphrase) throws Exception {
-        this.clientWrapper = clientWrapper;
-        this.account = clientWrapper.getKeyStore().newAccount(passphrase);
-    }
 
     /**
      * Creates a {@link KinAccount} from existing {@link KeyPair}
@@ -43,7 +29,7 @@ final class KinAccountImpl extends AbstractKinAccount {
         if (!isDeleted) {
             return account.getAccountId();
         }
-        return "";
+        return null;
     }
 
     @Override
@@ -71,11 +57,6 @@ final class KinAccountImpl extends AbstractKinAccount {
     public void activateSync(String passphrase) throws OperationFailedException {
         checkValidAccount();
         clientWrapper.activateAccount(account, passphrase);
-    }
-
-    void delete(String passphrase) throws DeleteAccountException {
-        clientWrapper.getKeyStore().deleteAccount(account, passphrase);
-        markAsDeleted();
     }
 
     void markAsDeleted() {

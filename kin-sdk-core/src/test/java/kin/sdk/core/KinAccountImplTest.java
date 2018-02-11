@@ -1,8 +1,7 @@
 package kin.sdk.core;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
+import static junit.framework.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,13 +35,6 @@ public class KinAccountImplTest {
         KeyPair keyPair = KeyPair.random();
         expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         kinAccount = new KinAccountImpl(mockClientWrapper, expectedRandomAccount);
-    }
-
-    @Test
-    public void getPublicAddress() throws Exception {
-        kinAccount = new KinAccountImpl(mockClientWrapper, PASSPHRASE);
-
-        assertEquals(fakeKeyStore.loadAccounts().get(0).getAccountId(), kinAccount.getPublicAddress());
     }
 
     @Test
@@ -121,9 +113,9 @@ public class KinAccountImplTest {
 
     @Test
     public void getPublicAddress_DeletedAccount_Empty() throws Exception {
-        kinAccount = new KinAccountImpl(mockClientWrapper, PASSPHRASE);
+        initWithRandomAccount();
         kinAccount.markAsDeleted();
 
-        assertThat(kinAccount.getPublicAddress(), isEmptyString());
+        assertNull(kinAccount.getPublicAddress());
     }
 }

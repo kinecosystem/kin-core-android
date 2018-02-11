@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import java.math.BigDecimal;
-import kin.sdk.core.exception.AccountNotActivatedException;
-import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.PassphraseException;
 import org.stellar.sdk.Network;
@@ -57,8 +55,8 @@ class ClientWrapper {
         return new KeyStoreImpl(context);
     }
 
-    void wipeoutAccount() {
-        //TODO
+    void wipeoutAccounts() {
+        keyStore.clearAllAccounts();
     }
 
     @NonNull
