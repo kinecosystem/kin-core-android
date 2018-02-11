@@ -56,7 +56,9 @@ public class ClientWrapperTest {
         String expectedAccountId = "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX";
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
-        when(mockTransactionSender.sendTransaction(any(), any(), any(), any())).thenReturn(expectedTransactionId);
+        when(mockTransactionSender
+            .sendTransaction((Account) any(), (String) any(), (String) any(), (BigDecimal) any()))
+            .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = clientWrapper
             .sendTransaction(expectedFrom, expectedPassphrase, expectedAccountId, expectedAmount);
@@ -71,7 +73,7 @@ public class ClientWrapperTest {
         KeyPair keyPair = KeyPair.random();
         Account expectedFrom = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         Balance expectedBalance = new BalanceImpl(new BigDecimal("11.0"));
-        when(mockBalanceQuery.getBalance(any())).thenReturn(expectedBalance);
+        when(mockBalanceQuery.getBalance((Account) any())).thenReturn(expectedBalance);
 
         Balance balance = clientWrapper.getBalance(expectedFrom);
 

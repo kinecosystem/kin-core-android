@@ -57,12 +57,25 @@ public class Request<T> {
 
     private void submitFuture(final Callable<T> callable, ResultCallback<T> callback) {
         this.resultCallback = callback;
-        future = executorService.submit(() -> {
-            try {
-                final T result = callable.call();
-                executeOnMainThreadIfNotCancelled(() -> resultCallback.onResult(result));
-            } catch (final Exception e) {
-                executeOnMainThreadIfNotCancelled(() -> resultCallback.onError(e));
+        future = executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final T result = callable.call();
+                    executeOnMainThreadIfNotCancelled(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultCallback.onResult(result);
+                        }
+                    });
+                } catch (final Exception e) {
+                    executeOnMainThreadIfNotCancelled(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultCallback.onError(e);
+                        }
+                    });
+                }
             }
         });
     }
@@ -77,8 +90,8 @@ public class Request<T> {
      * Cancel {@code Request} and detach its callback,
      * an attempt will be made to cancel ongoing request, if request has not run yet it will never run.
      *
-     * @param mayInterruptIfRunning true if the request should be interrupted; otherwise,
-     * in-progress requests are allowed to complete
+     * @param mayInterruptIfRunning true if the request should be interrupted; otherwise, in-progress requests are
+     * allowed to complete
      */
     synchronized public void cancel(boolean mayInterruptIfRunning) {
         if (!cancelled) {
@@ -88,7 +101,12 @@ public class Request<T> {
             }
             future = null;
             mainHandler.removeCallbacksAndMessages(null);
-            mainHandler.post(() -> resultCallback = null);
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    resultCallback = null;
+                }
+            });
         }
     }
 

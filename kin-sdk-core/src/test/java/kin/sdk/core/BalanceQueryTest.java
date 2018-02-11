@@ -4,18 +4,18 @@ import static kin.sdk.core.TestUtils.enqueueEmptyResponse;
 import static kin.sdk.core.TestUtils.generateSuccessMockResponse;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import kin.sdk.core.ServiceProvider.KinAsset;
-import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.AccountNotActivatedException;
+import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.OperationFailedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
+import org.hamcrest.Matchers;
 import org.hamcrest.beans.HasPropertyWithValue;
 import org.junit.Assert;
 import org.junit.Before;
@@ -115,7 +115,7 @@ public class BalanceQueryTest {
         );
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(instanceOf(HttpResponseException.class));
+        expectedEx.expectCause(Matchers.<Throwable>instanceOf(HttpResponseException.class));
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
     }
 

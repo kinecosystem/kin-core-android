@@ -28,13 +28,17 @@ public class RequestTest {
         void accept(T t);
     }
 
-    private <T> void runRequest(Callable<T> task, Consumer<T> onResultCallback, Consumer<Exception> onErrorCallback)
+    private <T> void runRequest(final Callable<T> task, final Consumer<T> onResultCallback,
+        final Consumer<Exception> onErrorCallback)
         throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        Request<T> mockRequest = new Request<>(() -> {
-            T result = task.call();
-            Thread.sleep(TASK_DURATION_MILLIS);
-            return result;
+        final CountDownLatch latch = new CountDownLatch(1);
+        Request<T> mockRequest = new Request<>(new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                T result = task.call();
+                Thread.sleep(TASK_DURATION_MILLIS);
+                return result;
+            }
         });
         mockRequest.run(new ResultCallback<T>() {
             @Override
@@ -58,22 +62,40 @@ public class RequestTest {
 
     @Test
     public void run_verifyExpectedResult() throws InterruptedException {
-        String expectedResult = "ExpectedResult";
+        final String expectedResult = "ExpectedResult";
         runRequest(
-            () -> expectedResult,
-            result -> assertEquals(expectedResult, result),
+            new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    return expectedResult;
+                }
+            },
+            new Consumer<Object>() {
+                @Override
+                public void accept(Object result) {
+                    assertEquals(expectedResult, result);
+                }
+            },
             null
         );
     }
 
     @Test
     public void run_verifyCorrectThreads() throws InterruptedException {
-        AtomicLongArray threadIds = new AtomicLongArray(2);
-        runRequest(() -> {
-                threadIds.set(0, Thread.currentThread().getId());
-                return null;
+        final AtomicLongArray threadIds = new AtomicLongArray(2);
+        runRequest(new Callable<Object>() {
+                       @Override
+                       public Object call() throws Exception {
+                           threadIds.set(0, Thread.currentThread().getId());
+                           return null;
+                       }
+                   },
+            new Consumer<Object>() {
+                @Override
+                public void accept(Object result) {
+                    threadIds.set(1, Thread.currentThread().getId());
+                }
             },
-            result -> threadIds.set(1, Thread.currentThread().getId()),
             null
         );
 
@@ -84,12 +106,20 @@ public class RequestTest {
 
     @Test
     public void run_verifyExceptionPropagation() throws InterruptedException {
-        Exception expectedException = new Exception("some exception");
-        runRequest(() -> {
-                throw expectedException;
-            },
+        final Exception expectedException = new Exception("some exception");
+        runRequest(new Callable<Object>() {
+                       @Override
+                       public Object call() throws Exception {
+                           throw expectedException;
+                       }
+                   },
             null
-            , e -> assertEquals(expectedException, e));
+            , new Consumer<Exception>() {
+                @Override
+                public void accept(Exception e) {
+                    assertEquals(expectedException, e);
+                }
+            });
     }
 
     @Test
@@ -103,19 +133,22 @@ public class RequestTest {
     }
 
     private void threadInterruptTest(boolean expectThreadInterruptted) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        CountDownLatch runLatch = new CountDownLatch(1);
-        AtomicBoolean threadInterrupted = new AtomicBoolean(false);
-        AtomicBoolean callbackExecuted = new AtomicBoolean(false);
-        Request<Object> mockRequest = new Request<>(() -> {
-            try {
-                runLatch.countDown();
-                Thread.sleep(TASK_DURATION_MILLIS);
-            } catch (InterruptedException ie) {
-                threadInterrupted.set(true);
+        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch runLatch = new CountDownLatch(1);
+        final AtomicBoolean threadInterrupted = new AtomicBoolean(false);
+        final AtomicBoolean callbackExecuted = new AtomicBoolean(false);
+        Request<Object> mockRequest = new Request<>(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                try {
+                    runLatch.countDown();
+                    Thread.sleep(TASK_DURATION_MILLIS);
+                } catch (InterruptedException ie) {
+                    threadInterrupted.set(true);
+                }
+                latch.countDown();
+                return new Object();
             }
-            latch.countDown();
-            return new Object();
         });
         mockRequest.run(new ResultCallback<Object>() {
             @Override
@@ -142,20 +175,35 @@ public class RequestTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void run_nullCallback() {
-        Request<String> request = new Request<>(() -> "");
+        Request<String> request = new Request<>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return "";
+            }
+        });
         request.run(null);
     }
 
     @Test(expected = IllegalStateException.class)
     public void run_twice() {
-        Request<String> request = new Request<>(() -> "");
+        Request<String> request = new Request<>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return "";
+            }
+        });
         request.run(getEmptyResultCallback());
         request.run(getEmptyResultCallback());
     }
 
     @Test(expected = IllegalStateException.class)
     public void runAfterCancel() {
-        Request<String> request = new Request<>(() -> "");
+        Request<String> request = new Request<>(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return "";
+            }
+        });
         request.cancel(true);
         request.run(getEmptyResultCallback());
     }

@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.stellar.sdk.KeyPair;
 
 @SuppressWarnings("deprecation")
@@ -36,7 +38,12 @@ public class KinClientTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        when(mockClientWrapper.getKeyStore()).thenAnswer(invocation -> fakeKeyStore);
+        when(mockClientWrapper.getKeyStore()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return fakeKeyStore;
+            }
+        });
     }
 
     @Test

@@ -22,8 +22,8 @@ import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 import kin.sdk.core.ServiceProvider.KinAsset;
-import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.AccountNotActivatedException;
+import kin.sdk.core.exception.AccountNotFoundException;
 import kin.sdk.core.exception.OperationFailedException;
 import kin.sdk.core.exception.TransactionFailedException;
 import okhttp3.mockwebserver.MockResponse;
@@ -38,6 +38,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.stellar.sdk.FormatException;
@@ -90,7 +92,12 @@ public class TransactionSenderTest {
     private void mockKeyStoreResponse() {
         when(mockKeyStore.decryptAccount(any(Account.class), anyString()))
             .thenAnswer(
-                invocation -> KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed()));
+                new Answer<Object>() {
+                    @Override
+                    public Object answer(InvocationOnMock invocation) throws Throwable {
+                        return KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed());
+                    }
+                });
     }
 
     @Test

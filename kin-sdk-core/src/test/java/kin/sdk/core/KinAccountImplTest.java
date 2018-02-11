@@ -53,7 +53,8 @@ public class KinAccountImplTest {
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
 
-        when(mockClientWrapper.sendTransaction(any(), any(), any(), any())).thenReturn(expectedTransactionId);
+        when(mockClientWrapper.sendTransaction((Account) any(), (String) any(), (String) any(), (BigDecimal) any()))
+            .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
             .sendTransactionSync(expectedAccountId, expectedPassphrase, expectedAmount);
@@ -68,7 +69,7 @@ public class KinAccountImplTest {
         initWithRandomAccount();
 
         Balance expectedBalance = new BalanceImpl(new BigDecimal("11.0"));
-        when(mockClientWrapper.getBalance(any())).thenReturn(expectedBalance);
+        when(mockClientWrapper.getBalance((Account) any())).thenReturn(expectedBalance);
 
         Balance balance = kinAccount.getBalanceSync();
 
