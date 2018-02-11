@@ -44,29 +44,9 @@ public class KinClient {
     }
 
     /**
-     * Create the account or returns the already created at index 0.
-     * <p>Multiple calls to this method will not create an additional account, use {@link #addAccount(String)} for
-     * creating multiple accounts.</p>
-     * Once created, the account information will be stored securely on the device and can
-     * be accessed again via the {@link #getAccount()} method.
-     *
-     * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
-     * @return {@link KinAccount} the account created store the key).
-     */
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public KinAccount createAccount(String passphrase) {
-        if (!hasAccount()) {
-            Account account = keyStore.newAccount(passphrase);
-            kinAccounts.add(new KinAccountImpl(clientWrapper, account));
-        }
-        return getAccount();
-    }
-
-    /**
      * Creates and adds an account.
      * <p>Once created, the account information will be stored securely on the device and can
-     * be accessed again via the {@link #getAccount()} method.</p>
+     * be accessed again via the {@link #getAccount(int)} method.</p>
      *
      * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
      * @return {@link KinAccount} the account created store the key).
@@ -79,19 +59,8 @@ public class KinClient {
     }
 
     /**
-     * Returns an account that has been previously created and stored on the device
-     * via the {@link #createAccount(String)} method.
-     *
-     * @return the account if it has been created or null if there is no such account
-     */
-    @Deprecated
-    public KinAccount getAccount() {
-        return getAccount(0);
-    }
-
-    /**
      * Return an account input index, returns an account that has previously been create and stored on the device
-     * via the {@link #createAccount(String)} method.
+     * via the {@link #addAccount(String)} method.
      *
      * @return the account at the input index or null if there is no such account
      */
@@ -114,16 +83,6 @@ public class KinClient {
      */
     public int getAccountCount() {
         return kinAccounts.size();
-    }
-
-    /**
-     * Deletes the account at index 0 (if it exists)
-     *
-     * @param passphrase the passphrase used when the account was created
-     */
-    @Deprecated
-    public void deleteAccount(String passphrase) throws DeleteAccountException {
-        deleteAccount(0, passphrase);
     }
 
     /**

@@ -40,10 +40,10 @@ public class KinClientTest {
     }
 
     @Test
-    public void createAccount_NewAccount() throws Exception {
+    public void addAccount_NewAccount() throws Exception {
         fakeKeyStore = new FakeKeyStore();
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
 
         assertNotNull(kinAccount);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
@@ -136,17 +136,6 @@ public class KinClientTest {
         assertNull(kinClient.getAccount(-1));
     }
 
-    @Test
-    public void createAccount_ExistingAccount_SameAccount() throws Exception {
-        Account account = createKeyStoreWithRandomAccount();
-
-        kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
-
-        assertEquals(account.getAccountId(), kinAccount.getPublicAddress());
-        assertThat(kinClient.getAccountCount(), equalTo(1));
-    }
-
     @NonNull
     private Account createRandomAccount() {
         KeyPair keyPair = KeyPair.random();
@@ -158,7 +147,7 @@ public class KinClientTest {
         fakeKeyStore = new FakeKeyStore();
 
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.getAccount();
+        KinAccount kinAccount = kinClient.getAccount(0);
 
         assertNull(kinAccount);
     }
@@ -168,7 +157,7 @@ public class KinClientTest {
         Account account = createKeyStoreWithRandomAccount();
 
         kinClient = new KinClient(mockClientWrapper);
-        KinAccount kinAccount = kinClient.getAccount();
+        KinAccount kinAccount = kinClient.getAccount(0);
 
         assertEquals(account.getAccountId(), kinAccount.getPublicAddress());
     }
@@ -215,7 +204,7 @@ public class KinClientTest {
 
         kinClient = new KinClient(mockClientWrapper);
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
 
         assertFalse(kinClient.hasAccount());
     }
@@ -228,10 +217,10 @@ public class KinClientTest {
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
         kinClient = new KinClient(mockClientWrapper);
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
 
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         assertFalse(kinClient.hasAccount());
     }
 

@@ -127,7 +127,7 @@ public class TransactionActivity extends BaseActivity {
 
     private void sendTransaction(String toAddress, BigDecimal amount) throws OperationFailedException {
         progressBar.setVisibility(View.VISIBLE);
-        KinAccount account = getKinClient().getAccount();
+        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             transactionRequest = account
                 .sendTransaction(toAddress, getPassphrase(), amount);

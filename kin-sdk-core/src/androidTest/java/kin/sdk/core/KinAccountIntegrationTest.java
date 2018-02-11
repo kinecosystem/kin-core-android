@@ -189,21 +189,21 @@ public class KinAccountIntegrationTest {
     @Test(expected = AccountDeletedException.class)
     public void activateSync_DeletedAccount_AccountDeletedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         kinAccount.activateSync(PASSPHRASE);
     }
 
     @Test(expected = AccountDeletedException.class)
     public void getBalanceSync_DeletedAccount_AccountDeletedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         kinAccount.getBalanceSync();
     }
 
     @Test(expected = AccountDeletedException.class)
     public void sendTransactionSync_DeletedAccount_AccountDeletedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         kinAccount.sendTransactionSync("GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM", PASSPHRASE,
             new BigDecimal(10));
     }
@@ -211,7 +211,7 @@ public class KinAccountIntegrationTest {
     @Test
     public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         assertNull(kinAccount.getPublicAddress());
     }
 
