@@ -159,10 +159,7 @@ class TransactionSender {
             } else {
                 throw Utils.createTransactionException(response);
             }
-        } catch (
-            IOException e)
-
-        {
+        } catch (IOException e) {
             throw new OperationFailedException(e);
         }
     }

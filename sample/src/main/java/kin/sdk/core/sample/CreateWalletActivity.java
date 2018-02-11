@@ -38,7 +38,7 @@ public class CreateWalletActivity extends BaseActivity {
     private void createAccount() {
         try {
             final KinClient kinClient = getKinClient();
-            kinClient.createAccount(getPassphrase());
+            kinClient.addAccount(getPassphrase());
             startActivity(WalletActivity.getIntent(this));
         } catch (CreateAccountException e) {
             KinAlertDialog.createErrorDialog(this, e.getMessage()).show();

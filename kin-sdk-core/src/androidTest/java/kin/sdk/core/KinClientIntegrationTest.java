@@ -30,21 +30,13 @@ public class KinClientIntegrationTest {
 
     @Before
     public void setup() {
-        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, FakeKinIssuer.KIN_ISSUER_ACCOUNT_ID);
+        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
         kinClient.wipeoutAccount();
     }
 
     @Test
-    public void createAccount_NewAccount() throws Exception {
-        KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
-
-        assertNotNull(kinAccount);
-        assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
-    }
-
-    @Test
-    public void createAccount_AddAccount() throws Exception {
+    public void addAccount_NewAccount() throws Exception {
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
 
         assertNotNull(kinAccount);
@@ -114,18 +106,15 @@ public class KinClientIntegrationTest {
 
 
     @Test
-    public void createAccount_ExistingAccount_SameAccount() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
+    public void getAccount_NegativeIndex() throws Exception {
+        kinClient.addAccount(PASSPHRASE);
 
-        KinAccount kinAccount = kinClient.createAccount(PASSPHRASE);
-
-        assertEquals(kinAccount1.getPublicAddress(), kinAccount.getPublicAddress());
+        assertNull(kinClient.getAccount(-1));
     }
 
     @Test
     public void getAccount_EmptyKeyStore_Null() throws Exception {
-        KinAccount kinAccount = kinClient.getAccount();
+        KinAccount kinAccount = kinClient.getAccount(0);
 
         assertNull(kinAccount);
     }
@@ -135,7 +124,7 @@ public class KinClientIntegrationTest {
         KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        KinAccount kinAccount = kinClient.getAccount();
+        KinAccount kinAccount = kinClient.getAccount(0);
 
         assertEquals(kinAccount1.getPublicAddress(), kinAccount.getPublicAddress());
     }
@@ -169,7 +158,7 @@ public class KinClientIntegrationTest {
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         assertFalse(kinClient.hasAccount());
     }
 
@@ -179,10 +168,10 @@ public class KinClientIntegrationTest {
         kinClient.addAccount(PASSPHRASE);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
 
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(PASSPHRASE);
+        kinClient.deleteAccount(0, PASSPHRASE);
         assertFalse(kinClient.hasAccount());
     }
 
@@ -207,7 +196,19 @@ public class KinClientIntegrationTest {
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
+    }
+
+    @Test
+    public void deleteAccount_NegativeIndex() throws Exception {
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+
+        kinClient.deleteAccount(-1, PASSPHRASE);
+
+        assertNotNull(kinClient.getAccount(0));
+        assertNotNull(kinClient.getAccount(1));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
     }
 
     @Test
@@ -217,15 +218,27 @@ public class KinClientIntegrationTest {
         kinClient.addAccount(PASSPHRASE);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        assertThat(kinClient.getAccountsCount(), equalTo(3));
+        assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2, PASSPHRASE);
         kinClient.deleteAccount(1, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(1));
+        assertThat(kinClient.getAccountCount(), equalTo(1));
         kinClient.addAccount(PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(2));
+        assertThat(kinClient.getAccountCount(), equalTo(2));
         kinClient.deleteAccount(1, PASSPHRASE);
         kinClient.deleteAccount(0, PASSPHRASE);
-        assertThat(kinClient.getAccountsCount(), equalTo(0));
+        assertThat(kinClient.getAccountCount(), equalTo(0));
+    }
+
+    @Test
+    public void wipeout() {
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount(PASSPHRASE);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
+
+        kinClient.wipeoutAccount();
+
+        assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test
