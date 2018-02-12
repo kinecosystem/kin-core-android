@@ -19,6 +19,8 @@ class EncryptorFactory {
         String versionString = store.getString(VERSION_KEY);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //handle android version upgrades, fallback to old encyrptor version if already exists, o.w. older
+            //keys cannot be restored
             if (VER_18.equals(versionString)) {
                 store.saveString(VERSION_KEY, VER_18);
                 return new EncryptorImplV18(context.getApplicationContext());
@@ -26,7 +28,7 @@ class EncryptorFactory {
                 store.saveString(VERSION_KEY, VER_16);
                 return new EncryptorImplV16();
             }
-            store.saveString(VERSION_KEY, "23");
+            store.saveString(VERSION_KEY, VER_23);
             return new EncryptorImplV23();
         } else if (Build.VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR2) {
             if (VER_16.equals(versionString)) {
@@ -36,7 +38,7 @@ class EncryptorFactory {
             store.saveString(VERSION_KEY, VER_18);
             return new EncryptorImplV18(context.getApplicationContext());
         } else {
-            store.saveString(VERSION_KEY, "16");
+            store.saveString(VERSION_KEY, VER_16);
             return new EncryptorImplV16();
         }
     }

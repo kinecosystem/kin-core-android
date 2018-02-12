@@ -15,6 +15,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -33,7 +35,8 @@ class EncryptorImplV18 implements Encryptor {
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
     private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
-    private static final String ALIAS = "KinKeyStore";
+    private static final String ALIAS = "KinKeyStoreRSA";
+    private static final String RSA = "RSA";
 
     private final Context context;
 
@@ -45,7 +48,7 @@ class EncryptorImplV18 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return rsaEncrypt(ALIAS, secret);
+            return rsaEncrypt(keyStore, ALIAS, secret);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
@@ -55,16 +58,22 @@ class EncryptorImplV18 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return rsaDecrypt(ALIAS
-                , encryptedSecret, keyStore);
+            return rsaDecrypt(ALIAS, encryptedSecret, keyStore);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
     }
 
-    private String rsaEncrypt(String alias, String secret) throws Exception {
-        KeyPair rsaKeys = generateRsaPair(alias);
-        byte[] encryptedBytes = performEncryption(secret.getBytes("UTF-8"), rsaKeys.getPublic());
+    private String rsaEncrypt(KeyStore keyStore, String alias, String secret) throws Exception {
+        Entry entry = keyStore.getEntry(alias, null);
+        PublicKey publicKey;
+        if (entry == null) {
+            KeyPair rsaKeys = generateRsaPair(alias);
+            publicKey = rsaKeys.getPublic();
+        } else {
+            publicKey = ((PrivateKeyEntry) entry).getCertificate().getPublicKey();
+        }
+        byte[] encryptedBytes = performEncryption(secret.getBytes("UTF-8"), publicKey);
         return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
     }
 
@@ -81,7 +90,7 @@ class EncryptorImplV18 implements Encryptor {
             .setStartDate(start.getTime())
             .setEndDate(end.getTime())
             .build();
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", ANDROID_KEY_STORE);
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(RSA, ANDROID_KEY_STORE);
         kpg.initialize(spec);
         return kpg.generateKeyPair();
     }
@@ -103,7 +112,7 @@ class EncryptorImplV18 implements Encryptor {
         throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, IOException, NoSuchProviderException, NoSuchPaddingException {
         KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, null);
 
-        Cipher output = Cipher.getInstance(RSA_MODE, CIPHER_PROVIDER);
+        Cipher output = Cipher.getInstance(RSA_MODE);
         output.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
         byte[] encryptedSecretBytes = Base64.decode(encryptedSecret64, Base64.DEFAULT);
         CipherInputStream cipherInputStream = new CipherInputStream(

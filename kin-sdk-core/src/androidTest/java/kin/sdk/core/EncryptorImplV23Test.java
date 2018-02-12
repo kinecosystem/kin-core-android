@@ -2,21 +2,27 @@ package kin.sdk.core;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assume.assumeTrue;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import android.os.Build;
+import android.os.Build.VERSION_CODES;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EncryptorTest {
+public class EncryptorImplV23Test {
 
     private Encryptor cryptor;
 
     @Before
     public void setup() {
-        Context context = InstrumentationRegistry.getTargetContext();
-        cryptor = EncryptorFactory
-            .create(context, new SharedPrefStore(context.getSharedPreferences("TEST", Context.MODE_PRIVATE)));
+        checkIfTestShouldRun();
+
+        cryptor = new EncryptorImplV23();
+    }
+
+    private void checkIfTestShouldRun() {
+        //run only on sdk >= 23 devices
+        assumeTrue(Build.VERSION.SDK_INT >= VERSION_CODES.M);
     }
 
     @Test

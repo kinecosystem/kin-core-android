@@ -7,20 +7,12 @@ import android.security.keystore.KeyProperties;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.util.Base64;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import org.json.JSONException;
@@ -31,7 +23,7 @@ class EncryptorImplV23 implements Encryptor {
 
     private static final String ANDROID_KEY_STORE = "AndroidKeyStore";
     private static final String AES_MODE = "AES/GCM/NoPadding";
-    private static final String ALIAS = "KinKeyStore";
+    private static final String ALIAS = "KinKeyStoreAES";
     private static final String JSON_IV = "iv";
     private static final String JSON_CIPHER = "cipher";
     private static final int KEY_SIZE = 128;
@@ -44,7 +36,7 @@ class EncryptorImplV23 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return aesEncrypt(ALIAS, secret);
+            return aesEncrypt(keyStore, ALIAS, secret);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
@@ -61,10 +53,7 @@ class EncryptorImplV23 implements Encryptor {
         }
     }
 
-    private String aesDecrypt(String encryptedSecret, KeyStore keyStore)
-        throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException,
-        NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IOException,
-        BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, JSONException {
+    private String aesDecrypt(String encryptedSecret, KeyStore keyStore) throws Exception {
         JSONObject jsonObject = new JSONObject(encryptedSecret);
         String ivBase64String = jsonObject.getString(JSON_IV);
         String cipherBase64String = jsonObject.getString(JSON_CIPHER);
@@ -75,8 +64,7 @@ class EncryptorImplV23 implements Encryptor {
     }
 
     @NonNull
-    private String performDecryption(KeyStore keyStore, byte[] ivBytes, byte[] encryptedSecretBytes)
-        throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, UnrecoverableEntryException, KeyStoreException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+    private String performDecryption(KeyStore keyStore, byte[] ivBytes, byte[] encryptedSecretBytes) throws Exception {
         final Cipher cipher = Cipher.getInstance(AES_MODE);
         final GCMParameterSpec spec = new GCMParameterSpec(KEY_SIZE, ivBytes);
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(ALIAS, keyStore), spec);
@@ -90,14 +78,17 @@ class EncryptorImplV23 implements Encryptor {
         return ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
     }
 
-    private String aesEncrypt(String alias, String secret)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, KeyStoreException, JSONException {
-        SecretKey secretKey = generateAESSecretKey(alias);
+    private String aesEncrypt(KeyStore keystore, String alias, String secret) throws Exception {
+        SecretKey secretKey;
+        if (keystore.containsAlias(alias)) {
+            secretKey = getSecretKey(alias, keystore);
+        } else {
+            secretKey = generateAESSecretKey(alias);
+        }
         return performEncryption(secretKey, secret.getBytes("UTF-8"));
     }
 
-    private SecretKey generateAESSecretKey(String alias)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    private SecretKey generateAESSecretKey(String alias) throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
         keyGenerator.init(
             new KeyGenParameterSpec.Builder(alias,
@@ -109,9 +100,7 @@ class EncryptorImplV23 implements Encryptor {
         return keyGenerator.generateKey();
     }
 
-    private String performEncryption(SecretKey secretKey, byte[] secretBytes)
-        throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, JSONException, InvalidAlgorithmParameterException {
-
+    private String performEncryption(SecretKey secretKey, byte[] secretBytes) throws Exception {
         Cipher cipher = Cipher.getInstance(AES_MODE);
 
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);

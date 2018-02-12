@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 
 import android.support.test.InstrumentationRegistry;
+import kin.sdk.core.exception.CreateAccountException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -230,7 +231,7 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void wipeout() {
+    public void wipeout() throws CreateAccountException {
         kinClient.addAccount(PASSPHRASE);
         kinClient.addAccount(PASSPHRASE);
         kinClient.addAccount(PASSPHRASE);
