@@ -36,7 +36,7 @@ class EncryptorImplV23 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return aesEncrypt(keyStore, ALIAS, secret);
+            return aesEncrypt(keyStore, secret);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
@@ -67,31 +67,31 @@ class EncryptorImplV23 implements Encryptor {
     private String performDecryption(KeyStore keyStore, byte[] ivBytes, byte[] encryptedSecretBytes) throws Exception {
         final Cipher cipher = Cipher.getInstance(AES_MODE);
         final GCMParameterSpec spec = new GCMParameterSpec(KEY_SIZE, ivBytes);
-        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(ALIAS, keyStore), spec);
+        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(keyStore), spec);
 
         byte[] decryptedBytes = cipher.doFinal(encryptedSecretBytes);
         return new String(decryptedBytes, 0, decryptedBytes.length, "UTF-8");
     }
 
-    private SecretKey getSecretKey(final String alias, KeyStore keyStore) throws NoSuchAlgorithmException,
+    private SecretKey getSecretKey(KeyStore keyStore) throws NoSuchAlgorithmException,
         UnrecoverableEntryException, KeyStoreException {
-        return ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
+        return ((KeyStore.SecretKeyEntry) keyStore.getEntry(ALIAS, null)).getSecretKey();
     }
 
-    private String aesEncrypt(KeyStore keystore, String alias, String secret) throws Exception {
+    private String aesEncrypt(KeyStore keystore, String secret) throws Exception {
         SecretKey secretKey;
-        if (keystore.containsAlias(alias)) {
-            secretKey = getSecretKey(alias, keystore);
+        if (keystore.containsAlias(ALIAS)) {
+            secretKey = getSecretKey(keystore);
         } else {
-            secretKey = generateAESSecretKey(alias);
+            secretKey = generateAESSecretKey();
         }
         return performEncryption(secretKey, secret.getBytes("UTF-8"));
     }
 
-    private SecretKey generateAESSecretKey(String alias) throws Exception {
+    private SecretKey generateAESSecretKey() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
         keyGenerator.init(
-            new KeyGenParameterSpec.Builder(alias,
+            new KeyGenParameterSpec.Builder(ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)

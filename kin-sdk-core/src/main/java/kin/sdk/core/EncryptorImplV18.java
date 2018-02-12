@@ -17,11 +17,9 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
-import java.security.UnrecoverableEntryException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import javax.crypto.Cipher;
@@ -48,7 +46,7 @@ class EncryptorImplV18 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return rsaEncrypt(keyStore, ALIAS, secret);
+            return rsaEncrypt(keyStore, secret);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
@@ -58,17 +56,17 @@ class EncryptorImplV18 implements Encryptor {
         try {
             KeyStore keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
             keyStore.load(null);
-            return rsaDecrypt(ALIAS, encryptedSecret, keyStore);
+            return rsaDecrypt(encryptedSecret, keyStore);
         } catch (Exception e) {
             throw new CryptoException(e);
         }
     }
 
-    private String rsaEncrypt(KeyStore keyStore, String alias, String secret) throws Exception {
-        Entry entry = keyStore.getEntry(alias, null);
+    private String rsaEncrypt(KeyStore keyStore, String secret) throws Exception {
+        Entry entry = keyStore.getEntry(ALIAS, null);
         PublicKey publicKey;
         if (entry == null) {
-            KeyPair rsaKeys = generateRsaPair(alias);
+            KeyPair rsaKeys = generateRsaPair();
             publicKey = rsaKeys.getPublic();
         } else {
             publicKey = ((PrivateKeyEntry) entry).getCertificate().getPublicKey();
@@ -78,14 +76,14 @@ class EncryptorImplV18 implements Encryptor {
     }
 
     @TargetApi(VERSION_CODES.JELLY_BEAN_MR2)
-    private KeyPair generateRsaPair(String alias)
+    private KeyPair generateRsaPair()
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
         end.add(Calendar.YEAR, 30);
         KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
-            .setAlias(alias)
-            .setSubject(new X500Principal("CN=" + alias))
+            .setAlias(ALIAS)
+            .setSubject(new X500Principal("CN=" + ALIAS))
             .setSerialNumber(BigInteger.TEN)
             .setStartDate(start.getTime())
             .setEndDate(end.getTime())
@@ -108,9 +106,8 @@ class EncryptorImplV18 implements Encryptor {
         return outputStream.toByteArray();
     }
 
-    private String rsaDecrypt(String alias, String encryptedSecret64, KeyStore keyStore)
-        throws UnrecoverableEntryException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, IOException, NoSuchProviderException, NoSuchPaddingException {
-        KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, null);
+    private String rsaDecrypt(String encryptedSecret64, KeyStore keyStore) throws Exception {
+        KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(ALIAS, null);
 
         Cipher output = Cipher.getInstance(RSA_MODE);
         output.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
