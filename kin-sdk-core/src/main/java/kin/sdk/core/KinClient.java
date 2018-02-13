@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
-import kin.sdk.core.exception.LoadAccountException;
 
 public class KinClient {
 
@@ -17,13 +16,12 @@ public class KinClient {
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
     /**
-     * KinClient is an account manager for a single {@link KinAccount} on
-     * ethereum network.
+     * KinClient is an account manager for a {@link KinAccount}.
      *
      * @param context the android application context
-     * @param provider the service provider to use to connect to an ethereum node
+     * @param provider the service provider provides blockchain network parameters
      */
-    public KinClient(Context context, ServiceProvider provider) {
+    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
         this.clientWrapper = new ClientWrapper(context, provider);
         keyStore = clientWrapper.getKeyStore();
         loadAccounts();
@@ -56,9 +54,10 @@ public class KinClient {
      * be accessed again via the {@link #getAccount(int)} method.</p>
      *
      * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
-     * @return {@link KinAccount} the account created store the key).
+     * @return {@link KinAccount} the account created store the key.
      */
-    public KinAccount addAccount(String passphrase) throws CreateAccountException {
+    public @NonNull
+    KinAccount addAccount(@NonNull String passphrase) throws CreateAccountException {
         Account account = keyStore.newAccount();
         KinAccountImpl newAccount = new KinAccountImpl(clientWrapper, account);
         kinAccounts.add(newAccount);
@@ -66,8 +65,7 @@ public class KinClient {
     }
 
     /**
-     * Return an account input index, returns an account that has previously been create and stored on the device
-     * via the {@link #addAccount(String)} method.
+     * Returns an account at input index.
      *
      * @return the account at the input index or null if there is no such account
      */
@@ -97,7 +95,7 @@ public class KinClient {
      *
      * @param passphrase the passphrase used when the account was created
      */
-    public void deleteAccount(int index, String passphrase) throws DeleteAccountException {
+    public void deleteAccount(int index, @NonNull String passphrase) throws DeleteAccountException {
         if (index >= 0 && getAccountCount() > index) {
             keyStore.deleteAccount(index);
             KinAccountImpl removedAccount = kinAccounts.remove(index);
@@ -106,7 +104,7 @@ public class KinClient {
     }
 
     /**
-     * Delete all kinAccounts. This will wipe out recursively the directory that holds all keystore files.
+     * Deletes all accounts.
      * WARNING - if you don't export your account before deleting it, you will lose all your Kin.
      */
     public void wipeoutAccount() {

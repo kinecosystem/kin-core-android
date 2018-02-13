@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.util.List;
 
+/**
+ * Blockchain transaction failure has happened, contains blockchain specific error details
+ */
 public class TransactionFailedException extends OperationFailedException {
 
     private final String txResultCode;

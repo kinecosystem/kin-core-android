@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
-import kin.sdk.core.exception.LoadAccountException;
 import org.stellar.sdk.KeyPair;
 
 interface KeyStore {

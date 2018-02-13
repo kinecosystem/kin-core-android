@@ -12,7 +12,7 @@ class Account {
     }
 
     /**
-     * Save secrete seed encrypted, decrypt it on demand only using the KeyStore
+     * Save encrypted secret seed, will be decrypted on demand only using the KeyStore
      */
     String getEncryptedSeed() {
         return encryptedSeed;

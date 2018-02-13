@@ -1,13 +1,15 @@
 package kin.sdk.core;
 
+import android.support.annotation.NonNull;
 import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
 abstract class AbstractKinAccount implements KinAccount {
 
+    @NonNull
     @Override
-    public Request<TransactionId> sendTransaction(final String publicAddress, final String passphrase,
-        final BigDecimal amount) {
+    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final String passphrase,
+        @NonNull final BigDecimal amount) {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {
@@ -16,6 +18,7 @@ abstract class AbstractKinAccount implements KinAccount {
         });
     }
 
+    @NonNull
     @Override
     public Request<Balance> getBalance() {
         return new Request<>(new Callable<Balance>() {
@@ -26,8 +29,9 @@ abstract class AbstractKinAccount implements KinAccount {
         });
     }
 
+    @NonNull
     @Override
-    public Request<Void> activate(final String passphrase) {
+    public Request<Void> activate(@NonNull final String passphrase) {
         return new Request<>(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -48,4 +52,4 @@ abstract class AbstractKinAccount implements KinAccount {
         KinAccount account = (KinAccount) obj;
         return getPublicAddress().equals(account.getPublicAddress());
     }
-}
+    }

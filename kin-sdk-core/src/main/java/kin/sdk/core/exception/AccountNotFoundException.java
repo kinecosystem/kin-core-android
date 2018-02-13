@@ -3,6 +3,9 @@ package kin.sdk.core.exception;
 
 import android.support.annotation.NonNull;
 
+/**
+ * Account was not created on the blockchain
+ */
 public class AccountNotFoundException extends OperationFailedException {
 
     private final String accountId;

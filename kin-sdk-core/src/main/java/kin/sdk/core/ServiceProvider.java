@@ -11,14 +11,17 @@ import org.stellar.sdk.AssetTypeCreditAlphaNum;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.AccountResponse;
 
+/**
+ * Provides blockchain network details
+ */
 public class ServiceProvider {
 
     /**
-     * main horizon network
+     * main blockchain network
      */
     public static final int NETWORK_ID_MAIN = 1;
     /**
-     * test horizon network
+     * test blockchain network
      */
     public static final int NETWORK_ID_TEST = 2;
 
@@ -37,11 +40,11 @@ public class ServiceProvider {
     }
 
     /**
-     * A ServiceProvider used to connect to an horizon network.
+     * A ServiceProvider used to connect to a horizon network.
      * <p>
      *
-     * @param providerUrl the provider to use
-     * @param networkId for example see {@value #NETWORK_ID_MAIN} {@value NETWORK_ID_TEST}
+     * @param providerUrl the horizon server to use
+     * @param networkId either {@link #NETWORK_ID_MAIN} or {@link #NETWORK_ID_TEST}
      */
     public ServiceProvider(String providerUrl, @NetworkId int networkId) {
         this.providerUrl = providerUrl;

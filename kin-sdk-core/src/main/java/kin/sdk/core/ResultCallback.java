@@ -10,7 +10,7 @@ public interface ResultCallback<T> {
     void onResult(T result);
 
     /**
-     * Method will be called when operation has completed with error
+     * Method will be called when operation has failed
      *
      * @param e the exception in case of error
      */

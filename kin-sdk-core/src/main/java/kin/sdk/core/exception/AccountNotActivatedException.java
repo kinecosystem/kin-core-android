@@ -2,7 +2,11 @@ package kin.sdk.core.exception;
 
 
 import android.support.annotation.NonNull;
+import kin.sdk.core.KinAccount;
 
+/**
+ * Account is not activated, use {@link KinAccount#activate(String)} to activate the account
+ */
 public class AccountNotActivatedException extends OperationFailedException {
 
     private final String accountId;

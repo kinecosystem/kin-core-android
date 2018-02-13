@@ -1,8 +1,7 @@
 package kin.sdk.core;
 
 /**
- * Identifier of the transaction, can be use on <a href="https://etherscan.io/">etherscan.io</a>
- * to find information about the transaction related to this TransactionId.
+ * Identifier of the transaction, useful for finding information about the transaction.
  */
 public interface TransactionId {
 

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
-import kin.sdk.core.exception.LoadAccountException;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Rule;

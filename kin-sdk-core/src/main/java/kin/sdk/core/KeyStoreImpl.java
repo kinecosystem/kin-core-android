@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import kin.sdk.core.exception.CreateAccountException;
 import kin.sdk.core.exception.DeleteAccountException;
-import kin.sdk.core.exception.LoadAccountException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,4 +115,5 @@ class KeyStoreImpl implements KeyStore {
     public void clearAllAccounts() {
         store.clear(STORE_KEY_ACCOUNTS);
     }
+
 }
