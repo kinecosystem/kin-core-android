@@ -41,6 +41,7 @@ abstract class AbstractKinAccount implements KinAccount {
         });
     }
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -50,6 +51,9 @@ abstract class AbstractKinAccount implements KinAccount {
             return false;
         }
         KinAccount account = (KinAccount) obj;
+        if (getPublicAddress() == null || account.getPublicAddress() == null) {
+            return false;
+        }
         return getPublicAddress().equals(account.getPublicAddress());
     }
-    }
+}

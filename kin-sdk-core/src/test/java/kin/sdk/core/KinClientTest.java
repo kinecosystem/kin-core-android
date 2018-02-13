@@ -77,7 +77,7 @@ public class KinClientTest {
         assertNotNull(kinAccount2);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
         assertThat(kinAccount2.getPublicAddress(), not(isEmptyOrNullString()));
-        assertThat(kinAccount.getPublicAddress(), not(equalTo(kinAccount2.getPublicAddress())));
+        assertThat(kinAccount, not(equalTo(kinAccount2)));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class KinClientTest {
         assertNotNull(kinAccount2);
         assertNotNull(expectedAccount1);
         assertNotNull(expectedAccount2);
-        assertThat(kinAccount.getPublicAddress(), equalTo(expectedAccount1.getPublicAddress()));
-        assertThat(kinAccount2.getPublicAddress(), equalTo(expectedAccount2.getPublicAddress()));
+        assertThat(kinAccount, equalTo(expectedAccount1));
+        assertThat(kinAccount2, equalTo(expectedAccount2));
     }
 
     @Test
@@ -115,8 +115,8 @@ public class KinClientTest {
         assertNotNull(expectedAccount2);
         assertNotNull(expectedAccount3);
         assertThat(account1.getAccountId(), equalTo(expectedAccount1.getPublicAddress()));
-        assertThat(kinAccount2.getPublicAddress(), equalTo(expectedAccount2.getPublicAddress()));
-        assertThat(kinAccount3.getPublicAddress(), equalTo(expectedAccount3.getPublicAddress()));
+        assertThat(kinAccount2, equalTo(expectedAccount2));
+        assertThat(kinAccount3, equalTo(expectedAccount3));
     }
 
     @Test

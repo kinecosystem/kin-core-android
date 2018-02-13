@@ -53,7 +53,7 @@ public class KinClientIntegrationTest {
         assertNotNull(kinAccount2);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
         assertThat(kinAccount2.getPublicAddress(), not(isEmptyOrNullString()));
-        assertThat(kinAccount.getPublicAddress(), not(equalTo(kinAccount2.getPublicAddress())));
+        assertThat(kinAccount, not(equalTo(kinAccount2)));
     }
 
     @Test
@@ -68,8 +68,8 @@ public class KinClientIntegrationTest {
         assertNotNull(kinAccount2);
         assertNotNull(expectedAccount1);
         assertNotNull(expectedAccount2);
-        assertThat(kinAccount.getPublicAddress(), equalTo(expectedAccount1.getPublicAddress()));
-        assertThat(kinAccount2.getPublicAddress(), equalTo(expectedAccount2.getPublicAddress()));
+        assertThat(kinAccount, equalTo(expectedAccount1));
+        assertThat(kinAccount2, equalTo(expectedAccount2));
     }
 
     @Test
@@ -86,9 +86,9 @@ public class KinClientIntegrationTest {
         assertNotNull(expectedAccount1);
         assertNotNull(expectedAccount2);
         assertNotNull(expectedAccount3);
-        assertThat(kinAccount1.getPublicAddress(), equalTo(expectedAccount1.getPublicAddress()));
-        assertThat(kinAccount2.getPublicAddress(), equalTo(expectedAccount2.getPublicAddress()));
-        assertThat(kinAccount3.getPublicAddress(), equalTo(expectedAccount3.getPublicAddress()));
+        assertThat(kinAccount1, equalTo(expectedAccount1));
+        assertThat(kinAccount2, equalTo(expectedAccount2));
+        assertThat(kinAccount3, equalTo(expectedAccount3));
     }
 
     @Test
@@ -101,8 +101,8 @@ public class KinClientIntegrationTest {
 
         assertNotNull(expectedAccount1);
         assertNotNull(expectedAccount2);
-        assertThat(kinAccount1.getPublicAddress(), equalTo(expectedAccount1.getPublicAddress()));
-        assertThat(kinAccount2.getPublicAddress(), equalTo(expectedAccount2.getPublicAddress()));
+        assertThat(kinAccount1, equalTo(expectedAccount1));
+        assertThat(kinAccount2, equalTo(expectedAccount2));
     }
 
 
@@ -127,7 +127,7 @@ public class KinClientIntegrationTest {
 
         KinAccount kinAccount = kinClient.getAccount(0);
 
-        assertEquals(kinAccount1.getPublicAddress(), kinAccount.getPublicAddress());
+        assertEquals(kinAccount1, kinAccount);
     }
 
 
@@ -185,7 +185,7 @@ public class KinClientIntegrationTest {
         kinClient.deleteAccount(1, PASSPHRASE);
 
         assertTrue(kinClient.hasAccount());
-        assertThat(kinAccount1.getPublicAddress(), equalTo(kinClient.getAccount(0).getPublicAddress()));
+        assertThat(kinAccount1, equalTo(kinClient.getAccount(0)));
     }
 
     @Test
