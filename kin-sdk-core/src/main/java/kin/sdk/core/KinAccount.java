@@ -15,14 +15,6 @@ public interface KinAccount {
     String getPublicAddress();
 
     /**
-     * Deprecated, export will return null
-     *
-     * @return null
-     */
-    @Deprecated
-    String exportKeyStore(String passphrase, String newPassphrase) throws PassphraseException, OperationFailedException;
-
-    /**
      * Create {@link Request} for signing and sending a transaction of the given amount in kin to the specified public
      * address
      * <p> See {@link KinAccount#sendTransactionSync(String, String, BigDecimal)} for possibles errors</p>

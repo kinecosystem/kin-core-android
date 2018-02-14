@@ -33,13 +33,6 @@ final class KinAccountImpl extends AbstractKinAccount {
     }
 
     @Override
-    public String exportKeyStore(String passphrase, String newPassphrase)
-        throws PassphraseException, OperationFailedException {
-        checkValidAccount();
-        return null;
-    }
-
-    @Override
     public TransactionId sendTransactionSync(String publicAddress, String passphrase, BigDecimal amount)
         throws OperationFailedException, PassphraseException {
         checkValidAccount();
