@@ -16,7 +16,7 @@ repositories {
 dependencies {
     ...
 
-    compile "com.github.kinfoundation:kin-core-android:<latest version>"
+    compile "com.github.kinfoundation:kin-core-android:dev-SNAPSHOT"
 }
 ```
 
@@ -28,9 +28,9 @@ A `ServiceProvider` provides details of how to access the Stellar horizon end po
 The example below creates a `ServiceProvider` that will be used to connect to the main (production) Stellar 
 network
 ```java
-ServiceProvider infuraProvider =  
+ServiceProvider horizonProvider =  
     new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN));
-KinClient kinClient = new KinClient(context, infuraProvider);
+KinClient kinClient = new KinClient(context, horizonProvider);
 ```
 
 To connect to a test Stellar network use the following ServiceProvider:
@@ -41,6 +41,7 @@ new ServiceProvider("https://horizon-testnet.stellar.org", ServiceProvider.NETWO
 ### Creating and retrieving a KIN account
 The first time you use `KinClient` you need to create a new account, using a passphrase. 
 The details of the account created will be securely stored on the device.
+Multiple acccounts can be created.
 ```java
 KinAccount account;
 try {
@@ -52,8 +53,8 @@ try {
 }
 ```
 
-Once an account has been created there is no need to call `createAccount` again on the same device. 
-From then on calling `getAccount` will retrieve the account stored on the device.
+
+Calling `getAccount` with the existing account index, will retrieve the account stored on the device.
 ```java
 if (kinClient.hasAccount()) {
     account = kinClient.getAccount(0);
@@ -117,9 +118,9 @@ balanceRequest.run(new ResultCallback<Balance>() {
 To transfer KIN to another account, you need the public address of the account you want 
 to transfer the KIN to. 
 
-The following code will transfer 20 KIN to account "#AB12349ACF123". 
+The following code will transfer 20 KIN to account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO". 
 ```java
-String toAddress = "#AB12349ACF123";
+String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
 String passphrase = "yourPassphrase";
 BigDecimal amountInKin = new BigDecimal("20");
 
@@ -150,14 +151,14 @@ A synchronous version of these methods is also provided. Make sure you call them
 
 ```java
 try {
-    account.getBalanceSync();
+    Balance balance = account.getBalanceSync();
 }
 catch (OperationFailedException e) {
    // something went wrong - check the exception message
 }
 
 try {
-    account.sendTransactionSync(toAddress, passphrase, amountInKin);
+    TransactionId transactionId = account.sendTransactionSync(toAddress, passphrase, amountInKin);
 }
 catch (PassphraseException e){
     // the passphrase used was wrong
@@ -172,9 +173,8 @@ For a more detailed example on how to use the library please take a look at our 
 
 ## Testing
 
-Both Unit tests and Android tests were provided, Android tests includes integration tests with Stellar test network, 
-those tests are marked as `@LargeTest`, as those are time consuming tests that access the network, and operates against
- real Stellar testnet.
+Both Unit tests and Android tests are provided, Android tests include integration tests that run on the Stellar test network, 
+these tests are marked as `@LargeTest`, because they are time consuming, and depends on the network.
 
 
 ## Contributing
