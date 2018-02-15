@@ -1,23 +1,22 @@
 package kin.sdk.core;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import java.util.List;
+import kin.sdk.core.exception.CreateAccountException;
+import kin.sdk.core.exception.DeleteAccountException;
+import kin.sdk.core.exception.LoadAccountException;
 import org.stellar.sdk.KeyPair;
 
 interface KeyStore {
 
     @NonNull
-    List<Account> loadAccounts();
+    List<Account> loadAccounts() throws LoadAccountException;
 
-    void deleteAccount(int index, String passphrase);
+    void deleteAccount(int index) throws DeleteAccountException;
 
-    Account newAccount(String passphrase);
+    Account newAccount() throws CreateAccountException;
 
-    @Nullable
-    String exportAccount(@NonNull Account account, @NonNull String passphrase);
-
-    KeyPair decryptAccount(Account account, String passphrase);
+    KeyPair decryptAccount(Account account) throws CryptoException;
 
     void clearAllAccounts();
 }

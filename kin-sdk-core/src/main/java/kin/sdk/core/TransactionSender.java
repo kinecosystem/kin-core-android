@@ -52,10 +52,18 @@ class TransactionSender {
         checkParams(from, passphrase, publicAddress, amount);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
-        KeyPair secretSeedKeyPair = keyStore.decryptAccount(from, passphrase);
+        KeyPair secretSeedKeyPair = decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount);
         return sendTransaction(transaction);
+    }
+
+    private KeyPair decryptAccount(@NonNull Account from, @NonNull String passphrase) throws OperationFailedException {
+        try {
+            return keyStore.decryptAccount(from);
+        } catch (CryptoException e) {
+            throw new OperationFailedException(e);
+        }
     }
 
     private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,

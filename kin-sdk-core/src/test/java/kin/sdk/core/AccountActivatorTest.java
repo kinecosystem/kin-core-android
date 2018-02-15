@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -64,7 +63,7 @@ public class AccountActivatorTest {
     private AccountActivator accountActivator;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         mockServer();
@@ -83,8 +82,8 @@ public class AccountActivatorTest {
         server = new Server(url);
     }
 
-    private void mockKeyStoreResponse() {
-        when(mockKeyStore.decryptAccount(any(Account.class), anyString()))
+    private void mockKeyStoreResponse() throws CryptoException {
+        when(mockKeyStore.decryptAccount(any(Account.class)))
             .thenAnswer(
                 new Answer<Object>() {
                     @Override

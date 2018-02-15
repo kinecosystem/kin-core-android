@@ -15,16 +15,6 @@ public interface KinAccount {
     String getPublicAddress();
 
     /**
-     * Exports the keystore json file
-     *
-     * @param passphrase the passphrase used to create the account
-     * @param newPassphrase the exported json will be encrypted using this new passphrase. The original keystore and
-     * passphrase will not change.
-     * @return String the json string
-     */
-    String exportKeyStore(String passphrase, String newPassphrase) throws PassphraseException, OperationFailedException;
-
-    /**
      * Create {@link Request} for signing and sending a transaction of the given amount in kin to the specified public
      * address
      * <p> See {@link KinAccount#sendTransactionSync(String, String, BigDecimal)} for possibles errors</p>

@@ -17,6 +17,7 @@ import org.stellar.sdk.Server;
  */
 class ClientWrapper {
 
+    private static final String STORE_NAME = "KinKeyStore";
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
@@ -52,7 +53,9 @@ class ClientWrapper {
     }
 
     private KeyStore initKeyStore(Context context) {
-        return new KeyStoreImpl(context);
+        SharedPrefStore store = new SharedPrefStore(context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE));
+        Encryptor encryptor = EncryptorFactory.create(context, store);
+        return new KeyStoreImpl(store, encryptor);
     }
 
     void wipeoutAccounts() {
