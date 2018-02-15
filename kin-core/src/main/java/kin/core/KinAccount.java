@@ -33,7 +33,7 @@ public interface KinAccount {
 
     /**
      * Create, sign and send a transaction of the given amount in kin to the specified public address
-     * <p><b>Note:</b> This method access the network, and should not be called on the android main thread.</p>
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
@@ -60,7 +60,7 @@ public interface KinAccount {
 
     /**
      * Get the current confirmed balance in kin
-     * <p><b>Note:</b> This method access the network, and should not be called on the android main thread.</p>
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @return the balance in kin
      * @throws AccountNotFoundException if account was not created
@@ -82,7 +82,7 @@ public interface KinAccount {
 
     /**
      * Allow an account to receive kin.
-     * <p><b>Note:</b> This method access the network, and should not be called on the android main thread.</p>
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @param passphrase the passphrase used to create the account
      * @throws AccountNotFoundException if account is not created
