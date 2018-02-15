@@ -1,1 +1,1 @@
-include ':sample', ':kin-sdk-core'
+include ':sample', ':kin-core'

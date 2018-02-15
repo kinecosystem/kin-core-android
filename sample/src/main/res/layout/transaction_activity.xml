@@ -8,7 +8,7 @@
     android:clickable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
-    tools:context="kin.sdk.core.sample.TransactionActivity">
+    tools:context="kin.sdk.core.sample.kin.core.sample.TransactionActivity">
 
     <TextView
         style="@style/KinText.Title.Bold"
