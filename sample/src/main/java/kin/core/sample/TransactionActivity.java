@@ -28,7 +28,8 @@ public class TransactionActivity extends BaseActivity {
     }
 
     private View sendTransaction, progressBar;
-    private EditText toAddressInput, amountInput;
+
+    private EditText toAddressInput, amountInput, memoInput;
     private Request<TransactionId> transactionRequest;
 
     @Override
@@ -41,8 +42,9 @@ public class TransactionActivity extends BaseActivity {
     private void initWidgets() {
         sendTransaction = findViewById(R.id.send_transaction_btn);
         progressBar = findViewById(R.id.transaction_progress);
-        toAddressInput = (EditText) findViewById(R.id.to_address_input);
-        amountInput = (EditText) findViewById(R.id.amount_input);
+        toAddressInput = findViewById(R.id.to_address_input);
+        amountInput = findViewById(R.id.amount_input);
+        memoInput = findViewById(R.id.memo_input);
 
         if (getKinClient().getServiceProvider().isMainNet()) {
             sendTransaction.setBackgroundResource(R.drawable.button_main_network_bg);
@@ -108,7 +110,7 @@ public class TransactionActivity extends BaseActivity {
         sendTransaction.setOnClickListener(view -> {
             BigDecimal amount = new BigDecimal(amountInput.getText().toString());
             try {
-                sendTransaction(toAddressInput.getText().toString(), amount);
+                sendTransaction(toAddressInput.getText().toString(), amount, memoInput.getText().toString());
             } catch (OperationFailedException e) {
                 KinAlertDialog.createErrorDialog(TransactionActivity.this, e.getMessage()).show();
             }
@@ -125,18 +127,19 @@ public class TransactionActivity extends BaseActivity {
         return R.string.transaction;
     }
 
-    private void sendTransaction(String toAddress, BigDecimal amount) throws OperationFailedException {
+    private void sendTransaction(String toAddress, BigDecimal amount, String memo) throws OperationFailedException {
         progressBar.setVisibility(View.VISIBLE);
         KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
-            transactionRequest = account
-                .sendTransaction(toAddress, getPassphrase(), amount);
-            transactionRequest.run(new DisplayCallback<TransactionId>(progressBar) {
+            DisplayCallback<TransactionId> callback = new DisplayCallback<TransactionId>(progressBar) {
                 @Override
                 public void displayResult(Context context, View view, TransactionId transactionId) {
                     KinAlertDialog.createErrorDialog(context, "Transaction id " + transactionId.id()).show();
                 }
-            });
+            };
+            transactionRequest = memo == null ? account.sendTransaction(toAddress, getPassphrase(), amount)
+                : account.sendTransaction(toAddress, getPassphrase(), amount, memo.getBytes());
+            transactionRequest.run(callback);
         } else {
             progressBar.setVisibility(View.GONE);
             throw new AccountDeletedException();

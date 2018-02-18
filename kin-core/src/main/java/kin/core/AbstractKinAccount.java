@@ -1,6 +1,7 @@
 package kin.core;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
@@ -13,7 +14,19 @@ abstract class AbstractKinAccount implements KinAccount {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {
-                return sendTransactionSync(publicAddress, passphrase, amount);
+                return sendTransactionSync(publicAddress, passphrase, amount, null);
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final String passphrase,
+        @NonNull final BigDecimal amount, @Nullable final byte[] memo) {
+        return new Request<>(new Callable<TransactionId>() {
+            @Override
+            public TransactionId call() throws Exception {
+                return sendTransactionSync(publicAddress, passphrase, amount, memo);
             }
         });
     }

@@ -8,7 +8,7 @@
     android:clickable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
-    tools:context="kin.sdk.core.sample.kin.core.sample.TransactionActivity">
+    tools:context="kin.core.sample.TransactionActivity">
 
     <TextView
         style="@style/KinText.Title.Bold"
@@ -40,6 +40,21 @@
         android:layout_marginBottom="10dp"
         android:inputType="numberSigned|numberDecimal"
         tools:text="10"/>
+
+    <TextView
+        style="@style/KinText.Title.Bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/memo"/>
+
+    <EditText
+        android:id="@+id/memo_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:inputType="text"
+        tools:text="optional memo"/>
 
     <View
         android:layout_width="match_parent"

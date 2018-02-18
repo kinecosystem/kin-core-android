@@ -3,6 +3,7 @@ package kin.core;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +63,28 @@ public class KinAccountImplTest {
 
         verify(mockTransactionSender)
             .sendTransaction(expectedRandomAccount, expectedPassphrase, expectedAccountId, expectedAmount);
+        assertEquals(expectedTransactionId, transactionId);
+    }
+
+    @Test
+    public void sendTransactionSync_WithMemo() throws Exception {
+        initWithRandomAccount();
+
+        String expectedPassphrase = PASSPHRASE;
+        String expectedAccountId = "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX";
+        BigDecimal expectedAmount = new BigDecimal("12.2");
+        TransactionId expectedTransactionId = new TransactionIdImpl("myId");
+        byte[] memo = "Dummy Memo".getBytes();
+
+        when(mockTransactionSender
+            .sendTransaction((Account) any(), anyString(), (String) any(), (BigDecimal) any(), (byte[]) any()))
+            .thenReturn(expectedTransactionId);
+
+        TransactionId transactionId = kinAccount
+            .sendTransactionSync(expectedAccountId, expectedPassphrase, expectedAmount, memo);
+
+        verify(mockTransactionSender)
+            .sendTransaction(expectedRandomAccount, expectedPassphrase, expectedAccountId, expectedAmount, memo);
         assertEquals(expectedTransactionId, transactionId);
     }
 

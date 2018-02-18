@@ -1,6 +1,7 @@
 package kin.core;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
@@ -34,10 +35,17 @@ final class KinAccountImpl extends AbstractKinAccount {
     @NonNull
     @Override
     public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount)
-        throws OperationFailedException, PassphraseException {
+        @NonNull BigDecimal amount) throws OperationFailedException, PassphraseException {
         checkValidAccount();
         return transactionSender.sendTransaction(account, passphrase, publicAddress, amount);
+    }
+
+    @NonNull
+    @Override
+    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
+        @NonNull BigDecimal amount, @Nullable byte[] memo) throws OperationFailedException, PassphraseException {
+        checkValidAccount();
+        return transactionSender.sendTransaction(account, passphrase, publicAddress, amount, memo);
     }
 
     @NonNull

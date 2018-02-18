@@ -32,6 +32,21 @@ public interface KinAccount {
         @NonNull BigDecimal amount);
 
     /**
+     * Create {@link Request} for signing and sending a transaction of the given amount in kin, to the specified public
+     * address
+     * <p> See {@link KinAccount#sendTransactionSync(String, String, BigDecimal)} for possibles errors</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @param amount the amount of kin to transfer
+     * @param passphrase the passphrase used to create the account
+     * @param memo An optional bytes array, up-to 32 bytes, included on the transaction record.
+     * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
+     */
+    @NonNull
+    Request<TransactionId> sendTransaction(@NonNull String publicAddress, @NonNull String passphrase,
+        @NonNull BigDecimal amount, @Nullable byte[] memo);
+
+    /**
      * Create, sign and send a transaction of the given amount in kin to the specified public address
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
@@ -47,6 +62,25 @@ public interface KinAccount {
     @NonNull
     TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
         @NonNull BigDecimal amount)
+        throws OperationFailedException, PassphraseException;
+
+    /**
+     * Create, sign and send a transaction of the given amount in kin to the specified public address
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @param amount the amount of kin to transfer
+     * @param memo An optional bytes array, up-to 32 bytes, included on the transaction record.
+     * @return TransactionId the transaction identifier
+     * @throws PassphraseException if the transaction could not be signed with the passphrase specified
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
+     * @throws OperationFailedException other error occurred
+     */
+    @NonNull
+    TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
+        @NonNull BigDecimal amount, @Nullable byte[] memo)
         throws OperationFailedException, PassphraseException;
 
     /**

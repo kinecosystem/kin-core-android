@@ -2,6 +2,7 @@ package kin.core;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import kin.core.ServiceProvider.KinAsset;
@@ -9,11 +10,12 @@ import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.PassphraseException;
-import kin.core.exception.TransactionFailedException;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.Transaction;
+import org.stellar.sdk.Transaction.Builder;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
@@ -30,29 +32,24 @@ class TransactionSender {
         this.kinAsset = kinAsset;
     }
 
-    /**
-     * Transfer amount of kin from account to the specified public address.
-     *
-     * @param from the sender {@link Account}
-     * @param publicAddress the address to send the kinIssuer to
-     * @param amount the amount of kinIssuer to send   @return {@link TransactionId} of the transaction
-     * @throws PassphraseException if the transaction could not be signed with the passphrase specified
-     * @throws AccountNotFoundException if the sender or destination account not created yet
-     * @throws AccountNotActivatedException if the sender or destination account is not activated
-     * @throws TransactionFailedException if stellar transaction failed, contains stellar horizon error codes
-     * @throws OperationFailedException other error occurred
-     */
     @NonNull
     TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
         throws OperationFailedException, PassphraseException {
+        return sendTransaction(from, passphrase, publicAddress, amount, null);
+    }
 
-        checkParams(from, passphrase, publicAddress, amount);
+    @NonNull
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
+        @NonNull BigDecimal amount, @Nullable byte[] memo)
+        throws OperationFailedException, PassphraseException {
+
+        checkParams(from, passphrase, publicAddress, amount, memo);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
         KeyPair secretSeedKeyPair = decryptAccount(from, passphrase);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
-        Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount);
+        Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount, memo);
         return sendTransaction(transaction);
     }
 
@@ -65,12 +62,13 @@ class TransactionSender {
     }
 
     private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount) {
+        @NonNull BigDecimal amount, @Nullable byte[] memo) {
         Utils.checkNotNull(from, "account");
         Utils.checkNotNull(passphrase, "passphrase");
         Utils.checkNotNull(amount, "amount");
         checkAddressNotEmpty(publicAddress);
         checkForNegativeAmount(amount);
+        checkMemo(memo);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -86,6 +84,12 @@ class TransactionSender {
         }
     }
 
+    private void checkMemo(byte[] memo) {
+        if (memo != null && memo.length > 32) {
+            throw new IllegalArgumentException("Memo cannot be longer that 32 bytes");
+        }
+    }
+
     @NonNull
     private KeyPair generateAddresseeKeyPair(@NonNull String publicAddress) throws OperationFailedException {
         try {
@@ -97,12 +101,15 @@ class TransactionSender {
 
     @NonNull
     private Transaction buildTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
-        AccountResponse sourceAccount) {
+        AccountResponse sourceAccount, @Nullable byte[] memo) {
 
-        Transaction transaction = new Transaction.Builder(sourceAccount)
+        Builder transactionBuilder = new Builder(sourceAccount)
             .addOperation(
-                new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build())
-            .build();
+                new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build());
+        if (memo != null) {
+            transactionBuilder.addMemo(Memo.hash(memo));
+        }
+        Transaction transaction = transactionBuilder.build();
         transaction.sign(from);
         return transaction;
     }

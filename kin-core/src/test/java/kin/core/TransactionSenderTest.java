@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
@@ -54,6 +55,7 @@ public class TransactionSenderTest {
     private static final String ACCOUNT_ID_TO = "GDJOJJVIWI6YVPUI3PX4BQCC4SQUZTRYIAMV2YBT6QVL54QGQUQSFKGM";
     private static final String SECRET_SEED_TO = "SCJFLXKUY6VQT2LYSP6XDP23WNEP5OITSC3LZEJUJO7GFZM7QLDF2BCN";
     private static final String TX_BODY = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAA0uSmqLI9ir6I2%2B%2FAwELkoUzOOEAZXWAz9Cq%2B8gaFISIAAAABS0lOAAAAAABBq58xoA5F8Hm%2F7tPH51hBTD4tUsenooq1dLrUnnJnxgAAAAAA5OHAAAAAAAAAAAFtBVodAAAAQLLn6OJYeSG1KEki6SL%2FKYPX01Dzdid5aTNTMYTJ%2FO7cMQC1n%2FAWSmyVXJdm5zQCtn9vAzTVZpIbBmKKyHjtfw4%3D";
+    private static final String TX_BODY_WITH_MEMO = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAANGYWtlIE1lbW8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAADS5Kaosj2Kvojb78DAQuShTM44QBldYDP0Kr7yBoUhIgAAAAFLSU4AAAAAAEGrnzGgDkXweb%2Fu08fnWEFMPi1Sx6eiirV0utSecmfGAAAAAADk4cAAAAAAAAAAAW0FWh0AAABASOdrcg%2FbIrQjx2kxhjicLYAZHSLz%2Ba2whV5%2B%2BIdKjDmD%2FMnQrTeyaoJy20x6%2F%2FWN%2FleWQbmKzuP9Gm9xGDlnAQ%3D%3D";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -113,6 +115,26 @@ public class TransactionSenderTest {
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
         assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
+    }
+
+    @Test
+    public void sendTransaction_WithMemo_success() throws Exception {
+        //send transaction fetch first to account details, then from account details, and finally perform tx,
+        //here we mock all 3 responses from server to achieve success operation
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_success_res.json"));
+        byte[] fakeMemo = "Fake Memo".getBytes();
+
+        TransactionId transactionId = transactionSender
+            .sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"), fakeMemo);
+
+        assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
+
+        //verify sent requests data
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
+        assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY_WITH_MEMO));
     }
 
     @Test
@@ -275,6 +297,29 @@ public class TransactionSenderTest {
         expectedEx.expectMessage("transaction");
 
         transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    public void sendTransaction_CryptoException_OperationFailedException() throws Exception {
+        when(mockKeyStore.decryptAccount((Account) any())).thenThrow(CryptoException.class);
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(isA(CryptoException.class));
+
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void sendTransaction_TooLongMemo() throws Exception {
+        //memo of 33 bytes long, limit is 32 bytes
+        byte[] tooLongMemo = Arrays.copyOf("fake memo".getBytes(), 33);
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("32 bytes");
+        transactionSender.sendTransaction(account, "", ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
+        assertThat(mockWebServer.getRequestCount(), equalTo(0));
     }
 
     @Test

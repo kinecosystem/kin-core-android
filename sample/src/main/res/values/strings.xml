@@ -23,4 +23,5 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="balance_error">Error</string>
+    <string name="memo">Memo</string>
 </resources>
