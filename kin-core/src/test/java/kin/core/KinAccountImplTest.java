@@ -18,23 +18,24 @@ public class KinAccountImplTest {
 
     private static final String PASSPHRASE = "123456";
     @Mock
-    private ClientWrapper mockClientWrapper;
+    private TransactionSender mockTransactionSender;
+    @Mock
+    private BalanceQuery mockBalanceQuery;
+    @Mock
+    private AccountActivator mockAccountActivator;
     private KinAccountImpl kinAccount;
-    private FakeKeyStore fakeKeyStore;
     private Account expectedRandomAccount;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-
-        fakeKeyStore = new FakeKeyStore();
-        when(mockClientWrapper.getKeyStore()).thenReturn(fakeKeyStore);
     }
 
     private void initWithRandomAccount() {
         KeyPair keyPair = KeyPair.random();
         expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
-        kinAccount = new KinAccountImpl(mockClientWrapper, expectedRandomAccount);
+        kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
+            mockBalanceQuery);
     }
 
     @Test
@@ -53,13 +54,13 @@ public class KinAccountImplTest {
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
 
-        when(mockClientWrapper.sendTransaction((Account) any(), (String) any(), (String) any(), (BigDecimal) any()))
+        when(mockTransactionSender.sendTransaction((Account) any(), (String) any(), (String) any(), (BigDecimal) any()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
             .sendTransactionSync(expectedAccountId, expectedPassphrase, expectedAmount);
 
-        verify(mockClientWrapper)
+        verify(mockTransactionSender)
             .sendTransaction(expectedRandomAccount, expectedPassphrase, expectedAccountId, expectedAmount);
         assertEquals(expectedTransactionId, transactionId);
     }
@@ -69,12 +70,12 @@ public class KinAccountImplTest {
         initWithRandomAccount();
 
         Balance expectedBalance = new BalanceImpl(new BigDecimal("11.0"));
-        when(mockClientWrapper.getBalance((Account) any())).thenReturn(expectedBalance);
+        when(mockBalanceQuery.getBalance((Account) any())).thenReturn(expectedBalance);
 
         Balance balance = kinAccount.getBalanceSync();
 
         assertEquals(expectedBalance, balance);
-        verify(mockClientWrapper).getBalance(expectedRandomAccount);
+        verify(mockBalanceQuery).getBalance(expectedRandomAccount);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class KinAccountImplTest {
 
         kinAccount.activateSync(expectedPassphrase);
 
-        verify(mockClientWrapper).activateAccount(expectedRandomAccount, expectedPassphrase);
+        verify(mockAccountActivator).activate(expectedRandomAccount, expectedPassphrase);
     }
 
     @Test(expected = AccountDeletedException.class)

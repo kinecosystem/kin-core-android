@@ -5,24 +5,22 @@ import java.math.BigDecimal;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.PassphraseException;
-import org.stellar.sdk.KeyPair;
 
 
 final class KinAccountImpl extends AbstractKinAccount {
 
-    private final ClientWrapper clientWrapper;
     private final Account account;
+    private final TransactionSender transactionSender;
+    private final AccountActivator accountActivator;
+    private final BalanceQuery balanceQuery;
     private boolean isDeleted = false;
 
-    /**
-     * Creates a {@link KinAccount} from existing {@link KeyPair}
-     *
-     * @param clientWrapper that will be use to call to Kin smart-contract.
-     * @param account the existing Account.
-     */
-    KinAccountImpl(ClientWrapper clientWrapper, Account account) {
+    KinAccountImpl(Account account, TransactionSender transactionSender, AccountActivator accountActivator,
+        BalanceQuery balanceQuery) {
         this.account = account;
-        this.clientWrapper = clientWrapper;
+        this.transactionSender = transactionSender;
+        this.accountActivator = accountActivator;
+        this.balanceQuery = balanceQuery;
     }
 
     @Override
@@ -39,20 +37,20 @@ final class KinAccountImpl extends AbstractKinAccount {
         @NonNull BigDecimal amount)
         throws OperationFailedException, PassphraseException {
         checkValidAccount();
-        return clientWrapper.sendTransaction(account, passphrase, publicAddress, amount);
+        return transactionSender.sendTransaction(account, passphrase, publicAddress, amount);
     }
 
     @NonNull
     @Override
     public Balance getBalanceSync() throws OperationFailedException {
         checkValidAccount();
-        return clientWrapper.getBalance(account);
+        return balanceQuery.getBalance(account);
     }
 
     @Override
     public void activateSync(@NonNull String passphrase) throws OperationFailedException {
         checkValidAccount();
-        clientWrapper.activateAccount(account, passphrase);
+        accountActivator.activate(account, passphrase);
     }
 
     void markAsDeleted() {
