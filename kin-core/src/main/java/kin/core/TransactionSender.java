@@ -22,6 +22,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
+    private static final int MEMO_BYTES_LIMIT = 32; //Stellar "hash" memo bytes limitation
     private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
@@ -85,7 +86,7 @@ class TransactionSender {
     }
 
     private void checkMemo(byte[] memo) {
-        if (memo != null && memo.length > 32) {
+        if (memo != null && memo.length > MEMO_BYTES_LIMIT) {
             throw new IllegalArgumentException("Memo cannot be longer that 32 bytes");
         }
     }

@@ -137,8 +137,11 @@ public class TransactionActivity extends BaseActivity {
                     KinAlertDialog.createErrorDialog(context, "Transaction id " + transactionId.id()).show();
                 }
             };
-            transactionRequest = memo == null ? account.sendTransaction(toAddress, getPassphrase(), amount)
-                : account.sendTransaction(toAddress, getPassphrase(), amount, memo.getBytes());
+            if (memo == null) {
+                account.sendTransaction(toAddress, getPassphrase(), amount);
+            } else {
+                account.sendTransaction(toAddress, getPassphrase(), amount, memo.getBytes());
+            }
             transactionRequest.run(callback);
         } else {
             progressBar.setVisibility(View.GONE);
