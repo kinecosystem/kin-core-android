@@ -3,12 +3,15 @@ package kin.core;
 
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
@@ -19,8 +22,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.stellar.sdk.Memo;
+import org.stellar.sdk.MemoHash;
+import org.stellar.sdk.Server;
+import org.stellar.sdk.responses.TransactionResponse;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "ConstantConditions"})
 public class KinAccountIntegrationTest {
 
     private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
@@ -108,6 +115,33 @@ public class KinAccountIntegrationTest {
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
         assertThat(kinAccountSender.getBalanceSync().value(), equalTo(new BigDecimal("78.8770000")));
         assertThat(kinAccountReceiver.getBalanceSync().value(), equalTo(new BigDecimal("21.1230000")));
+    }
+
+    @Test
+    @LargeTest
+    public void sendTransaction_WithMemo() throws Exception {
+        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
+        fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
+        byte[] expectedMemo = "fake memo".getBytes();
+
+        kinAccountSender.activateSync(PASSPHRASE);
+        kinAccountReceiver.activateSync(PASSPHRASE);
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
+
+        TransactionId transactionId = kinAccountSender
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"),
+                expectedMemo);
+        assertThat(kinAccountSender.getBalanceSync().value(), equalTo(new BigDecimal("78.8770000")));
+        assertThat(kinAccountReceiver.getBalanceSync().value(), equalTo(new BigDecimal("21.1230000")));
+
+        Server server = new Server(TEST_NETWORK_URL);
+        TransactionResponse transaction = server.transactions().transaction(transactionId.id());
+        Memo actualMemo = transaction.getMemo();
+        assertThat(actualMemo, is(instanceOf(MemoHash.class)));
+        //memo is 32 bytes long, actual memo will be padded with zeros, pad with zeros as well when comparing
+        assertThat(Arrays.copyOf(expectedMemo, 32), equalTo(((MemoHash) actualMemo).getBytes()));
     }
 
     @Test

@@ -7,11 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.DeleteAccountException;
+import org.stellar.sdk.Network;
+import org.stellar.sdk.Server;
 
 public class KinClient {
 
+    private static final String STORE_NAME = "KinKeyStore";
+    private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
-    private final ClientWrapper clientWrapper;
+    private final TransactionSender transactionSender;
+    private final AccountActivator accountActivator;
+    private final BalanceQuery balanceQuery;
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
@@ -22,28 +28,51 @@ public class KinClient {
      * @param provider the service provider provides blockchain network parameters
      */
     public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
-        this.clientWrapper = new ClientWrapper(context, provider);
-        keyStore = clientWrapper.getKeyStore();
+        this.serviceProvider = provider;
+        Server server = initServer();
+        keyStore = initKeyStore(context.getApplicationContext());
+        transactionSender = new TransactionSender(server, keyStore, provider.getKinAsset());
+        accountActivator = new AccountActivator(server, keyStore, provider.getKinAsset());
+        balanceQuery = new BalanceQuery(server, provider.getKinAsset());
         loadAccounts();
     }
 
     @VisibleForTesting
-    KinClient(ClientWrapper clientWrapper) {
-        this.clientWrapper = clientWrapper;
-        keyStore = clientWrapper.getKeyStore();
+    KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
+        AccountActivator accountActivator, BalanceQuery balanceQuery) {
+        this.serviceProvider = serviceProvider;
+        this.keyStore = keyStore;
+        this.transactionSender = transactionSender;
+        this.accountActivator = accountActivator;
+        this.balanceQuery = balanceQuery;
         loadAccounts();
+    }
+
+    private Server initServer() {
+        if (serviceProvider.isMainNet()) {
+            Network.usePublicNetwork();
+        } else {
+            Network.useTestNetwork();
+        }
+        return new Server(serviceProvider.getProviderUrl());
+    }
+
+    private KeyStore initKeyStore(Context context) {
+        SharedPrefStore store = new SharedPrefStore(context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE));
+        Encryptor encryptor = EncryptorFactory.create(context, store);
+        return new KeyStoreImpl(store, encryptor);
     }
 
     private void loadAccounts() {
         List<Account> accounts = null;
         try {
-            accounts = clientWrapper.getKeyStore().loadAccounts();
+            accounts = keyStore.loadAccounts();
         } catch (LoadAccountException e) {
             e.printStackTrace();
         }
         if (accounts != null && !accounts.isEmpty()) {
             for (Account account : accounts) {
-                kinAccounts.add(new KinAccountImpl(clientWrapper, account));
+                kinAccounts.add(new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery));
             }
         }
     }
@@ -59,7 +88,7 @@ public class KinClient {
     public @NonNull
     KinAccount addAccount(@NonNull String passphrase) throws CreateAccountException {
         Account account = keyStore.newAccount();
-        KinAccountImpl newAccount = new KinAccountImpl(clientWrapper, account);
+        KinAccountImpl newAccount = new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery);
         kinAccounts.add(newAccount);
         return newAccount;
     }
@@ -108,7 +137,7 @@ public class KinClient {
      * WARNING - if you don't export your account before deleting it, you will lose all your Kin.
      */
     public void wipeoutAccount() {
-        clientWrapper.wipeoutAccounts();
+        keyStore.clearAllAccounts();
         for (KinAccountImpl kinAccount : kinAccounts) {
             kinAccount.markAsDeleted();
         }
@@ -116,7 +145,7 @@ public class KinClient {
     }
 
     public ServiceProvider getServiceProvider() {
-        return clientWrapper.getServiceProvider();
+        return serviceProvider;
     }
 
 }
