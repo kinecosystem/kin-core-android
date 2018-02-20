@@ -74,7 +74,7 @@ and then must the account must be activated, before it can receive or send KIN.
 
 
 ```java
-Request<Balance> activationRequest = account.activate(passphrase)
+Request<Void> activationRequest = account.activate(passphrase)
 activationRequest.run(new ResultCallback<Void>() {
     @Override
     public void onResult(Void result) {
