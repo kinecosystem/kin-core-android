@@ -24,6 +24,8 @@ public class KinAccountImplTest {
     private BalanceQuery mockBalanceQuery;
     @Mock
     private AccountActivator mockAccountActivator;
+    @Mock
+    private PaymentWatcherCreator mockPaymentWatcherCreator;
     private KinAccountImpl kinAccount;
     private Account expectedRandomAccount;
 
@@ -36,7 +38,7 @@ public class KinAccountImplTest {
         KeyPair keyPair = KeyPair.random();
         expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+            mockBalanceQuery, mockPaymentWatcherCreator);
     }
 
     @Test
@@ -109,6 +111,15 @@ public class KinAccountImplTest {
         kinAccount.activateSync(expectedPassphrase);
 
         verify(mockAccountActivator).activate(expectedRandomAccount, expectedPassphrase);
+    }
+
+    @Test
+    public void createPaymentsWatcher() throws Exception {
+        initWithRandomAccount();
+
+        kinAccount.createPaymentWatcher();
+
+        verify(mockPaymentWatcherCreator).create(expectedRandomAccount);
     }
 
     @Test(expected = AccountDeletedException.class)

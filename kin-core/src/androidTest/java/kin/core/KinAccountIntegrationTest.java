@@ -2,6 +2,7 @@ package kin.core;
 
 
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -11,7 +12,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
@@ -124,7 +129,7 @@ public class KinAccountIntegrationTest {
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
-        byte[] expectedMemo = "fake memo".getBytes();
+        byte[] expectedMemo = memoHashFromString("fake memo");
 
         kinAccountSender.activateSync(PASSPHRASE);
         kinAccountReceiver.activateSync(PASSPHRASE);
@@ -140,8 +145,12 @@ public class KinAccountIntegrationTest {
         TransactionResponse transaction = server.transactions().transaction(transactionId.id());
         Memo actualMemo = transaction.getMemo();
         assertThat(actualMemo, is(instanceOf(MemoHash.class)));
-        //memo is 32 bytes long, actual memo will be padded with zeros, pad with zeros as well when comparing
-        assertThat(Arrays.copyOf(expectedMemo, 32), equalTo(((MemoHash) actualMemo).getBytes()));
+        assertThat(expectedMemo, equalTo(((MemoHash) actualMemo).getBytes()));
+    }
+
+    private byte[] memoHashFromString(String memo) {
+        //memo is 32 bytes long, pad with zeros as actual memo will be padded with zeros
+        return Arrays.copyOf(memo.getBytes(), 32);
     }
 
     @Test
@@ -201,6 +210,84 @@ public class KinAccountIntegrationTest {
         expectedEx.expectMessage(kinAccountSender.getPublicAddress());
         kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+    }
+
+    @Test
+    @LargeTest
+    public void createPaymentWatcher_WatchReceiver_PaymentEvent() throws Exception {
+        watchPayment(false);
+    }
+
+    @Test
+    @LargeTest
+    public void createPaymentWatcher_WatchSender_PaymentEvent() throws Exception {
+        watchPayment(true);
+    }
+
+    private void watchPayment(boolean watchSender) throws Exception {
+        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
+        fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
+
+        kinAccountSender.activateSync(PASSPHRASE);
+        kinAccountReceiver.activateSync(PASSPHRASE);
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        final List<PaymentInfo> actualResults = new ArrayList<>();
+        KinAccount accountToWatch = watchSender ? kinAccountSender : kinAccountReceiver;
+        accountToWatch.createPaymentWatcher().start(new WatcherListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+                actualResults.add(data);
+                latch.countDown();
+            }
+        });
+
+        BigDecimal expectedAmount = new BigDecimal("21.123");
+        byte[] expectedMemo = memoHashFromString("memo");
+        TransactionId expectedTransactionId = kinAccountSender
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, expectedAmount, expectedMemo);
+
+        latch.await(10, TimeUnit.SECONDS);
+        assertThat(actualResults.size(), equalTo(1));
+        PaymentInfo paymentInfo = actualResults.get(0);
+        assertThat(paymentInfo.amount(), equalTo(expectedAmount));
+        assertThat(paymentInfo.destinationPublicKey(), equalTo(kinAccountReceiver.getPublicAddress()));
+        assertThat(paymentInfo.sourcePublicKey(), equalTo(kinAccountSender.getPublicAddress()));
+        assertThat(paymentInfo.memo(), equalTo(expectedMemo));
+        assertThat(paymentInfo.hash().id(), equalTo(expectedTransactionId.id()));
+    }
+
+    @Test
+    @LargeTest
+    public void createPaymentWatcher_StopWatching_NoEvents() throws Exception {
+        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
+        fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
+
+        kinAccountSender.activateSync(PASSPHRASE);
+        kinAccountReceiver.activateSync(PASSPHRASE);
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        PaymentWatcher paymentWatcher = kinAccountReceiver.createPaymentWatcher();
+        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+                fail("should not get eny event!");
+                latch.countDown();
+            }
+        });
+        paymentWatcher.stop();
+
+        kinAccountSender
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"), null);
+
+        latch.await(15, TimeUnit.SECONDS);
     }
 
     @Test

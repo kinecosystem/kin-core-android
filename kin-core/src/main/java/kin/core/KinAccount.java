@@ -124,4 +124,11 @@ public interface KinAccount {
      * @throws OperationFailedException any other error
      */
     void activateSync(@NonNull String passphrase) throws OperationFailedException;
+
+    /**
+     * Creates a watcher for every payment done in kin that involves this account.
+     *
+     * @return {@link PaymentWatcher} watching payments
+     */
+    PaymentWatcher createPaymentWatcher();
 }

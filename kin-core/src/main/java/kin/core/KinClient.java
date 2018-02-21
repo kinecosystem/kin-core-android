@@ -18,6 +18,7 @@ public class KinClient {
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
     private final BalanceQuery balanceQuery;
+    private final PaymentWatcherCreator paymentWatcherCreator;
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
@@ -34,17 +35,19 @@ public class KinClient {
         transactionSender = new TransactionSender(server, keyStore, provider.getKinAsset());
         accountActivator = new AccountActivator(server, keyStore, provider.getKinAsset());
         balanceQuery = new BalanceQuery(server, provider.getKinAsset());
+        paymentWatcherCreator = new PaymentWatcherCreator(server, provider.getKinAsset());
         loadAccounts();
     }
 
     @VisibleForTesting
     KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
-        AccountActivator accountActivator, BalanceQuery balanceQuery) {
+        AccountActivator accountActivator, BalanceQuery balanceQuery, PaymentWatcherCreator paymentWatcherCreator) {
         this.serviceProvider = serviceProvider;
         this.keyStore = keyStore;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
         this.balanceQuery = balanceQuery;
+        this.paymentWatcherCreator = paymentWatcherCreator;
         loadAccounts();
     }
 
@@ -72,7 +75,7 @@ public class KinClient {
         }
         if (accounts != null && !accounts.isEmpty()) {
             for (Account account : accounts) {
-                kinAccounts.add(new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery));
+                kinAccounts.add(createNewKinAccount(account));
             }
         }
     }
@@ -88,7 +91,7 @@ public class KinClient {
     public @NonNull
     KinAccount addAccount(@NonNull String passphrase) throws CreateAccountException {
         Account account = keyStore.newAccount();
-        KinAccountImpl newAccount = new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery);
+        KinAccountImpl newAccount = createNewKinAccount(account);
         kinAccounts.add(newAccount);
         return newAccount;
     }
@@ -146,6 +149,11 @@ public class KinClient {
 
     public ServiceProvider getServiceProvider() {
         return serviceProvider;
+    }
+
+    @NonNull
+    private KinAccountImpl createNewKinAccount(Account account) {
+        return new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery, paymentWatcherCreator);
     }
 
 }

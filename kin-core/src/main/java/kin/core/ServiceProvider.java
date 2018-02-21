@@ -87,8 +87,12 @@ public class ServiceProvider {
 
         boolean isKinBalance(@NonNull AccountResponse.Balance balance) {
             return stellarKinAsset.getCode().equals(balance.getAssetCode()) &&
-                balance.getAssetIssuer() != null &&
-                stellarKinAsset.getIssuer().getAccountId().equals(balance.getAssetIssuer().getAccountId());
+                balance.getAsset() != null &&
+                isKinAsset(balance.getAsset());
+        }
+
+        boolean isKinAsset(@NonNull Asset asset) {
+            return stellarKinAsset.equals(asset);
         }
 
         boolean hasKinTrust(@NonNull AccountResponse addresseeAccount) {
