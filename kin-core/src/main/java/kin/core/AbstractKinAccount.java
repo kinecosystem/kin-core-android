@@ -22,7 +22,7 @@ abstract class AbstractKinAccount implements KinAccount {
     @NonNull
     @Override
     public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final String passphrase,
-        @NonNull final BigDecimal amount, @Nullable final byte[] memo) {
+        @NonNull final BigDecimal amount, @Nullable final String memo) {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {

@@ -45,7 +45,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @NonNull
     @Override
     public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount, @Nullable byte[] memo) throws OperationFailedException, PassphraseException {
+        @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException, PassphraseException {
         checkValidAccount();
         return transactionSender.sendTransaction(account, passphrase, publicAddress, amount, memo);
     }

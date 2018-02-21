@@ -13,7 +13,6 @@ import android.support.test.filters.LargeTest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.stellar.sdk.Memo;
-import org.stellar.sdk.MemoHash;
+import org.stellar.sdk.MemoText;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.responses.TransactionResponse;
 
@@ -129,7 +128,7 @@ public class KinAccountIntegrationTest {
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
-        byte[] expectedMemo = memoHashFromString("fake memo");
+        String expectedMemo = "fake memo";
 
         kinAccountSender.activateSync(PASSPHRASE);
         kinAccountReceiver.activateSync(PASSPHRASE);
@@ -144,13 +143,8 @@ public class KinAccountIntegrationTest {
         Server server = new Server(TEST_NETWORK_URL);
         TransactionResponse transaction = server.transactions().transaction(transactionId.id());
         Memo actualMemo = transaction.getMemo();
-        assertThat(actualMemo, is(instanceOf(MemoHash.class)));
-        assertThat(expectedMemo, equalTo(((MemoHash) actualMemo).getBytes()));
-    }
-
-    private byte[] memoHashFromString(String memo) {
-        //memo is 32 bytes long, pad with zeros as actual memo will be padded with zeros
-        return Arrays.copyOf(memo.getBytes(), 32);
+        assertThat(actualMemo, is(instanceOf(MemoText.class)));
+        assertThat(((MemoText) actualMemo).getText(), equalTo(expectedMemo));
     }
 
     @Test
@@ -246,7 +240,7 @@ public class KinAccountIntegrationTest {
         });
 
         BigDecimal expectedAmount = new BigDecimal("21.123");
-        byte[] expectedMemo = memoHashFromString("memo");
+        String expectedMemo = "memo";
         TransactionId expectedTransactionId = kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, expectedAmount, expectedMemo);
 

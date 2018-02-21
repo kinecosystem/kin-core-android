@@ -10,10 +10,10 @@ class PaymentInfoImpl implements PaymentInfo {
     private final String sourcePublicKey;
     private final BigDecimal amount;
     private final TransactionId hash;
-    private final byte[] memo;
+    private final String memo;
 
     PaymentInfoImpl(String createdAt, String destinationPublicKey, String sourcePublicKey, BigDecimal amount,
-        TransactionId hash, byte[] memo) {
+        TransactionId hash, String memo) {
         this.createdAt = createdAt;
         this.destinationPublicKey = destinationPublicKey;
         this.sourcePublicKey = sourcePublicKey;
@@ -48,7 +48,7 @@ class PaymentInfoImpl implements PaymentInfo {
     }
 
     @Override
-    public byte[] memo() {
+    public String memo() {
         return memo;
     }
 }

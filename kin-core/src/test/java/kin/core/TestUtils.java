@@ -3,7 +3,6 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -27,10 +26,5 @@ final class TestUtils {
     static void enqueueEmptyResponse(MockWebServer mockWebServer) {
         //simulate http 200 with no body, will cause to parse empty body and response will be null
         mockWebServer.enqueue(new MockResponse().setBodyDelay(1, TimeUnit.SECONDS));
-    }
-
-    static byte[] memoHashFromString(String memo) {
-        //memo is 32 bytes long, pad with zeros as actual memo will be padded with zeros
-        return Arrays.copyOf(memo.getBytes(), 32);
     }
 }

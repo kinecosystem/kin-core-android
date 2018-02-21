@@ -4,37 +4,37 @@ package kin.core;
 import java.math.BigDecimal;
 
 /**
- * Represents payment issued on the blockchain
+ * Represents payment issued on the blockchain.
  */
-interface PaymentInfo {
+public interface PaymentInfo {
 
     /**
-     * Transaction creation time
+     * Transaction creation time.
      */
     String createdAt();
 
     /**
-     * Destination account public id
+     * Destination account public id.
      */
     String destinationPublicKey();
 
     /**
-     * Source account public id
+     * Source account public id.
      */
     String sourcePublicKey();
 
     /**
-     * Payment amount in kin
+     * Payment amount in kin.
      */
     BigDecimal amount();
 
     /**
-     * Transaction id (hash)
+     * Transaction id (hash).
      */
     TransactionId hash();
 
     /**
-     * Optional bytes array, up-to 32 bytes, included on the transaction record.
+     * An optional string, up-to 28 characters, included on the transaction record.
      */
-    byte[] memo();
+    String memo();
 }

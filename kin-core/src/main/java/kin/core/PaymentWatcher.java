@@ -9,7 +9,7 @@ import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
-import org.stellar.sdk.MemoHash;
+import org.stellar.sdk.MemoText;
 import org.stellar.sdk.Operation;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
@@ -75,7 +75,7 @@ public class PaymentWatcher {
                             extractSourceAccountId(transactionResponse, paymentOperation),
                             new BigDecimal(paymentOperation.getAmount()),
                             new TransactionIdImpl(transactionResponse.getHash()),
-                            extractHashMemoIfAny(transactionResponse)
+                            extractHashTextIfAny(transactionResponse)
                         );
                         listener.onEvent(paymentInfo);
                     }
@@ -96,13 +96,13 @@ public class PaymentWatcher {
         return paymentOperation.getAsset() != null && kinAsset.isKinAsset(paymentOperation.getAsset());
     }
 
-    private byte[] extractHashMemoIfAny(TransactionResponse transactionResponse) {
-        byte[] memoBytes = null;
+    private String extractHashTextIfAny(TransactionResponse transactionResponse) {
+        String memoString = null;
         Memo memo = transactionResponse.getMemo();
-        if (memo instanceof MemoHash) {
-            memoBytes = ((MemoHash) memo).getBytes();
+        if (memo instanceof MemoText) {
+            memoString = ((MemoText) memo).getText();
         }
-        return memoBytes;
+        return memoString;
     }
 
     /**

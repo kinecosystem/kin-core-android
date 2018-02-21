@@ -76,10 +76,10 @@ public class KinAccountImplTest {
         String expectedAccountId = "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX";
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
-        byte[] memo = "Dummy Memo".getBytes();
+        String memo = "Dummy Memo";
 
         when(mockTransactionSender
-            .sendTransaction((Account) any(), anyString(), (String) any(), (BigDecimal) any(), (byte[]) any()))
+            .sendTransaction((Account) any(), anyString(), (String) any(), (BigDecimal) any(), anyString()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount

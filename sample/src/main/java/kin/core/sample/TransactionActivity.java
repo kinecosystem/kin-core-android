@@ -140,7 +140,7 @@ public class TransactionActivity extends BaseActivity {
             if (memo == null) {
                 account.sendTransaction(toAddress, getPassphrase(), amount);
             } else {
-                account.sendTransaction(toAddress, getPassphrase(), amount, memo.getBytes());
+                account.sendTransaction(toAddress, getPassphrase(), amount, memo);
             }
             transactionRequest.run(callback);
         } else {

@@ -1,7 +1,6 @@
 package kin.core;
 
 import static kin.core.TestUtils.loadResource;
-import static kin.core.TestUtils.memoHashFromString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -119,7 +118,7 @@ public class PaymentWatcherTest {
             equalTo("GD4YOKVYR6KPPXA7HXG2SQOTWGZ6FO6BNCDJ5IGIGWRLL3Z5ABPEEYD3"));
         assertThat(payment1.amount(), equalTo(new BigDecimal("612.784")));
         assertThat(payment1.createdAt(), equalTo("2018-02-21T06:51:00Z"));
-        assertThat(payment1.memo(), equalTo(memoHashFromString("Test Transaction")));
+        assertThat(payment1.memo(), equalTo("Test Transaction"));
 
         assertThat(payment2.hash().id(), equalTo("899a639e280d91c917e82816c803e4ec68025a6352fd2b3769403012a4ee3cb4"));
         assertThat(payment2.sourcePublicKey(), equalTo("GBRXY5BAZAAB7M2PI3KG5WLIRARJAGUPV2IPC4AGIPTTZRM7UY2VVKN3"));
@@ -127,7 +126,7 @@ public class PaymentWatcherTest {
             equalTo("GD4YOKVYR6KPPXA7HXG2SQOTWGZ6FO6BNCDJ5IGIGWRLL3Z5ABPEEYD3"));
         assertThat(payment2.amount(), equalTo(new BigDecimal("147.32564")));
         assertThat(payment2.createdAt(), equalTo("2018-02-21T06:51:24Z"));
-        assertThat(payment2.memo(), equalTo(memoHashFromString("Test Transaction")));
+        assertThat(payment2.memo(), equalTo("Test Transaction2"));
     }
 
     @Test

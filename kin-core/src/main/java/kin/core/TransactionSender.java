@@ -22,7 +22,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
-    private static final int MEMO_BYTES_LIMIT = 32; //Stellar "hash" memo bytes limitation
+    private static final int MEMO_LENGTH_LIMIT = 28; //Stellar text memo length limitation
     private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
@@ -42,7 +42,7 @@ class TransactionSender {
 
     @NonNull
     TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable byte[] memo)
+        @NonNull BigDecimal amount, @Nullable String memo)
         throws OperationFailedException, PassphraseException {
 
         checkParams(from, passphrase, publicAddress, amount, memo);
@@ -63,7 +63,7 @@ class TransactionSender {
     }
 
     private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable byte[] memo) {
+        @NonNull BigDecimal amount, @Nullable String memo) {
         Utils.checkNotNull(from, "account");
         Utils.checkNotNull(passphrase, "passphrase");
         Utils.checkNotNull(amount, "amount");
@@ -85,9 +85,9 @@ class TransactionSender {
         }
     }
 
-    private void checkMemo(byte[] memo) {
-        if (memo != null && memo.length > MEMO_BYTES_LIMIT) {
-            throw new IllegalArgumentException("Memo cannot be longer that 32 bytes");
+    private void checkMemo(String memo) {
+        if (memo != null && memo.length() > MEMO_LENGTH_LIMIT) {
+            throw new IllegalArgumentException("Memo cannot be longer that 28 characters");
         }
     }
 
@@ -102,13 +102,13 @@ class TransactionSender {
 
     @NonNull
     private Transaction buildTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
-        AccountResponse sourceAccount, @Nullable byte[] memo) {
+        AccountResponse sourceAccount, @Nullable String memo) {
 
         Builder transactionBuilder = new Builder(sourceAccount)
             .addOperation(
                 new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build());
         if (memo != null) {
-            transactionBuilder.addMemo(Memo.hash(memo));
+            transactionBuilder.addMemo(Memo.text(memo));
         }
         Transaction transaction = transactionBuilder.build();
         transaction.sign(from);
