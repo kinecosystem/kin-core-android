@@ -76,6 +76,15 @@ public class BalanceQueryTest {
     }
 
     @Test
+    public void getBalance_SameIssuerDifferentAsset_AccountNotActivatedException() throws Exception {
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
+        expectedEx.expect(AccountNotActivatedException.class);
+        expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID)));
+
+        getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @Test
     public void getBalance_IOException() throws Exception {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 

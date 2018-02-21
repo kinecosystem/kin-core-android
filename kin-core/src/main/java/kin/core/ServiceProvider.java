@@ -4,6 +4,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import java.lang.annotation.Retention;
 import org.stellar.sdk.Asset;
@@ -85,21 +86,15 @@ public class ServiceProvider {
             this.stellarKinAsset = (AssetTypeCreditAlphaNum) Asset.createNonNativeAsset(KIN_ASSET_CODE, issuerKeyPair);
         }
 
-        boolean isKinBalance(@NonNull AccountResponse.Balance balance) {
-            return stellarKinAsset.getCode().equals(balance.getAssetCode()) &&
-                balance.getAsset() != null &&
-                isKinAsset(balance.getAsset());
-        }
-
-        boolean isKinAsset(@NonNull Asset asset) {
-            return stellarKinAsset.equals(asset);
+        boolean isKinAsset(@Nullable Asset asset) {
+            return asset != null && stellarKinAsset.equals(asset);
         }
 
         boolean hasKinTrust(@NonNull AccountResponse addresseeAccount) {
             AccountResponse.Balance balances[] = addresseeAccount.getBalances();
             boolean hasTrust = false;
             for (AccountResponse.Balance balance : balances) {
-                if (isKinBalance(balance)) {
+                if (isKinAsset(balance.getAsset())) {
                     hasTrust = true;
                 }
             }

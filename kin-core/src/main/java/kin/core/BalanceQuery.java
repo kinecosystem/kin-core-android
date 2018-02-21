@@ -41,7 +41,7 @@ class BalanceQuery {
                 throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
             }
             for (AccountResponse.Balance assetBalance : accountResponse.getBalances()) {
-                if (kinAsset.isKinBalance(assetBalance)) {
+                if (kinAsset.isKinAsset(assetBalance.getAsset())) {
                     balance = new BalanceImpl(new BigDecimal(assetBalance.getBalance()));
                     break;
                 }

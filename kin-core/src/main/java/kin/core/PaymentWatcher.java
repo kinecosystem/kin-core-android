@@ -38,7 +38,8 @@ public class PaymentWatcher {
     }
 
     /**
-     * Start watching for payments, use {@link #stop()} to stop watching.
+     * Start watching for payments, use {@link #stop()} to stop watching, multiple listeners are not supported,
+     * start can be called only once.
      * <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
@@ -93,7 +94,7 @@ public class PaymentWatcher {
     }
 
     private boolean isPaymentInKin(PaymentOperation paymentOperation) {
-        return paymentOperation.getAsset() != null && kinAsset.isKinAsset(paymentOperation.getAsset());
+        return kinAsset.isKinAsset(paymentOperation.getAsset());
     }
 
     private String extractHashTextIfAny(TransactionResponse transactionResponse) {
@@ -106,7 +107,7 @@ public class PaymentWatcher {
     }
 
     /**
-     * Stop watching for payments
+     * Stop watching for payments, unregister listener.
      */
     public void stop() {
         if (serverSentEvent != null) {

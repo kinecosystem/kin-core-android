@@ -1,0 +1,71 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU"
+    },
+    "transactions": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/transactions{?cursor,limit,order}",
+      "templated": true
+    },
+    "operations": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/operations{?cursor,limit,order}",
+      "templated": true
+    },
+    "payments": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/payments{?cursor,limit,order}",
+      "templated": true
+    },
+    "effects": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "offers": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/offers{?cursor,limit,order}",
+      "templated": true
+    },
+    "trades": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/trades{?cursor,limit,order}",
+      "templated": true
+    },
+    "data": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU/data/{key}",
+      "templated": true
+    }
+  },
+  "id": "GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU",
+  "paging_token": "",
+  "account_id": "GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU",
+  "sequence": "30115292772302851",
+  "subentry_count": 0,
+  "thresholds": {
+    "low_threshold": 0,
+    "med_threshold": 0,
+    "high_threshold": 0
+  },
+  "flags": {
+    "auth_required": false,
+    "auth_revocable": false
+  },
+  "balances": [
+    {
+      "balance": "9999.9999800",
+      "limit": "922337203685.4775807",
+      "asset_type": "credit_alphanum4",
+      "asset_code": "NIK",
+      "asset_issuer": "GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM"
+    },
+    {
+      "balance": "9999.9999700",
+      "asset_type": "native"
+    }
+  ],
+  "signers": [
+    {
+      "public_key": "GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU",
+      "weight": 1,
+      "key": "GD6QL4QDEOFJQ5W77DY7VHUHK2O4EIM7HDZJDZPOKM7HZ7SJZTKK43WU",
+      "type": "ed25519_public_key"
+    }
+  ],
+  "data": {}
+}
