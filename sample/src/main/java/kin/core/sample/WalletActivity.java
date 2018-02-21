@@ -56,6 +56,7 @@ public class WalletActivity extends BaseActivity {
         final View refresh = findViewById(R.id.refresh_btn);
         getKinBtn = findViewById(R.id.get_kin_btn);
         final View deleteAccount = findViewById(R.id.delete_account_btn);
+        final View watchPayments = findViewById(R.id.watch_payments_btn);
 
         if (isMainNet()) {
             transaction.setBackgroundResource(R.drawable.button_main_network_bg);
@@ -72,6 +73,7 @@ public class WalletActivity extends BaseActivity {
         deleteAccount.setOnClickListener(view -> showDeleteAlert());
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
+        watchPayments.setOnClickListener(view -> startActivity(WatchPaymentActivity.getIntent(WalletActivity.this)));
         refresh.setOnClickListener(view -> updateBalance(true));
     }
 

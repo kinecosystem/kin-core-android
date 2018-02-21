@@ -109,6 +109,8 @@ public class PaymentWatcher {
      * Stop watching for payments
      */
     public void stop() {
-        serverSentEvent.close();
+        if (serverSentEvent != null) {
+            serverSentEvent.close();
+        }
     }
 }
