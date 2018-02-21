@@ -4,7 +4,7 @@ Android library responsible for creating a new Stellar account and managing KIN 
 
 ## Build
 
-* Add this to your module's `build.gradle` file.
+Add this to your module's `build.gradle` file.
 ```gradle
 repositories {
     ...
@@ -139,6 +139,47 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
         }
 });
 ```
+
+#####Memo
+Arbitrary data can be added to a transfer operation using the memo parameter,
+the memo is a `String` of up to 28 characters.
+
+```java
+String memo = "arbitrary data";
+transactionRequest = account.sendTransaction(toAddress, getPassphrase(), amount, memo);
+transactionRequest.run(new ResultCallback<TransactionId>() {
+
+    @Override
+        public void onResult(TransactionId result) {
+            Log.d("example", "The transaction id: " + result.toString());
+        }
+
+        @Override
+        public void onError(Exception e) {
+            e.printStackTrace();
+        }
+});
+```
+### Watching Payments
+
+Ongoing payments in KIN, from or to an account, can be observed. 
+<br/>First, Create a `PaymentWatcher`
+object:
+```java
+PaymentWatcher watcher = account.createPaymentWatcher();
+```
+For start watching, use `start` method, by providing listener of `WatcherListener<PaymentInfo>`:
+```java
+paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+    @Override
+    public void onEvent(PaymentInfo payment) {
+        Log.d("example", String
+            .format("payment event, to = %s, from = %s, amount = %s", payment.sourcePublicKey(),
+                payment.destinationPublicKey(), payment.amount().toPlainString());
+    }
+});
+```
+When you longer want to watch payment, stop the notifications and unregister the listener using `PaymentWatcher.stop()` method.
 
 ### Sync vs Async
 
