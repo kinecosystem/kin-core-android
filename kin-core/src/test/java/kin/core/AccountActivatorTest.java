@@ -116,6 +116,20 @@ public class AccountActivatorTest {
     }
 
     @Test
+    public void activate_HasTrustWithSameIssuerDifferentAsset_Success() throws Exception {
+        mockWebServer
+            .enqueue(TestUtils
+                .generateSuccessMockResponse(this.getClass(),
+                    "activate_account_same_issuer_different_asset_code.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_success.json"));
+
+        accountActivator.activate(account, "");
+
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
+        assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
+    }
+
+    @Test
     public void activate_HasTrustAlready_NoChangeTrust() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account.json"));
 

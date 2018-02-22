@@ -14,14 +14,16 @@ final class KinAccountImpl extends AbstractKinAccount {
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
     private final BalanceQuery balanceQuery;
+    private final PaymentWatcherCreator paymentWatcherCreator;
     private boolean isDeleted = false;
 
     KinAccountImpl(Account account, TransactionSender transactionSender, AccountActivator accountActivator,
-        BalanceQuery balanceQuery) {
+        BalanceQuery balanceQuery, PaymentWatcherCreator paymentWatcherCreator) {
         this.account = account;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
         this.balanceQuery = balanceQuery;
+        this.paymentWatcherCreator = paymentWatcherCreator;
     }
 
     @Override
@@ -43,7 +45,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @NonNull
     @Override
     public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount, @Nullable byte[] memo) throws OperationFailedException, PassphraseException {
+        @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException, PassphraseException {
         checkValidAccount();
         return transactionSender.sendTransaction(account, passphrase, publicAddress, amount, memo);
     }
@@ -59,6 +61,11 @@ final class KinAccountImpl extends AbstractKinAccount {
     public void activateSync(@NonNull String passphrase) throws OperationFailedException {
         checkValidAccount();
         accountActivator.activate(account, passphrase);
+    }
+
+    @Override
+    public PaymentWatcher createPaymentWatcher() {
+        return paymentWatcherCreator.create(account);
     }
 
     void markAsDeleted() {

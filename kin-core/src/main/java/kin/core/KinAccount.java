@@ -39,12 +39,12 @@ public interface KinAccount {
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
      * @param passphrase the passphrase used to create the account
-     * @param memo An optional bytes array, up-to 32 bytes, included on the transaction record.
+     * @param memo An optional string, up-to 28 characters, included on the transaction record.
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
     @NonNull
     Request<TransactionId> sendTransaction(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount, @Nullable byte[] memo);
+        @NonNull BigDecimal amount, @Nullable String memo);
 
     /**
      * Create, sign and send a transaction of the given amount in kin to the specified public address
@@ -70,7 +70,7 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional bytes array, up-to 32 bytes, included on the transaction record.
+     * @param memo An optional string, up-to 28 characters, included on the transaction record.
      * @return TransactionId the transaction identifier
      * @throws PassphraseException if the transaction could not be signed with the passphrase specified
      * @throws AccountNotFoundException if the sender or destination account was not created
@@ -80,7 +80,7 @@ public interface KinAccount {
      */
     @NonNull
     TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount, @Nullable byte[] memo)
+        @NonNull BigDecimal amount, @Nullable String memo)
         throws OperationFailedException, PassphraseException;
 
     /**
@@ -124,4 +124,11 @@ public interface KinAccount {
      * @throws OperationFailedException any other error
      */
     void activateSync(@NonNull String passphrase) throws OperationFailedException;
+
+    /**
+     * Creates a watcher for every payment done in kin that involves this account.
+     *
+     * @return {@link PaymentWatcher} watching payments
+     */
+    PaymentWatcher createPaymentWatcher();
 }

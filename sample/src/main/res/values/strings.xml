@@ -24,4 +24,11 @@
     <string name="cancel">Cancel</string>
     <string name="balance_error">Error</string>
     <string name="memo">Memo</string>
+    <string name="watch_payments">Watch Payments</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_stop">Stop</string>
+    <string name="to">To:</string>
+    <string name="from">From:</string>
+    <string name="hash">Hash:</string>
+    <string name="created_at">Created at:</string>
 </resources>

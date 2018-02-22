@@ -33,6 +33,8 @@ public class KinClientTest {
     private AccountActivator mockAccountActivator;
     @Mock
     private BalanceQuery mockBalanceQuery;
+    @Mock
+    private PaymentWatcherCreator mockPaymentWatcherCreator;
     private KinClient kinClient;
     private KeyStore fakeKeyStore;
     private ServiceProvider fakeServiceProvider;
@@ -42,8 +44,7 @@ public class KinClientTest {
         MockitoAnnotations.initMocks(this);
         fakeServiceProvider = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST);
         fakeKeyStore = new FakeKeyStore();
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
     }
 
     @Test
@@ -94,8 +95,7 @@ public class KinClientTest {
     public void getAccount_ExistingAccount_AddMultipleAccount() throws Exception {
         Account account1 = createKeyStoreWithRandomAccount();
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
 
         KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccount3 = kinClient.addAccount(PASSPHRASE);
@@ -118,8 +118,7 @@ public class KinClientTest {
         Account account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
 
@@ -164,8 +163,7 @@ public class KinClientTest {
         ArrayList<Account> accounts = new ArrayList<>();
         accounts.add(account);
         fakeKeyStore = new FakeKeyStore(accounts);
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         return account;
     }
 
@@ -188,8 +186,7 @@ public class KinClientTest {
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         assertTrue(kinClient.hasAccount());
     }
 
@@ -210,8 +207,7 @@ public class KinClientTest {
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         kinClient.deleteAccount(0, PASSPHRASE);
 
         assertTrue(kinClient.hasAccount());
@@ -226,8 +222,7 @@ public class KinClientTest {
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         kinClient.deleteAccount(1, PASSPHRASE);
 
         assertTrue(kinClient.hasAccount());
@@ -241,8 +236,7 @@ public class KinClientTest {
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         kinClient.deleteAccount(3, PASSPHRASE);
 
         assertNotNull(kinClient.getAccount(0));
@@ -257,8 +251,7 @@ public class KinClientTest {
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
         kinClient.deleteAccount(-1, PASSPHRASE);
 
         assertNotNull(kinClient.getAccount(0));
@@ -273,8 +266,7 @@ public class KinClientTest {
         Account account3 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
 
         assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2, PASSPHRASE);
@@ -294,8 +286,7 @@ public class KinClientTest {
         Account account3 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
-        kinClient = new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+        kinClient = createNewKinClient();
 
         kinClient.wipeoutAccount();
 
@@ -307,7 +298,7 @@ public class KinClientTest {
         String url = "My awesome Horizon server";
         ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery);
+            mockBalanceQuery, mockPaymentWatcherCreator);
         ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
@@ -316,4 +307,9 @@ public class KinClientTest {
         assertEquals(ServiceProvider.NETWORK_ID_TEST, actualServiceProvider.getNetworkId());
     }
 
+    @NonNull
+    private KinClient createNewKinClient() {
+        return new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
+            mockBalanceQuery, mockPaymentWatcherCreator);
+    }
 }
