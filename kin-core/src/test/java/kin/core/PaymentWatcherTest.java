@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.here.oksse.ServerSentEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import org.stellar.sdk.requests.EventListener;
 import org.stellar.sdk.requests.TransactionsRequestBuilder;
 import org.stellar.sdk.responses.GsonSingleton;
 import org.stellar.sdk.responses.TransactionResponse;
-import org.stellar.sdk.sse.ServerSentEvent;
 
 public class PaymentWatcherTest {
 
