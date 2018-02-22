@@ -33,6 +33,7 @@ public class WatchPaymentActivity extends BaseActivity {
         initWidgets();
         KinClient kinClient = ((KinClientSampleApplication) getApplication()).getKinClient();
         account = kinClient.getAccount(0);
+        paymentWatcher = account.createPaymentWatcher();
     }
 
     private void initWidgets() {
@@ -46,7 +47,6 @@ public class WatchPaymentActivity extends BaseActivity {
     private void startWatcher() {
         startBtn.setEnabled(false);
         stopBtn.setEnabled(true);
-        paymentWatcher = account.createPaymentWatcher();
         paymentWatcher.start(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
     }
 

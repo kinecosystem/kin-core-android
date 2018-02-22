@@ -146,6 +146,24 @@ public class PaymentWatcherTest {
         });
     }
 
+    @Test
+    public void start_StopAndStart_Success() throws Exception {
+        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+            }
+        });
+        paymentWatcher.stop();
+        final CountDownLatch latch = new CountDownLatch(1);
+        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+                latch.countDown();
+            }
+        });
+        latch.await(1, TimeUnit.SECONDS);
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test
     public void start_NullListener_IllegalArgumentException() throws Exception {

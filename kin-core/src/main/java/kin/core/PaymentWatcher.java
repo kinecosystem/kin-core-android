@@ -38,8 +38,7 @@ public class PaymentWatcher {
     }
 
     /**
-     * Start watching for payments, use {@link #stop()} to stop watching, multiple listeners are not supported,
-     * start can be called only once.
+     * Start watching for payments, use {@link #stop()} to stop watching, start can be called again after stop.
      * <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
@@ -112,6 +111,7 @@ public class PaymentWatcher {
     public void stop() {
         if (serverSentEvent != null) {
             serverSentEvent.close();
+            started = false;
         }
     }
 }
