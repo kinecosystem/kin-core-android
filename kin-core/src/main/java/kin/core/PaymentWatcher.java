@@ -4,6 +4,7 @@ package kin.core;
 import static kin.core.Utils.checkNotNull;
 
 import android.support.annotation.NonNull;
+import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
@@ -15,7 +16,6 @@ import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.requests.EventListener;
 import org.stellar.sdk.responses.TransactionResponse;
-import org.stellar.sdk.sse.ServerSentEvent;
 
 /**
  * Watch blockchain network for ongoing payments involved specific account.
