@@ -47,9 +47,30 @@ public class KinAccountIntegrationTest {
         fakeKinIssuer = new FakeKinIssuer();
     }
 
+    private class TestServiceProvider extends ServiceProvider {
+
+        private final String issuerAccountId;
+
+        TestServiceProvider(String issuerAccountId) {
+            super(TEST_NETWORK_URL, NETWORK_ID_TEST);
+            this.issuerAccountId = issuerAccountId;
+        }
+
+        @Override
+        protected String getAssetCode() {
+            return "KIN";
+        }
+
+        @Override
+        protected String getIssuerAccountId() {
+            return issuerAccountId;
+        }
+    }
+
+
     @Before
     public void setup() throws IOException {
-        ServiceProvider serviceProvider = new ServiceProvider(TEST_NETWORK_URL, fakeKinIssuer.getAccountId());
+        ServiceProvider serviceProvider = new TestServiceProvider(fakeKinIssuer.getAccountId());
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
         kinClient.wipeoutAccount();
     }

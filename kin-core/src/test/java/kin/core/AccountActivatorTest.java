@@ -1,6 +1,7 @@
 package kin.core;
 
 import static junit.framework.Assert.fail;
+import static kin.core.TestUtils.createKinAsset;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -67,7 +68,7 @@ public class AccountActivatorTest {
         mockKeyStoreResponse();
         Network.useTestNetwork();
 
-        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         accountActivator = new AccountActivator(server, mockKeyStore, kinAsset);
         account = new Account(SECRET_SEED_FROM, ACCOUNT_ID_FROM);
     }
@@ -205,7 +206,7 @@ public class AccountActivatorTest {
     public void activate_ChangeTimeOut() throws Exception {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
-        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         accountActivator = new AccountActivator(server, mockKeyStore, kinAsset);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account_no_kin.json"));

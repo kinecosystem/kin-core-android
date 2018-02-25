@@ -1,5 +1,6 @@
 package kin.core;
 
+import static kin.core.TestUtils.createKinAsset;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
@@ -133,13 +134,13 @@ public class BalanceQueryTest {
             .setResponseCode(500)
         );
         expectedEx.expect(IllegalArgumentException.class);
-        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
         balanceQuery.getBalance(null);
     }
 
     private Balance getBalance(String issuerAccountId, String accountId) throws OperationFailedException {
-        KinAsset kinAsset = new KinAsset(issuerAccountId);
+        KinAsset kinAsset = createKinAsset(issuerAccountId);
         BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
         Account account = new Account("", accountId);
         return balanceQuery.getBalance(account);
