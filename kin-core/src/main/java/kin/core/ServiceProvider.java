@@ -28,6 +28,7 @@ public class ServiceProvider {
 
     private static final String MAIN_NETWORK_ISSUER = "GBGFNADX2FTYVCLDCVFY5ZRTVEMS4LV6HKMWOY7XJKVXMBIWVDESCJW5";
     private static final String TEST_NETWORK_ISSUER = "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V";
+    private static final String KIN_ASSET_CODE = "KIN";
 
     private final String providerUrl;
     @NetworkId
@@ -50,7 +51,15 @@ public class ServiceProvider {
     public ServiceProvider(String providerUrl, @NetworkId int networkId) {
         this.providerUrl = providerUrl;
         this.networkId = networkId;
-        this.kinAsset = new KinAsset(isMainNet() ? MAIN_NETWORK_ISSUER : TEST_NETWORK_ISSUER);
+        this.kinAsset = new KinAsset(getIssuerCode(), getAssetCode());
+    }
+
+    protected String getIssuerCode(){
+        return isMainNet() ? MAIN_NETWORK_ISSUER : TEST_NETWORK_ISSUER;
+    }
+
+    protected String getAssetCode(){
+        return KIN_ASSET_CODE;
     }
 
     @VisibleForTesting
@@ -78,12 +87,11 @@ public class ServiceProvider {
 
     static class KinAsset {
 
-        private static final String KIN_ASSET_CODE = "KIN";
         private final AssetTypeCreditAlphaNum stellarKinAsset;
 
-        KinAsset(String kinIssuerAccountId) {
+        KinAsset(String kinIssuerAccountId, string assetCode) {
             KeyPair issuerKeyPair = KeyPair.fromAccountId(kinIssuerAccountId);
-            this.stellarKinAsset = (AssetTypeCreditAlphaNum) Asset.createNonNativeAsset(KIN_ASSET_CODE, issuerKeyPair);
+            this.stellarKinAsset = (AssetTypeCreditAlphaNum) Asset.createNonNativeAsset(assetCode, issuerKeyPair);
         }
 
         boolean isKinAsset(@Nullable Asset asset) {
