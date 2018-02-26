@@ -2,6 +2,7 @@ package kin.core;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static kin.core.TestUtils.createKinAsset;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -74,7 +75,7 @@ public class TransactionSenderTest {
         mockKeyStoreResponse();
         Network.useTestNetwork();
 
-        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         transactionSender = new TransactionSender(server, mockKeyStore, kinAsset);
         account = new Account(SECRET_SEED_FROM, ACCOUNT_ID_FROM);
     }
@@ -253,7 +254,7 @@ public class TransactionSenderTest {
     public void sendTransaction_changeTimeOut() throws Exception {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
-        KinAsset kinAsset = new KinAsset(ACCOUNT_ID_KIN_ISSUER);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         transactionSender = new TransactionSender(server, mockKeyStore, kinAsset);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));

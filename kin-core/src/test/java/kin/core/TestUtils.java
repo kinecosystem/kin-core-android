@@ -4,6 +4,7 @@ package kin.core;
 import android.support.annotation.NonNull;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
+import kin.core.ServiceProvider.KinAsset;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
@@ -26,5 +27,9 @@ final class TestUtils {
     static void enqueueEmptyResponse(MockWebServer mockWebServer) {
         //simulate http 200 with no body, will cause to parse empty body and response will be null
         mockWebServer.enqueue(new MockResponse().setBodyDelay(1, TimeUnit.SECONDS));
+    }
+
+    static KinAsset createKinAsset(String issuer) {
+        return new KinAsset("KIN", issuer);
     }
 }
