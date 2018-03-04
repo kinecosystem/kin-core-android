@@ -3,11 +3,11 @@ package kin.core;
 
 import static kin.core.Utils.checkNotNull;
 
-import android.support.annotation.NonNull;
 import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
+import org.stellar.sdk.CreateAccountOperation;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.MemoText;
@@ -19,8 +19,9 @@ import org.stellar.sdk.responses.TransactionResponse;
 
 /**
  * Watch blockchain network for ongoing payments involved specific account.
- * <p>Use {@link #start(WatcherListener)} to start
- * watching, new payments will be notified on the input {@link WatcherListener WatcherListener&lt;PaymentInfo&gt;}</p>
+ * <p>Use {@link #startPaymentListener(WatcherListener)} to start
+ * watching payment or {@link #startCreateAccountListener(WatcherListener)} to start
+ * watching create account, new payments will be notified on the input {@link WatcherListener WatcherListener&lt;PaymentInfo&gt;}</p>
  */
 public class PaymentWatcher {
 
@@ -28,8 +29,10 @@ public class PaymentWatcher {
     private final Server server;
     private final KinAsset kinAsset;
     private final KeyPair accountKeyPair;
-    private boolean started;
     private ServerSentEvent serverSentEvent;
+    private boolean started;
+
+
 
     PaymentWatcher(Server server, Account account, KinAsset kinAsset) {
         this.server = server;
@@ -38,17 +41,14 @@ public class PaymentWatcher {
     }
 
     /**
-     * Start watching for payments, use {@link #stop()} to stop watching, start can be called again after stop.
+     * Start watching for payment, use {@link #stop()} to stop watching, startPaymentListener can be called again after stop.
      * <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
      */
-    public void start(@NonNull final WatcherListener<PaymentInfo> listener) {
+    public void startPaymentListener(final WatcherListener<PaymentInfo> listener){
         checkNotNull(listener, "listener");
-        if (started) {
-            throw new IllegalStateException("Watcher already started");
-        }
-        started = true;
+        setStarted();
         serverSentEvent = server
             .transactions()
             .forAccount(accountKeyPair)
@@ -60,6 +60,34 @@ public class PaymentWatcher {
                 }
             });
     }
+
+    /**
+     * Start watching for create account, use {@link #stop()} to stop watching, startCreateAccountListener can be called again after stop.
+     * <p><b>Note:</b> Events will be fired on background thread.</p>
+     *
+     * @param listener listener object for payment events
+     */
+    public void startCreateAccountListener(final WatcherListener<PaymentInfo> listener){
+        checkNotNull(listener, "listener");
+        setStarted();
+        serverSentEvent = server.transactions()
+            .forAccount(accountKeyPair)
+            .cursor(CURSOR_FUTURE_ONLY)
+            .stream(new EventListener<TransactionResponse>() {
+                @Override
+                public void onEvent(TransactionResponse transactionResponse) {
+                    extractCreateAccountFromTransaction(transactionResponse,listener);
+                }
+            });
+    }
+
+    private void setStarted() {
+        if (started) {
+            throw new IllegalStateException("Watcher already started");
+        }
+        started = true;
+    }
+
 
     private void extractPaymentsFromTransaction(TransactionResponse transactionResponse,
         WatcherListener<PaymentInfo> listener) {
@@ -85,10 +113,40 @@ public class PaymentWatcher {
         }
     }
 
+    private void extractCreateAccountFromTransaction(TransactionResponse transactionResponse,
+        WatcherListener<PaymentInfo> listener) {
+        List<Operation> operations = transactionResponse.getOperations();
+        if (operations != null) {
+            for (Operation operation : operations) {
+                if (operation instanceof CreateAccountOperation) {
+                    CreateAccountOperation createAccountOperation = (CreateAccountOperation) operation;
+                        PaymentInfo paymentInfo = new PaymentInfoImpl(
+                            transactionResponse.getCreatedAt(),
+                            createAccountOperation.getDestination().getAccountId(),
+                            extractSourceAccountId(transactionResponse, createAccountOperation),
+                            new BigDecimal(createAccountOperation.getStartingBalance()),
+                            new TransactionIdImpl(transactionResponse.getHash()),
+                            extractHashTextIfAny(transactionResponse)
+                        );
+                        listener.onEvent(paymentInfo);
+                        break;
+                }
+            }
+
+        }
+    }
+
     private String extractSourceAccountId(TransactionResponse transactionResponse, PaymentOperation paymentOperation) {
         //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
         //is the transaction source account
         return paymentOperation.getSourceAccount() != null ? paymentOperation.getSourceAccount()
+            .getAccountId() : transactionResponse.getSourceAccount().getAccountId();
+    }
+
+    private String extractSourceAccountId(TransactionResponse transactionResponse, CreateAccountOperation createAccountOperation) {
+        //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
+        //is the transaction source account
+        return createAccountOperation.getSourceAccount() != null ? createAccountOperation.getSourceAccount()
             .getAccountId() : transactionResponse.getSourceAccount().getAccountId();
     }
 

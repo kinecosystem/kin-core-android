@@ -252,7 +252,7 @@ public class KinAccountIntegrationTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final List<PaymentInfo> actualResults = new ArrayList<>();
         KinAccount accountToWatch = watchSender ? kinAccountSender : kinAccountReceiver;
-        accountToWatch.createPaymentWatcher().start(new WatcherListener<PaymentInfo>() {
+        accountToWatch.createPaymentWatcher().startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 actualResults.add(data);
@@ -290,7 +290,7 @@ public class KinAccountIntegrationTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         PaymentWatcher paymentWatcher = kinAccountReceiver.createPaymentWatcher();
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 fail("should not get eny event!");

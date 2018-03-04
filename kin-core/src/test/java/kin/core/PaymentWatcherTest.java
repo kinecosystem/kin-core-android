@@ -70,6 +70,8 @@ public class PaymentWatcherTest {
                         @Override
                         public void run() {
                             sleep();
+                            listener.onEvent(createTransactionResponse("create_account_tx_response1.json"));
+                            sleep();
                             listener.onEvent(createTransactionResponse("payment_watcher_tx_response1.json"));
                             sleep();
                             listener.onEvent(createTransactionResponse("payment_watcher_tx_response2.json"));
@@ -96,10 +98,10 @@ public class PaymentWatcherTest {
     }
 
     @Test
-    public void start() throws Exception {
+    public void startPaymentListener() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
         final List<PaymentInfo> actualResults = new ArrayList<>();
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 actualResults.add(data);
@@ -130,15 +132,40 @@ public class PaymentWatcherTest {
     }
 
     @Test
+    public void startCreateAcountListener() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final List<PaymentInfo> actualResults = new ArrayList<>();
+        paymentWatcher.startCreateAccountListener(new WatcherListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+                actualResults.add(data);
+                if (actualResults.size() == 1) {
+                    latch.countDown();
+                }
+            }
+        });
+        latch.await();//1, TimeUnit.SECONDS);
+        assertThat(actualResults.size(), equalTo(1));
+        PaymentInfo payment1 = actualResults.get(0);
+        assertThat(payment1.hash().id(), equalTo("e12829adf0a357f86a455ad91187484a356625c0d46866687532aeca661c10ca"));
+        assertThat(payment1.sourcePublicKey(), equalTo("GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K"));
+        assertThat(payment1.destinationPublicKey(),
+            equalTo("GBRXY5BAZAAB7M2PI3KG5WLIRARJAGUPV2IPC4AGIPTTZRM7UY2VVKN3"));
+        assertThat(payment1.amount(), equalTo(new BigDecimal("10000")));
+        assertThat(payment1.createdAt(), equalTo("2017-12-25T13:22:55Z"));
+       // assertThat(payment1.memo(), equalTo("Test Transaction"));
+    }
+
+    @Test
     public void start_AlreadyStarted_IllegalStateException() throws Exception {
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
             }
         });
         expectedEx.expect(IllegalStateException.class);
         expectedEx.expectMessage("started");
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
 
@@ -148,14 +175,14 @@ public class PaymentWatcherTest {
 
     @Test
     public void start_StopAndStart_Success() throws Exception {
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
             }
         });
         paymentWatcher.stop();
         final CountDownLatch latch = new CountDownLatch(1);
-        paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 latch.countDown();
@@ -169,7 +196,7 @@ public class PaymentWatcherTest {
     public void start_NullListener_IllegalArgumentException() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("listener");
-        paymentWatcher.start(null);
+        paymentWatcher.startPaymentListener(null);
     }
 
 }

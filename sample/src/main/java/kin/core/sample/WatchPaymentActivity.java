@@ -47,7 +47,7 @@ public class WatchPaymentActivity extends BaseActivity {
     private void startWatcher() {
         startBtn.setEnabled(false);
         stopBtn.setEnabled(true);
-        paymentWatcher.start(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
+        paymentWatcher.startPaymentListener(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
     }
 
     private void addPaymentToUi(PaymentInfo paymentInfo) {

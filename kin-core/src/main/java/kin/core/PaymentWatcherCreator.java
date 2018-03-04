@@ -9,6 +9,7 @@ class PaymentWatcherCreator {
     private final Server server;
     private final KinAsset kinAsset;
 
+
     PaymentWatcherCreator(Server server, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;

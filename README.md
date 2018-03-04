@@ -169,9 +169,9 @@ object:
 ```java
 PaymentWatcher watcher = account.createPaymentWatcher();
 ```
-For start watching, use `start` method, by providing listener of `WatcherListener<PaymentInfo>`:
+For start watching, use `startPaymentListener` method, by providing listener of `WatcherListener<PaymentInfo>`:
 ```java
-paymentWatcher.start(new WatcherListener<PaymentInfo>() {
+paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
     @Override
     public void onEvent(PaymentInfo payment) {
         Log.d("example", String
@@ -181,6 +181,27 @@ paymentWatcher.start(new WatcherListener<PaymentInfo>() {
 });
 ```
 When you longer want to watch payment, stop the notifications and unregister the listener using `PaymentWatcher.stop()` method.
+
+### Watching Account Creation
+When the account is first created by another account it can be observed.
+<br/>First, Create a `PaymentWatcher`
+object:
+```java
+PaymentWatcher watcher = account.createPaymentWatcher();
+```
+
+For start watching, use `startCreateAccountListener` method, by providing listener of `WatcherListener<PaymentInfo>`:
+```java
+paymentWatcher.startCreateAccountListener(new WatcherListener<PaymentInfo>() {
+    @Override
+    public void onEvent(PaymentInfo payment) {
+        Log.d("example", String
+            .format("payment event, to = %s, from = %s, amount = %s", payment.sourcePublicKey(),
+                payment.destinationPublicKey(), payment.amount().toPlainString());
+    }
+});
+```
+The payment amount will represent the created account native balance.
 
 ### Sync vs Async
 
