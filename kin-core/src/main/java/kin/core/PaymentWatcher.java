@@ -136,17 +136,10 @@ public class PaymentWatcher {
         }
     }
 
-    private String extractSourceAccountId(TransactionResponse transactionResponse, PaymentOperation paymentOperation) {
+    private String extractSourceAccountId(TransactionResponse transactionResponse, Operation operation) {
         //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
         //is the transaction source account
-        return paymentOperation.getSourceAccount() != null ? paymentOperation.getSourceAccount()
-            .getAccountId() : transactionResponse.getSourceAccount().getAccountId();
-    }
-
-    private String extractSourceAccountId(TransactionResponse transactionResponse, CreateAccountOperation createAccountOperation) {
-        //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
-        //is the transaction source account
-        return createAccountOperation.getSourceAccount() != null ? createAccountOperation.getSourceAccount()
+        return operation.getSourceAccount() != null ? operation.getSourceAccount()
             .getAccountId() : transactionResponse.getSourceAccount().getAccountId();
     }
 
