@@ -49,11 +49,8 @@ public class KinAccountIntegrationTest {
 
     private class TestServiceProvider extends ServiceProvider {
 
-        private final String issuerAccountId;
-
-        TestServiceProvider(String issuerAccountId) {
+        TestServiceProvider() {
             super(TEST_NETWORK_URL, NETWORK_ID_TEST);
-            this.issuerAccountId = issuerAccountId;
         }
 
         @Override
@@ -63,14 +60,14 @@ public class KinAccountIntegrationTest {
 
         @Override
         protected String getIssuerAccountId() {
-            return issuerAccountId;
+            return fakeKinIssuer.getAccountId();
         }
     }
 
 
     @Before
     public void setup() throws IOException {
-        ServiceProvider serviceProvider = new TestServiceProvider(fakeKinIssuer.getAccountId());
+        ServiceProvider serviceProvider = new TestServiceProvider();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
         kinClient.wipeoutAccount();
     }
