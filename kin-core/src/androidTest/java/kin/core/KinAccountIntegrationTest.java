@@ -343,6 +343,7 @@ public class KinAccountIntegrationTest {
 
     @Test
     public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
+        fail("test failure in travis!!");
         KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
         kinClient.deleteAccount(0, PASSPHRASE);
         assertNull(kinAccount.getPublicAddress());
