@@ -68,12 +68,12 @@ public class KinAccountIntegrationTest {
     public void setup() throws IOException {
         ServiceProvider serviceProvider = new TestServiceProvider();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
     }
 
     @After
     public void teardown() {
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
     }
 
     @Test

@@ -137,9 +137,8 @@ public class KinClient {
 
     /**
      * Deletes all accounts.
-     * WARNING - if you don't export your account before deleting it, you will lose all your Kin.
      */
-    public void wipeoutAccount() {
+    public void clearAllAccounts() {
         keyStore.clearAllAccounts();
         for (KinAccountImpl kinAccount : kinAccounts) {
             kinAccount.markAsDeleted();

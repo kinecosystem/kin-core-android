@@ -279,7 +279,7 @@ public class KinClientTest {
     }
 
     @Test
-    public void wipeout() {
+    public void clearAllAccounts() {
         Account account1 = createRandomAccount();
         Account account2 = createRandomAccount();
         Account account3 = createRandomAccount();
@@ -287,7 +287,7 @@ public class KinClientTest {
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
         kinClient = createNewKinClient();
 
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
 
         assertThat(kinClient.getAccountCount(), equalTo(0));
     }

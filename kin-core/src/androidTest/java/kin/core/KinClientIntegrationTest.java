@@ -32,7 +32,7 @@ public class KinClientIntegrationTest {
     public void setup() {
         serviceProvider = new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
     }
 
     @Test
@@ -230,13 +230,13 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void wipeout() throws CreateAccountException {
+    public void clearAllAccounts() throws CreateAccountException {
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
 
         assertThat(kinClient.getAccountCount(), equalTo(0));
     }
