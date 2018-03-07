@@ -185,11 +185,11 @@ public class TransactionSenderTest {
     }
 
     @Test
-    public void sendTransaction_UnderfundStellarError() throws Exception {
+    public void sendTransaction_GeneralStellarError() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
         mockWebServer.enqueue(new MockResponse()
-            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_internal_error.json"))
+            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_general_stellar_error.json"))
             .setResponseCode(400)
         );
 

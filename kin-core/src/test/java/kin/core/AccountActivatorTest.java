@@ -166,16 +166,16 @@ public class AccountActivatorTest {
     }
 
     @Test
-    public void activate_UnderfundStellarError() throws Exception {
+    public void activate_GeneralStellarError() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account_no_kin.json"));
         mockWebServer.enqueue(new MockResponse()
-            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_internal_error.json"))
+            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_general_stellar_error.json"))
             .setResponseCode(400)
         );
 
         expectedEx.expect(TransactionFailedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("transactionResultCode", equalTo("tx_failed")));
-        expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_underfunded")));
+        expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_malformed")));
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", hasSize(1)));
 
         accountActivator.activate(account);
