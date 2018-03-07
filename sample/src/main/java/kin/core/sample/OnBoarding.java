@@ -41,7 +41,7 @@ class OnBoarding {
             .build();
     }
 
-    void onBoard(@NonNull KinAccount account, @NonNull String passphrase, @NonNull Callbacks callbacks) {
+    void onBoard(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
 
         Request request = new Request.Builder()
             .url(URL_CREATE_ACCOUNT)
@@ -57,7 +57,7 @@ class OnBoarding {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (response.code() == 200) {
-                        activateAccount(account, passphrase, callbacks);
+                        activateAccount(account, callbacks);
                     } else {
                         fireOnFailure(callbacks, new Exception("Create account - response code is " + response.code()));
                     }
@@ -82,9 +82,8 @@ class OnBoarding {
         return json.toString();
     }
 
-    private void activateAccount(@NonNull KinAccount account, @NonNull String passphrase,
-        @NonNull Callbacks callbacks) {
-        account.activate(passphrase)
+    private void activateAccount(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
+        account.activate()
             .run(new ResultCallback<Void>() {
                 @Override
                 public void onResult(Void result) {

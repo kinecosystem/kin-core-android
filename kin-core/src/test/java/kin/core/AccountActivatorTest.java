@@ -96,7 +96,7 @@ public class AccountActivatorTest {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account_no_kin.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_success.json"));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
 
         //verify sent requests data
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
@@ -110,7 +110,7 @@ public class AccountActivatorTest {
                 .generateSuccessMockResponse(this.getClass(), "activate_account_kin_trust_different_issuer.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_success.json"));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
 
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
         assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
@@ -124,7 +124,7 @@ public class AccountActivatorTest {
                     "activate_account_same_issuer_different_asset_code.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_success.json"));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
 
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
         assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
@@ -134,7 +134,7 @@ public class AccountActivatorTest {
     public void activate_HasTrustAlready_NoChangeTrust() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account.json"));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
 
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
         assertThat(mockWebServer.getRequestCount(), equalTo(1));
@@ -148,7 +148,7 @@ public class AccountActivatorTest {
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class AccountActivatorTest {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
         try {
-            accountActivator.activate(account, "");
+            accountActivator.activate(account);
             fail("Expected OperationFailedException");
         } catch (Exception ex) {
             Assert.assertThat(ex, is(instanceOf(OperationFailedException.class)));
@@ -178,7 +178,7 @@ public class AccountActivatorTest {
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_underfunded")));
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", hasSize(1)));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class AccountActivatorTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class AccountActivatorTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test(timeout = 500)
@@ -214,7 +214,7 @@ public class AccountActivatorTest {
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(SocketTimeoutException.class));
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class AccountActivatorTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage(ACCOUNT_ID_FROM);
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -235,7 +235,7 @@ public class AccountActivatorTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage("transaction");
 
-        accountActivator.activate(account, "");
+        accountActivator.activate(account);
     }
 
     @Test
@@ -243,15 +243,7 @@ public class AccountActivatorTest {
     public void activate_NullAccount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("account");
-        accountActivator.activate(null, "");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void activate_NullPassphrase() throws Exception {
-        expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("passphrase");
-        accountActivator.activate(account, null);
+        accountActivator.activate(null);
     }
 
 }

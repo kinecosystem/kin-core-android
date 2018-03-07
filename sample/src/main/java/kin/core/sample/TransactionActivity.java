@@ -138,9 +138,9 @@ public class TransactionActivity extends BaseActivity {
                 }
             };
             if (memo == null) {
-                transactionRequest = account.sendTransaction(toAddress, getPassphrase(), amount);
+                transactionRequest = account.sendTransaction(toAddress, amount);
             } else {
-                transactionRequest = account.sendTransaction(toAddress, getPassphrase(), amount, memo);
+                transactionRequest = account.sendTransaction(toAddress, amount, memo);
             }
             transactionRequest.run(callback);
         } else {

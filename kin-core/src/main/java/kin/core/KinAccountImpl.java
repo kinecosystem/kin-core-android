@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
-import kin.core.exception.PassphraseException;
 
 
 final class KinAccountImpl extends AbstractKinAccount {
@@ -36,18 +35,18 @@ final class KinAccountImpl extends AbstractKinAccount {
 
     @NonNull
     @Override
-    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount) throws OperationFailedException, PassphraseException {
+    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount)
+        throws OperationFailedException {
         checkValidAccount();
-        return transactionSender.sendTransaction(account, passphrase, publicAddress, amount);
+        return transactionSender.sendTransaction(account, publicAddress, amount);
     }
 
     @NonNull
     @Override
-    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull String passphrase,
-        @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException, PassphraseException {
+    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount,
+        @Nullable String memo) throws OperationFailedException {
         checkValidAccount();
-        return transactionSender.sendTransaction(account, passphrase, publicAddress, amount, memo);
+        return transactionSender.sendTransaction(account, publicAddress, amount, memo);
     }
 
     @NonNull
@@ -58,9 +57,9 @@ final class KinAccountImpl extends AbstractKinAccount {
     }
 
     @Override
-    public void activateSync(@NonNull String passphrase) throws OperationFailedException {
+    public void activateSync() throws OperationFailedException {
         checkValidAccount();
-        accountActivator.activate(account, passphrase);
+        accountActivator.activate(account);
     }
 
     @Override

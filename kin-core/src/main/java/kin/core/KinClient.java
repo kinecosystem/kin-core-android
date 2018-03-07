@@ -10,6 +10,9 @@ import kin.core.exception.DeleteAccountException;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 
+/**
+ * An account manager for a {@link KinAccount}.
+ */
 public class KinClient {
 
     private static final String STORE_NAME = "KinKeyStore";
@@ -85,11 +88,10 @@ public class KinClient {
      * <p>Once created, the account information will be stored securely on the device and can
      * be accessed again via the {@link #getAccount(int)} method.</p>
      *
-     * @param passphrase a passphrase provided by the user that will be used to store the account private key securely.
      * @return {@link KinAccount} the account created store the key.
      */
     public @NonNull
-    KinAccount addAccount(@NonNull String passphrase) throws CreateAccountException {
+    KinAccount addAccount() throws CreateAccountException {
         Account account = keyStore.newAccount();
         KinAccountImpl newAccount = createNewKinAccount(account);
         kinAccounts.add(newAccount);
@@ -124,10 +126,8 @@ public class KinClient {
 
     /**
      * Deletes the account at input index (if it exists)
-     *
-     * @param passphrase the passphrase used when the account was created
      */
-    public void deleteAccount(int index, @NonNull String passphrase) throws DeleteAccountException {
+    public void deleteAccount(int index) throws DeleteAccountException {
         if (index >= 0 && getAccountCount() > index) {
             keyStore.deleteAccount(index);
             KinAccountImpl removedAccount = kinAccounts.remove(index);

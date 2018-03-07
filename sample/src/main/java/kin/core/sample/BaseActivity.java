@@ -12,12 +12,6 @@ import kin.sdk.core.sample.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    // ideally user should be asked for a passphrase when
-    // creating an account and then the same passphrase
-    // should be used when sending transactions
-    // To make the UI simpler for the sample application
-    // we are using a hardcoded passphrase.
-    final static String PASSPHRASE1 = "12345";
     final static int NO_ACTION_BAR_TITLE = -1;
 
     abstract Intent getBackIntent();
@@ -76,10 +70,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
         finish();
-    }
-
-    public String getPassphrase() {
-        return PASSPHRASE1;
     }
 
     protected void hideKeyboard(View view) {

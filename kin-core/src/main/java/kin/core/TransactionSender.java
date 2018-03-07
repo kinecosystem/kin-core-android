@@ -9,7 +9,6 @@ import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;
-import kin.core.exception.PassphraseException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
@@ -34,27 +33,27 @@ class TransactionSender {
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
-        throws OperationFailedException, PassphraseException {
-        return sendTransaction(from, passphrase, publicAddress, amount, null);
+        throws OperationFailedException {
+        return sendTransaction(from, publicAddress, amount, null);
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable String memo)
-        throws OperationFailedException, PassphraseException {
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+        @Nullable String memo)
+        throws OperationFailedException {
 
-        checkParams(from, passphrase, publicAddress, amount, memo);
+        checkParams(from, publicAddress, amount, memo);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
-        KeyPair secretSeedKeyPair = decryptAccount(from, passphrase);
+        KeyPair secretSeedKeyPair = decryptAccount(from);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount, memo);
         return sendTransaction(transaction);
     }
 
-    private KeyPair decryptAccount(@NonNull Account from, @NonNull String passphrase) throws OperationFailedException {
+    private KeyPair decryptAccount(@NonNull Account from) throws OperationFailedException {
         try {
             return keyStore.decryptAccount(from);
         } catch (CryptoException e) {
@@ -62,10 +61,9 @@ class TransactionSender {
         }
     }
 
-    private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable String memo) {
+    private void checkParams(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+        @Nullable String memo) {
         Utils.checkNotNull(from, "account");
-        Utils.checkNotNull(passphrase, "passphrase");
         Utils.checkNotNull(amount, "amount");
         checkAddressNotEmpty(publicAddress);
         checkForNegativeAmount(amount);

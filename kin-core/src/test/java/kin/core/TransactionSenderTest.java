@@ -107,7 +107,7 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_success_res.json"));
 
         TransactionId transactionId = transactionSender
-            .sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
 
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
 
@@ -127,7 +127,7 @@ public class TransactionSenderTest {
         String fakeMemo = "Fake Memo";
 
         TransactionId transactionId = transactionSender
-            .sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"), fakeMemo);
+            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"), fakeMemo);
 
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
 
@@ -146,7 +146,7 @@ public class TransactionSenderTest {
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_TO)));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
     }
 
     @Test
@@ -157,7 +157,7 @@ public class TransactionSenderTest {
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_TO)));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class TransactionSenderTest {
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
     }
 
     @Test
@@ -180,7 +180,7 @@ public class TransactionSenderTest {
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
     }
 
     @Test
@@ -197,7 +197,7 @@ public class TransactionSenderTest {
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_underfunded")));
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", hasSize(1)));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -224,7 +224,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -235,7 +235,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -247,7 +247,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test(timeout = 500)
@@ -263,7 +263,7 @@ public class TransactionSenderTest {
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(SocketTimeoutException.class));
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -273,7 +273,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage(ACCOUNT_ID_TO);
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -284,7 +284,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage(ACCOUNT_ID_FROM);
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -296,7 +296,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage("transaction");
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -308,7 +308,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(CryptoException.class));
 
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -317,7 +317,7 @@ public class TransactionSenderTest {
         String tooLongMemo = "memo string can be only 28 characters";
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("28 characters");
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
+        transactionSender.sendTransaction(account, ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
         assertThat(mockWebServer.getRequestCount(), equalTo(0));
     }
 
@@ -326,15 +326,7 @@ public class TransactionSenderTest {
     public void sendTransaction_NullAccount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("account");
-        transactionSender.sendTransaction(null, "", ACCOUNT_ID_TO, new BigDecimal("200"));
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void sendTransaction_NullPassphrase() throws Exception {
-        expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("passphrase");
-        transactionSender.sendTransaction(account, null, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(null, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
 
     @Test
@@ -342,7 +334,7 @@ public class TransactionSenderTest {
     public void sendTransaction_NullPublicAddress() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "", null, new BigDecimal("200"));
+        transactionSender.sendTransaction(account, null, new BigDecimal("200"));
     }
 
     @Test
@@ -350,21 +342,21 @@ public class TransactionSenderTest {
     public void sendTransaction_NullAmount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("amount");
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, null);
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, null);
     }
 
     @Test
     public void sendTransaction_EmptyPublicAddress() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "", "", new BigDecimal("200"));
+        transactionSender.sendTransaction(account, "", new BigDecimal("200"));
     }
 
     @Test
     public void sendTransaction_NegativeAmount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Amount");
-        transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("-200"));
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("-200"));
     }
 
     @Test
@@ -373,7 +365,7 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(FormatException.class));
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "", "ABCDEF", new BigDecimal("200"));
+        transactionSender.sendTransaction(account, "ABCDEF", new BigDecimal("200"));
     }
 
     @Test
@@ -382,14 +374,14 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(FormatException.class));
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "", "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OG3",
+        transactionSender.sendTransaction(account, "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OG3",
             new BigDecimal("200"));
     }
 
     @SuppressWarnings("SameParameterValue")
     private void testHttpResponseCode(int resCode) {
         try {
-            transactionSender.sendTransaction(account, "", ACCOUNT_ID_TO, new BigDecimal("200"));
+            transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
             fail("Expected OperationFailedException");
         } catch (Exception ex) {
             Assert.assertThat(ex, is(instanceOf(OperationFailedException.class)));

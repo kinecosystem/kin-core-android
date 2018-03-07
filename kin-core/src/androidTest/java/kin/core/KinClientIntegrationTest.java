@@ -22,7 +22,6 @@ import org.junit.rules.ExpectedException;
 public class KinClientIntegrationTest {
 
     private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
-    private static final String PASSPHRASE = "12345678";
     private ServiceProvider serviceProvider;
     private KinClient kinClient;
 
@@ -38,7 +37,7 @@ public class KinClientIntegrationTest {
 
     @Test
     public void addAccount_NewAccount() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
 
         assertNotNull(kinAccount);
         assertThat(kinAccount.getPublicAddress(), not(isEmptyOrNullString()));
@@ -46,8 +45,8 @@ public class KinClientIntegrationTest {
 
     @Test
     public void createAccount_AddMultipleAccount() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
+        KinAccount kinAccount2 = kinClient.addAccount();
 
         assertNotNull(kinAccount);
         assertNotNull(kinAccount2);
@@ -58,8 +57,8 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccount_AddMultipleAccount() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
+        KinAccount kinAccount2 = kinClient.addAccount();
 
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
@@ -74,10 +73,10 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccount_ExistingAccount_AddMultipleAccount() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount1 = kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
-        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccount3 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount2 = kinClient.addAccount();
+        KinAccount kinAccount3 = kinClient.addAccount();
 
         KinAccount expectedAccount3 = kinClient.getAccount(2);
         KinAccount expectedAccount2 = kinClient.getAccount(1);
@@ -93,8 +92,8 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccount_ExistingMultipleAccount() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccount2 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount1 = kinClient.addAccount();
+        KinAccount kinAccount2 = kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
@@ -108,7 +107,7 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccount_NegativeIndex() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
 
         assertNull(kinClient.getAccount(-1));
     }
@@ -122,7 +121,7 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccount_ExistingAccount_SameAccount() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount1 = kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         KinAccount kinAccount = kinClient.getAccount(0);
@@ -138,7 +137,7 @@ public class KinClientIntegrationTest {
 
     @Test
     public void hasAccount_ExistingAccount_True() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         assertTrue(kinClient.hasAccount());
@@ -146,8 +145,8 @@ public class KinClientIntegrationTest {
 
     @Test
     public void hasAccount_ExistingMultipleAccounts_True() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         assertTrue(kinClient.hasAccount());
@@ -155,34 +154,34 @@ public class KinClientIntegrationTest {
 
     @Test
     public void deleteAccount() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(0, PASSPHRASE);
+        kinClient.deleteAccount(0);
         assertFalse(kinClient.hasAccount());
     }
 
     @Test
     public void deleteAccount_MultipleAccounts() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        kinClient.deleteAccount(0, PASSPHRASE);
+        kinClient.deleteAccount(0);
 
         assertTrue(kinClient.hasAccount());
-        kinClient.deleteAccount(0, PASSPHRASE);
+        kinClient.deleteAccount(0);
         assertFalse(kinClient.hasAccount());
     }
 
     @Test
     public void deleteAccount_AtIndex() throws Exception {
-        KinAccount kinAccount1 = kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount1 = kinClient.addAccount();
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
-        kinClient.deleteAccount(1, PASSPHRASE);
+        kinClient.deleteAccount(1);
 
         assertTrue(kinClient.hasAccount());
         assertThat(kinAccount1, equalTo(kinClient.getAccount(0)));
@@ -190,10 +189,10 @@ public class KinClientIntegrationTest {
 
     @Test
     public void deleteAccount_IndexOutOfBounds() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
 
-        kinClient.deleteAccount(3, PASSPHRASE);
+        kinClient.deleteAccount(3);
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
@@ -202,10 +201,10 @@ public class KinClientIntegrationTest {
 
     @Test
     public void deleteAccount_NegativeIndex() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
 
-        kinClient.deleteAccount(-1, PASSPHRASE);
+        kinClient.deleteAccount(-1);
 
         assertNotNull(kinClient.getAccount(0));
         assertNotNull(kinClient.getAccount(1));
@@ -214,27 +213,27 @@ public class KinClientIntegrationTest {
 
     @Test
     public void getAccountCount() throws Exception {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         assertThat(kinClient.getAccountCount(), equalTo(3));
-        kinClient.deleteAccount(2, PASSPHRASE);
-        kinClient.deleteAccount(1, PASSPHRASE);
+        kinClient.deleteAccount(2);
+        kinClient.deleteAccount(1);
         assertThat(kinClient.getAccountCount(), equalTo(1));
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
         assertThat(kinClient.getAccountCount(), equalTo(2));
-        kinClient.deleteAccount(1, PASSPHRASE);
-        kinClient.deleteAccount(0, PASSPHRASE);
+        kinClient.deleteAccount(1);
+        kinClient.deleteAccount(0);
         assertThat(kinClient.getAccountCount(), equalTo(0));
     }
 
     @Test
     public void wipeout() throws CreateAccountException {
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
-        kinClient.addAccount(PASSPHRASE);
+        kinClient.addAccount();
+        kinClient.addAccount();
+        kinClient.addAccount();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
 
         kinClient.wipeoutAccount();
