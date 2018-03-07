@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import kin.core.KinAccount;
 
 /**
- * Account is not activated, use {@link KinAccount#activate(String)} to activate the account
+ * Account is not activated, use {@link KinAccount#activate()} to activate the account
  */
 public class AccountNotActivatedException extends OperationFailedException {
 

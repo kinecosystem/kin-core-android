@@ -5,11 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
-import kin.core.exception.PassphraseException;
+import kin.core.exception.TransactionFailedException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
@@ -23,6 +25,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 class TransactionSender {
 
     private static final int MEMO_LENGTH_LIMIT = 28; //Stellar text memo length limitation
+    private static final String INSUFFICIENT_KIN_RESULT_CODE = "op_underfunded";
     private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
@@ -34,27 +37,27 @@ class TransactionSender {
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
-        throws OperationFailedException, PassphraseException {
-        return sendTransaction(from, passphrase, publicAddress, amount, null);
+        throws OperationFailedException {
+        return sendTransaction(from, publicAddress, amount, null);
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable String memo)
-        throws OperationFailedException, PassphraseException {
+    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+        @Nullable String memo)
+        throws OperationFailedException {
 
-        checkParams(from, passphrase, publicAddress, amount, memo);
+        checkParams(from, publicAddress, amount, memo);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
-        KeyPair secretSeedKeyPair = decryptAccount(from, passphrase);
+        KeyPair secretSeedKeyPair = decryptAccount(from);
         AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
         Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount, memo);
         return sendTransaction(transaction);
     }
 
-    private KeyPair decryptAccount(@NonNull Account from, @NonNull String passphrase) throws OperationFailedException {
+    private KeyPair decryptAccount(@NonNull Account from) throws OperationFailedException {
         try {
             return keyStore.decryptAccount(from);
         } catch (CryptoException e) {
@@ -62,10 +65,9 @@ class TransactionSender {
         }
     }
 
-    private void checkParams(@NonNull Account from, @NonNull String passphrase, @NonNull String publicAddress,
-        @NonNull BigDecimal amount, @Nullable String memo) {
+    private void checkParams(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+        @Nullable String memo) {
         Utils.checkNotNull(from, "account");
-        Utils.checkNotNull(passphrase, "passphrase");
         Utils.checkNotNull(amount, "amount");
         checkAddressNotEmpty(publicAddress);
         checkForNegativeAmount(amount);
@@ -163,10 +165,25 @@ class TransactionSender {
             if (response.isSuccess()) {
                 return new TransactionIdImpl(response.getHash());
             } else {
-                throw Utils.createTransactionException(response);
+                return createFailureException(response);
             }
         } catch (IOException e) {
             throw new OperationFailedException(e);
         }
+    }
+
+    private TransactionId createFailureException(SubmitTransactionResponse response)
+        throws TransactionFailedException, InsufficientKinException {
+        TransactionFailedException transactionException = Utils.createTransactionException(response);
+        if (isInsufficientKinException(transactionException)) {
+            throw new InsufficientKinException();
+        } else {
+            throw transactionException;
+        }
+    }
+
+    private boolean isInsufficientKinException(TransactionFailedException transactionException) {
+        List<String> resultCodes = transactionException.getOperationsResultCodes();
+        return resultCodes != null && resultCodes.size() > 0 && INSUFFICIENT_KIN_RESULT_CODE.equals(resultCodes.get(0));
     }
 }

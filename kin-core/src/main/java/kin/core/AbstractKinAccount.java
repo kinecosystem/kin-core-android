@@ -9,24 +9,24 @@ abstract class AbstractKinAccount implements KinAccount {
 
     @NonNull
     @Override
-    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final String passphrase,
+    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress,
         @NonNull final BigDecimal amount) {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {
-                return sendTransactionSync(publicAddress, passphrase, amount, null);
+                return sendTransactionSync(publicAddress, amount, null);
             }
         });
     }
 
     @NonNull
     @Override
-    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final String passphrase,
-        @NonNull final BigDecimal amount, @Nullable final String memo) {
+    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final BigDecimal amount,
+        @Nullable final String memo) {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {
-                return sendTransactionSync(publicAddress, passphrase, amount, memo);
+                return sendTransactionSync(publicAddress, amount, memo);
             }
         });
     }
@@ -44,11 +44,11 @@ abstract class AbstractKinAccount implements KinAccount {
 
     @NonNull
     @Override
-    public Request<Void> activate(@NonNull final String passphrase) {
+    public Request<Void> activate() {
         return new Request<>(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                activateSync(passphrase);
+                activateSync();
                 return null;
             }
         });

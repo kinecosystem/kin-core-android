@@ -28,15 +28,15 @@ class AccountActivator {
         this.keyStore = keyStore;
     }
 
-    void activate(@NonNull Account account, @NonNull String passphrase) throws OperationFailedException {
-        verifyParams(account, passphrase);
+    void activate(@NonNull Account account) throws OperationFailedException {
+        verifyParams(account);
         AccountResponse accountResponse;
         try {
             accountResponse = getAccountDetails(account);
             if (kinAsset.hasKinTrust(accountResponse)) {
                 return;
             }
-            SubmitTransactionResponse response = sendAllowKinTrustOperation(account, passphrase, accountResponse);
+            SubmitTransactionResponse response = sendAllowKinTrustOperation(account, accountResponse);
             handleTransactionResponse(response);
         } catch (HttpResponseException httpError) {
             if (httpError.getStatusCode() == 404) {
@@ -49,9 +49,8 @@ class AccountActivator {
         }
     }
 
-    private void verifyParams(@NonNull Account account, @NonNull String passphrase) {
+    private void verifyParams(@NonNull Account account) {
         Utils.checkNotNull(account, "account");
-        Utils.checkNotNull(passphrase, "passphrase");
     }
 
     @NonNull
@@ -64,8 +63,8 @@ class AccountActivator {
         return accountResponse;
     }
 
-    private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, String passphrase,
-        AccountResponse accountResponse) throws IOException, CryptoException {
+    private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, AccountResponse accountResponse)
+        throws IOException, CryptoException {
         Transaction allowKinTrustTransaction = new Transaction.Builder(accountResponse).addOperation(
             new ChangeTrustOperation.Builder(kinAsset.getStellarAsset(), TRUST_NO_LIMIT_VALUE)
                 .build()
