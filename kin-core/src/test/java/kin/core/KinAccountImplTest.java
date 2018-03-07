@@ -17,7 +17,6 @@ import org.stellar.sdk.KeyPair;
 
 public class KinAccountImplTest {
 
-    private static final String PASSPHRASE = "123456";
     @Mock
     private TransactionSender mockTransactionSender;
     @Mock
