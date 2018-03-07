@@ -5,10 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
+import kin.core.exception.TransactionFailedException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
@@ -22,6 +25,7 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 class TransactionSender {
 
     private static final int MEMO_LENGTH_LIMIT = 28; //Stellar text memo length limitation
+    private static final String INSUFFICIENT_KIN_RESULT_CODE = "op_underfunded";
     private final Server server; //horizon server
     private final KeyStore keyStore;
     private final KinAsset kinAsset;
@@ -161,10 +165,25 @@ class TransactionSender {
             if (response.isSuccess()) {
                 return new TransactionIdImpl(response.getHash());
             } else {
-                throw Utils.createTransactionException(response);
+                return createFailureException(response);
             }
         } catch (IOException e) {
             throw new OperationFailedException(e);
         }
+    }
+
+    private TransactionId createFailureException(SubmitTransactionResponse response)
+        throws TransactionFailedException, InsufficientKinException {
+        TransactionFailedException transactionException = Utils.createTransactionException(response);
+        if (isInsufficientKinException(transactionException)) {
+            throw new InsufficientKinException();
+        } else {
+            throw transactionException;
+        }
+    }
+
+    private boolean isInsufficientKinException(TransactionFailedException transactionException) {
+        List<String> resultCodes = transactionException.getOperationsResultCodes();
+        return resultCodes != null && resultCodes.size() > 0 && INSUFFICIENT_KIN_RESULT_CODE.equals(resultCodes.get(0));
     }
 }

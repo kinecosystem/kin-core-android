@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;
 
@@ -54,6 +55,7 @@ public interface KinAccount {
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws InsufficientKinException if account balance has not enough kin
      * @throws TransactionFailedException if transaction failed, contains blockchain failure details
      * @throws OperationFailedException other error occurred
      */
@@ -71,6 +73,7 @@ public interface KinAccount {
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws InsufficientKinException if account balance has not enough kin
      * @throws TransactionFailedException if transaction failed, contains blockchain failure details
      * @throws OperationFailedException other error occurred
      */

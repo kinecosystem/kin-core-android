@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.InsufficientKinException;
 import kin.core.exception.TransactionFailedException;
 import org.junit.After;
 import org.junit.Before;
@@ -221,6 +222,23 @@ public class KinAccountIntegrationTest {
         expectedEx.expectMessage(kinAccountSender.getPublicAddress());
         kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
+    }
+
+    @Test
+    @LargeTest
+    public void sendTransaction_Underfunded_InsufficientKinException() throws Exception {
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
+        fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
+        fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
+
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
+
+        expectedEx.expect(InsufficientKinException.class);
+        kinAccountSender
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("101"));
     }
 
     @Test

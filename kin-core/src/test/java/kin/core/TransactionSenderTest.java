@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;
 import okhttp3.mockwebserver.MockResponse;
@@ -188,14 +189,28 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
         mockWebServer.enqueue(new MockResponse()
-            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_underfund.json"))
+            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_internal_error.json"))
             .setResponseCode(400)
         );
 
         expectedEx.expect(TransactionFailedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("transactionResultCode", equalTo("tx_failed")));
-        expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_underfunded")));
+        expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_malformed")));
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", hasSize(1)));
+
+        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+    }
+
+    @Test
+    public void sendTransaction_Underfunded_InsufficientKinException() throws Exception {
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_underfunded.json"))
+            .setResponseCode(400)
+        );
+
+        expectedEx.expect(InsufficientKinException.class);
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }

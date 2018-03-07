@@ -169,7 +169,7 @@ public class AccountActivatorTest {
     public void activate_UnderfundStellarError() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account_no_kin.json"));
         mockWebServer.enqueue(new MockResponse()
-            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_underfund.json"))
+            .setBody(TestUtils.loadResource(this.getClass(), "tx_failure_res_internal_error.json"))
             .setResponseCode(400)
         );
 
