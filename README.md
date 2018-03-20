@@ -30,7 +30,7 @@ The example below creates a `ServiceProvider` that will be used to connect to th
 network
 ```java
 ServiceProvider horizonProvider =  
-    new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN));
+    new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN);
 KinClient kinClient = new KinClient(context, horizonProvider);
 ```
 
