@@ -125,7 +125,7 @@ String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
 BigDecimal amountInKin = new BigDecimal("20");
 
 
-transactionRequest = account.sendTransaction(toAddress, amount);
+transactionRequest = account.sendTransaction(toAddress, amountInKin);
 transactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
@@ -146,7 +146,7 @@ the memo is a `String` of up to 28 characters.
 
 ```java
 String memo = "arbitrary data";
-transactionRequest = account.sendTransaction(toAddress, amount, memo);
+transactionRequest = account.sendTransaction(toAddress, amountInKin, memo);
 transactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
