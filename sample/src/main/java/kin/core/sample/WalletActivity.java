@@ -84,7 +84,7 @@ public class WalletActivity extends BaseActivity {
 
     private void deleteAccount() {
         try {
-            getKinClient().deleteAccount(0, getPassphrase());
+            getKinClient().deleteAccount(0);
             onBackPressed();
         } catch (DeleteAccountException e) {
             KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
@@ -99,7 +99,7 @@ public class WalletActivity extends BaseActivity {
             getKinBtn.setClickable(false);
 
             OnBoarding onBoarding = new OnBoarding();
-            onBoarding.onBoard(account, PASSPHRASE1, new Callbacks() {
+            onBoarding.onBoard(account, new Callbacks() {
                 @Override
                 public void onSuccess() {
                     updateBalance(true);

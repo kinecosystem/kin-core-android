@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
-import kin.core.exception.TransactionFailedException;
+import kin.core.exception.InsufficientKinException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,7 +35,6 @@ import org.stellar.sdk.responses.TransactionResponse;
 public class KinAccountIntegrationTest {
 
     private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
-    private static final String PASSPHRASE = "12345678";
     private static FakeKinIssuer fakeKinIssuer;
     private KinClient kinClient;
 
@@ -49,11 +48,8 @@ public class KinAccountIntegrationTest {
 
     private class TestServiceProvider extends ServiceProvider {
 
-        private final String issuerAccountId;
-
-        TestServiceProvider(String issuerAccountId) {
+        TestServiceProvider() {
             super(TEST_NETWORK_URL, NETWORK_ID_TEST);
-            this.issuerAccountId = issuerAccountId;
         }
 
         @Override
@@ -63,27 +59,27 @@ public class KinAccountIntegrationTest {
 
         @Override
         protected String getIssuerAccountId() {
-            return issuerAccountId;
+            return fakeKinIssuer.getAccountId();
         }
     }
 
 
     @Before
     public void setup() throws IOException {
-        ServiceProvider serviceProvider = new TestServiceProvider(fakeKinIssuer.getAccountId());
+        ServiceProvider serviceProvider = new TestServiceProvider();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider);
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
     }
 
     @After
     public void teardown() {
-        kinClient.wipeoutAccount();
+        kinClient.clearAllAccounts();
     }
 
     @Test
     @LargeTest
     public void getBalanceSync_AccountNotCreated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expectMessage(kinAccount.getPublicAddress());
@@ -93,7 +89,7 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void getBalanceSync_AccountNotActivated_AccountNotActivatedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
 
         expectedEx.expect(AccountNotActivatedException.class);
@@ -104,10 +100,10 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void getBalanceSync_FundedAccount_GotBalance() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
 
-        kinAccount.activateSync(PASSPHRASE);
+        kinAccount.activateSync();
         assertThat(kinAccount.getBalanceSync().value(), equalTo(new BigDecimal("0.0000000")));
 
         fakeKinIssuer.fundWithKin(kinAccount.getPublicAddress(), "3.1415926");
@@ -117,27 +113,27 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void activateSync_AccountNotCreated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expectMessage(kinAccount.getPublicAddress());
-        kinAccount.activateSync(PASSPHRASE);
+        kinAccount.activateSync();
     }
 
     @Test
     @LargeTest
     public void sendTransaction() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountSender.activateSync(PASSPHRASE);
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
         fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
         assertThat(kinAccountSender.getBalanceSync().value(), equalTo(new BigDecimal("78.8770000")));
         assertThat(kinAccountReceiver.getBalanceSync().value(), equalTo(new BigDecimal("21.1230000")));
     }
@@ -145,18 +141,18 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void sendTransaction_WithMemo() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
         String expectedMemo = "fake memo";
 
-        kinAccountSender.activateSync(PASSPHRASE);
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
         fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
         TransactionId transactionId = kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"),
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"),
                 expectedMemo);
         assertThat(kinAccountSender.getBalanceSync().value(), equalTo(new BigDecimal("78.8770000")));
         assertThat(kinAccountReceiver.getBalanceSync().value(), equalTo(new BigDecimal("21.1230000")));
@@ -171,60 +167,60 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void sendTransaction_ReceiverAccountNotCreated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expectMessage(kinAccountReceiver.getPublicAddress());
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
     }
 
     @Test
     @LargeTest
     public void sendTransaction_SenderAccountNotCreated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountReceiver.activateSync();
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expectMessage(kinAccountSender.getPublicAddress());
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
     }
 
     @Test
     @LargeTest
     public void sendTransaction_ReceiverAccountNotActivated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountSender.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
 
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expectMessage(kinAccountReceiver.getPublicAddress());
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
     }
 
     @Test
     @LargeTest
     public void sendTransaction_SenderAccountNotActivated_AccountNotFoundException() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountReceiver.activateSync();
 
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expectMessage(kinAccountSender.getPublicAddress());
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
     }
 
     @Test
@@ -240,13 +236,13 @@ public class KinAccountIntegrationTest {
     }
 
     private void listenToPayments(boolean sender) throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountSender.activateSync(PASSPHRASE);
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
         fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
         final CountDownLatch latch = new CountDownLatch(1);
@@ -263,7 +259,7 @@ public class KinAccountIntegrationTest {
         BigDecimal expectedAmount = new BigDecimal("21.123");
         String expectedMemo = "memo";
         TransactionId expectedTransactionId = kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, expectedAmount, expectedMemo);
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), expectedAmount, expectedMemo);
 
         latch.await(10, TimeUnit.SECONDS);
         assertThat(actualResults.size(), equalTo(1));
@@ -278,13 +274,13 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void createPaymentListener_RemoveListener_NoEvents() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountSender.activateSync(PASSPHRASE);
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
         fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
         final CountDownLatch latch = new CountDownLatch(1);
@@ -292,16 +288,16 @@ public class KinAccountIntegrationTest {
         BlockchainEvents blockchainEvents = kinAccountReceiver.blockchainEvents();
         ListenerRegistration listenerRegistration = blockchainEvents
             .addPaymentListener(new EventListener<PaymentInfo>() {
-            @Override
-            public void onEvent(PaymentInfo data) {
-                fail("should not get eny event!");
-                latch.countDown();
-            }
-        });
+                @Override
+                public void onEvent(PaymentInfo data) {
+                    fail("should not get eny event!");
+                    latch.countDown();
+                }
+            });
         listenerRegistration.remove();
 
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"), null);
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"), null);
 
         latch.await(15, TimeUnit.SECONDS);
     }
@@ -309,46 +305,45 @@ public class KinAccountIntegrationTest {
     @Test
     @LargeTest
     public void sendTransaction_NotEnoughKin_TransactionFailedException() throws Exception {
-        KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
-        KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
+        KinAccount kinAccountSender = kinClient.addAccount();
+        KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
         fakeKinIssuer.createAccount(kinAccountReceiver.getPublicAddress());
 
-        kinAccountSender.activateSync(PASSPHRASE);
-        kinAccountReceiver.activateSync(PASSPHRASE);
+        kinAccountSender.activateSync();
+        kinAccountReceiver.activateSync();
 
-        expectedEx.expect(TransactionFailedException.class);
-        expectedEx.expectMessage("underfunded");
+        expectedEx.expect(InsufficientKinException.class);
         kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"));
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
     }
 
     @Test(expected = AccountDeletedException.class)
     public void activateSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(0, PASSPHRASE);
-        kinAccount.activateSync(PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
+        kinClient.deleteAccount(0);
+        kinAccount.activateSync();
     }
 
     @Test(expected = AccountDeletedException.class)
     public void getBalanceSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(0, PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
+        kinClient.deleteAccount(0);
         kinAccount.getBalanceSync();
     }
 
     @Test(expected = AccountDeletedException.class)
     public void sendTransactionSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(0, PASSPHRASE);
-        kinAccount.sendTransactionSync("GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM", PASSPHRASE,
+        KinAccount kinAccount = kinClient.addAccount();
+        kinClient.deleteAccount(0);
+        kinAccount.sendTransactionSync("GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM",
             new BigDecimal(10));
     }
 
     @Test
     public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount(PASSPHRASE);
-        kinClient.deleteAccount(0, PASSPHRASE);
+        KinAccount kinAccount = kinClient.addAccount();
+        kinClient.deleteAccount(0);
         assertNull(kinAccount.getPublicAddress());
     }
 

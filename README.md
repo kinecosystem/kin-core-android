@@ -30,7 +30,7 @@ The example below creates a `ServiceProvider` that will be used to connect to th
 network
 ```java
 ServiceProvider horizonProvider =  
-    new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN));
+    new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN);
 KinClient kinClient = new KinClient(context, horizonProvider);
 ```
 
@@ -40,14 +40,14 @@ new ServiceProvider("https://horizon-testnet.stellar.org", ServiceProvider.NETWO
 ``` 
 
 ### Creating and retrieving a KIN account
-The first time you use `KinClient` you need to create a new account, using a passphrase. 
-The details of the account created will be securely stored on the device.
-Multiple acccounts can be created.
+The first time you use `KinClient` you need to create a new account, 
+the details of the created account will be securely stored on the device.
+Multiple accounts can be created using `addAccount`.
 ```java
 KinAccount account;
 try {
     if (!kinClient.hasAccount()) {
-        account = kinClient.addAccount("yourPassphrase");
+        account = kinClient.addAccount();
     }
 } catch (CreateAccountException e) {
     e.printStackTrace();
@@ -62,10 +62,10 @@ if (kinClient.hasAccount()) {
 }
 ``` 
 
-You can delete your account from the device using `deleteAccount` with the passphrase you used to create it as a parameter, 
+You can delete your account from the device using `deleteAccount`, 
 but beware! you will lose all your existing KIN if you do this.
 ```java
-kinClient.deleteAccount(int index, String passphrase);
+kinClient.deleteAccount(int index);
 ``` 
 
 ### Onboarding
@@ -75,7 +75,7 @@ and then must the account must be activated, before it can receive or send KIN.
 
 
 ```java
-Request<Void> activationRequest = account.activate(passphrase)
+Request<Void> activationRequest = account.activate()
 activationRequest.run(new ResultCallback<Void>() {
     @Override
     public void onResult(Void result) {
@@ -122,11 +122,10 @@ to transfer the KIN to.
 The following code will transfer 20 KIN to account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO". 
 ```java
 String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
-String passphrase = "yourPassphrase";
 BigDecimal amountInKin = new BigDecimal("20");
 
 
-transactionRequest = account.sendTransaction(toAddress, getPassphrase(), amount);
+transactionRequest = account.sendTransaction(toAddress, amountInKin);
 transactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
@@ -147,7 +146,7 @@ the memo is a `String` of up to 28 characters.
 
 ```java
 String memo = "arbitrary data";
-transactionRequest = account.sendTransaction(toAddress, getPassphrase(), amount, memo);
+transactionRequest = account.sendTransaction(toAddress, amountInKin, memo);
 transactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
@@ -211,18 +210,13 @@ A synchronous version of these methods is also provided. Make sure you call them
 ```java
 try {
     Balance balance = account.getBalanceSync();
-}
-catch (OperationFailedException e) {
+} catch (OperationFailedException e) {
    // something went wrong - check the exception message
 }
 
 try {
-    TransactionId transactionId = account.sendTransactionSync(toAddress, passphrase, amountInKin);
-}
-catch (PassphraseException e){
-    // the passphrase used was wrong
-}
-catch (OperationFailedException e){
+    TransactionId transactionId = account.sendTransactionSync(toAddress, amountInKin);
+} catch (OperationFailedException e){
     // something else went wrong - check the exception message
 } 
 ```

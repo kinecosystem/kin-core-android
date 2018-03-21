@@ -17,7 +17,6 @@ import org.stellar.sdk.KeyPair;
 
 public class KinAccountImplTest {
 
-    private static final String PASSPHRASE = "123456";
     @Mock
     private TransactionSender mockTransactionSender;
     @Mock
@@ -52,19 +51,18 @@ public class KinAccountImplTest {
     public void sendTransactionSync() throws Exception {
         initWithRandomAccount();
 
-        String expectedPassphrase = PASSPHRASE;
         String expectedAccountId = "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX";
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
 
-        when(mockTransactionSender.sendTransaction((Account) any(), (String) any(), (String) any(), (BigDecimal) any()))
+        when(mockTransactionSender.sendTransaction((Account) any(), (String) any(), (BigDecimal) any()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
-            .sendTransactionSync(expectedAccountId, expectedPassphrase, expectedAmount);
+            .sendTransactionSync(expectedAccountId, expectedAmount);
 
         verify(mockTransactionSender)
-            .sendTransaction(expectedRandomAccount, expectedPassphrase, expectedAccountId, expectedAmount);
+            .sendTransaction(expectedRandomAccount, expectedAccountId, expectedAmount);
         assertEquals(expectedTransactionId, transactionId);
     }
 
@@ -72,21 +70,20 @@ public class KinAccountImplTest {
     public void sendTransactionSync_WithMemo() throws Exception {
         initWithRandomAccount();
 
-        String expectedPassphrase = PASSPHRASE;
         String expectedAccountId = "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX";
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
         String memo = "Dummy Memo";
 
         when(mockTransactionSender
-            .sendTransaction((Account) any(), anyString(), (String) any(), (BigDecimal) any(), anyString()))
+            .sendTransaction((Account) any(), anyString(), (BigDecimal) any(), anyString()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
-            .sendTransactionSync(expectedAccountId, expectedPassphrase, expectedAmount, memo);
+            .sendTransactionSync(expectedAccountId, expectedAmount, memo);
 
         verify(mockTransactionSender)
-            .sendTransaction(expectedRandomAccount, expectedPassphrase, expectedAccountId, expectedAmount, memo);
+            .sendTransaction(expectedRandomAccount, expectedAccountId, expectedAmount, memo);
         assertEquals(expectedTransactionId, transactionId);
     }
 
@@ -106,11 +103,10 @@ public class KinAccountImplTest {
     @Test
     public void activateSync() throws Exception {
         initWithRandomAccount();
-        String expectedPassphrase = PASSPHRASE;
 
-        kinAccount.activateSync(expectedPassphrase);
+        kinAccount.activateSync();
 
-        verify(mockAccountActivator).activate(expectedRandomAccount, expectedPassphrase);
+        verify(mockAccountActivator).activate(expectedRandomAccount);
     }
 
     @Test
@@ -127,8 +123,8 @@ public class KinAccountImplTest {
         initWithRandomAccount();
         kinAccount.markAsDeleted();
 
-        kinAccount.sendTransactionSync("GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX", PASSPHRASE,
-            new BigDecimal("12.2"));
+        kinAccount
+            .sendTransactionSync("GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OGX", new BigDecimal("12.2"));
     }
 
     @Test(expected = AccountDeletedException.class)
@@ -144,7 +140,7 @@ public class KinAccountImplTest {
         initWithRandomAccount();
 
         kinAccount.markAsDeleted();
-        kinAccount.activateSync(PASSPHRASE);
+        kinAccount.activateSync();
     }
 
     @Test
