@@ -24,7 +24,7 @@ public class KinAccountImplTest {
     @Mock
     private AccountActivator mockAccountActivator;
     @Mock
-    private PaymentWatcherCreator mockPaymentWatcherCreator;
+    private BlockchainEventsCreator mockBlockchainEventsCreator;
     private KinAccountImpl kinAccount;
     private Account expectedRandomAccount;
 
@@ -37,7 +37,7 @@ public class KinAccountImplTest {
         KeyPair keyPair = KeyPair.random();
         expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery, mockPaymentWatcherCreator);
+            mockBalanceQuery, mockBlockchainEventsCreator);
     }
 
     @Test
@@ -110,12 +110,12 @@ public class KinAccountImplTest {
     }
 
     @Test
-    public void createPaymentsWatcher() throws Exception {
+    public void createBlockchainEvents() throws Exception {
         initWithRandomAccount();
 
-        kinAccount.createPaymentWatcher();
+        kinAccount.blockchainEvents();
 
-        verify(mockPaymentWatcherCreator).create(expectedRandomAccount);
+        verify(mockBlockchainEventsCreator).create(expectedRandomAccount);
     }
 
     @Test(expected = AccountDeletedException.class)

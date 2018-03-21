@@ -4,9 +4,12 @@ package kin.core.sample;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import kin.core.KinAccount;
+import kin.core.ListenerRegistration;
 import kin.core.ResultCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -25,6 +28,7 @@ class OnBoarding {
     private static final String URL_FUND = "http://188.166.34.7:8000/fund";
     private final OkHttpClient okHttpClient;
     private final Handler handler;
+    private ListenerRegistration listenerRegistration;
 
     public interface Callbacks {
 
@@ -42,7 +46,22 @@ class OnBoarding {
     }
 
     void onBoard(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
+        Runnable accountCreationListeningTimeout = () -> {
+            listenerRegistration.remove();
+            fireOnFailure(callbacks, new TimeoutException("Waiting for account creation event time out"));
+        };
 
+        listenerRegistration = account.blockchainEvents()
+            .addAccountCreationListener(data -> {
+                listenerRegistration.remove();
+                handler.removeCallbacks(accountCreationListeningTimeout);
+                activateAccount(account, callbacks);
+            });
+        handler.postDelayed(accountCreationListeningTimeout, 10 * DateUtils.SECOND_IN_MILLIS);
+        createAccount(account, callbacks);
+    }
+
+    private void createAccount(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
         Request request = new Request.Builder()
             .url(URL_CREATE_ACCOUNT)
             .post(createRequestBody(account))
@@ -56,14 +75,11 @@ class OnBoarding {
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (response.code() == 200) {
-                        activateAccount(account, callbacks);
-                    } else {
+                    if (response.code() != 200) {
                         fireOnFailure(callbacks, new Exception("Create account - response code is " + response.code()));
                     }
                 }
             });
-
     }
 
     @NonNull

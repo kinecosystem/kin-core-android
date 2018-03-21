@@ -35,7 +35,7 @@
         android:layout_below="@id/start_btn"
         android:background="@color/white"
         android:fillViewport="true"
-        tools:context="kin.core.sample.WatchPaymentActivity">
+        tools:context="kin.core.sample.PaymentListenerActivity">
         <LinearLayout
             android:id="@+id/payments_container"
             android:layout_width="match_parent"

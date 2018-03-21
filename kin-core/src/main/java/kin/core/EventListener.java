@@ -1,7 +1,7 @@
 package kin.core;
 
 
-public interface WatcherListener<T> {
+public interface EventListener<T> {
 
     void onEvent(T data);
 }

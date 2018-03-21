@@ -9,45 +9,45 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import kin.core.KinAccount;
 import kin.core.KinClient;
+import kin.core.ListenerRegistration;
 import kin.core.PaymentInfo;
-import kin.core.PaymentWatcher;
 import kin.sdk.core.sample.R;
 
-public class WatchPaymentActivity extends BaseActivity {
+public class PaymentListenerActivity extends BaseActivity {
 
-    public static final String TAG = WatchPaymentActivity.class.getSimpleName();
+    public static final String TAG = PaymentListenerActivity.class.getSimpleName();
     private ViewGroup rootView;
-    private PaymentWatcher paymentWatcher;
     private KinAccount account;
     private View startBtn;
     private View stopBtn;
+    private ListenerRegistration listenerRegistration;
 
     public static Intent getIntent(Context context) {
-        return new Intent(context, WatchPaymentActivity.class);
+        return new Intent(context, PaymentListenerActivity.class);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.watch_payments_activity);
+        setContentView(R.layout.payments_listener_activity);
         initWidgets();
         KinClient kinClient = ((KinClientSampleApplication) getApplication()).getKinClient();
         account = kinClient.getAccount(0);
-        paymentWatcher = account.createPaymentWatcher();
     }
 
     private void initWidgets() {
         rootView = findViewById(R.id.payments_container);
         stopBtn = findViewById(R.id.stop_btn);
-        stopBtn.setOnClickListener(view -> stopWatcher());
+        stopBtn.setOnClickListener(view -> stopListener());
         startBtn = findViewById(R.id.start_btn);
-        startBtn.setOnClickListener(view -> startWatcher());
+        startBtn.setOnClickListener(view -> startListener());
     }
 
-    private void startWatcher() {
+    private void startListener() {
         startBtn.setEnabled(false);
         stopBtn.setEnabled(true);
-        paymentWatcher.start(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
+        listenerRegistration = account.blockchainEvents()
+            .addPaymentListener(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
     }
 
     private void addPaymentToUi(PaymentInfo paymentInfo) {
@@ -69,10 +69,10 @@ public class WatchPaymentActivity extends BaseActivity {
         rootView.addView(paymentView, 0);
     }
 
-    private void stopWatcher() {
+    private void stopListener() {
         startBtn.setEnabled(true);
         stopBtn.setEnabled(false);
-        paymentWatcher.stop();
+        listenerRegistration.remove();
     }
 
     @Override
@@ -82,14 +82,14 @@ public class WatchPaymentActivity extends BaseActivity {
 
     @Override
     int getActionBarTitleRes() {
-        return R.string.watch_payments;
+        return R.string.payments_listener;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (paymentWatcher != null) {
-            paymentWatcher.stop();
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
         }
     }
 }
