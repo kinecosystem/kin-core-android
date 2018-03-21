@@ -14,16 +14,16 @@ final class KinAccountImpl extends AbstractKinAccount {
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
     private final BalanceQuery balanceQuery;
-    private final PaymentWatcherCreator paymentWatcherCreator;
+    private final BlockchainEvents blockchainEvents;
     private boolean isDeleted = false;
 
     KinAccountImpl(Account account, TransactionSender transactionSender, AccountActivator accountActivator,
-        BalanceQuery balanceQuery, PaymentWatcherCreator paymentWatcherCreator) {
+        BalanceQuery balanceQuery, BlockchainEventsCreator blockchainEventsCreator) {
         this.account = account;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
         this.balanceQuery = balanceQuery;
-        this.paymentWatcherCreator = paymentWatcherCreator;
+        this.blockchainEvents = blockchainEventsCreator.create(account);
     }
 
     @Override
@@ -64,8 +64,8 @@ final class KinAccountImpl extends AbstractKinAccount {
     }
 
     @Override
-    public PaymentWatcher createPaymentWatcher() {
-        return paymentWatcherCreator.create(account);
+    public BlockchainEvents blockchainEvents() {
+        return blockchainEvents;
     }
 
     void markAsDeleted() {

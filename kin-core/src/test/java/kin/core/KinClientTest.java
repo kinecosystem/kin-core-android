@@ -34,7 +34,7 @@ public class KinClientTest {
     @Mock
     private BalanceQuery mockBalanceQuery;
     @Mock
-    private PaymentWatcherCreator mockPaymentWatcherCreator;
+    private BlockchainEventsCreator mockBlockchainEventsCreator;
     private KinClient kinClient;
     private KeyStore fakeKeyStore;
     private ServiceProvider fakeServiceProvider;
@@ -298,7 +298,7 @@ public class KinClientTest {
         String url = "My awesome Horizon server";
         ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery, mockPaymentWatcherCreator);
+            mockBalanceQuery, mockBlockchainEventsCreator);
         ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
@@ -310,6 +310,6 @@ public class KinClientTest {
     @NonNull
     private KinClient createNewKinClient() {
         return new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery, mockPaymentWatcherCreator);
+            mockBalanceQuery, mockBlockchainEventsCreator);
     }
 }

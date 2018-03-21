@@ -40,7 +40,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
-            android:name="kin.core.sample.WatchPaymentActivity"
+            android:name="kin.core.sample.PaymentListenerActivity"
             android:parentActivityName="kin.core.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>

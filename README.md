@@ -161,26 +161,22 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
         }
 });
 ```
-### Watching Payments
+### Listening to payments
 
-Ongoing payments in KIN, from or to an account, can be observed. 
-<br/>First, Create a `PaymentWatcher`
-object:
+Ongoing payments in KIN, from or to an account, can be observed,
+by adding payment listener using `BlockchainEvents`:
 ```java
-PaymentWatcher watcher = account.createPaymentWatcher();
+ListenerRegistration listenerRegistration = account.blockchainEvents()
+            .addPaymentListener(new EventListener<PaymentInfo>() {
+                @Override
+                public void onEvent(PaymentInfo payment) {
+                    Log.d("example", String
+                        .format("payment event, to = %s, from = %s, amount = %s", payment.sourcePublicKey(),
+                            payment.destinationPublicKey(), payment.amount().toPlainString());
+                }
+            });
 ```
-For start watching, use `startPaymentListener` method, by providing listener of `WatcherListener<PaymentInfo>`:
-```java
-paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
-    @Override
-    public void onEvent(PaymentInfo payment) {
-        Log.d("example", String
-            .format("payment event, to = %s, from = %s, amount = %s", payment.sourcePublicKey(),
-                payment.destinationPublicKey(), payment.amount().toPlainString());
-    }
-});
-```
-When you longer want to watch payment, stop the notifications and unregister the listener using `PaymentWatcher.stop()` method.
+For unregister the listener use `listenerRegistration.remove()` method.
 
 ### Watching Account Creation
 When the account is first created by another account it can be observed.
@@ -192,7 +188,7 @@ PaymentWatcher watcher = account.createPaymentWatcher();
 
 For start watching, use `startCreateAccountListener` method, by providing listener of `WatcherListener<PaymentInfo>`:
 ```java
-paymentWatcher.startCreateAccountListener(new WatcherListener<PaymentInfo>() {
+blockchainEvents.startCreateAccountListener(new WatcherListener<PaymentInfo>() {
     @Override
     public void onEvent(PaymentInfo payment) {
         Log.d("example", String

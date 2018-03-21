@@ -229,17 +229,17 @@ public class KinAccountIntegrationTest {
 
     @Test
     @LargeTest
-    public void createPaymentWatcher_WatchReceiver_PaymentEvent() throws Exception {
-        watchPayment(false);
+    public void createPaymentListener_ListenToReceiver_PaymentEvent() throws Exception {
+        listenToPayments(false);
     }
 
     @Test
     @LargeTest
-    public void createPaymentWatcher_WatchSender_PaymentEvent() throws Exception {
-        watchPayment(true);
+    public void createPaymentListener_ListenToSender_PaymentEvent() throws Exception {
+        listenToPayments(true);
     }
 
-    private void watchPayment(boolean watchSender) throws Exception {
+    private void listenToPayments(boolean sender) throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
@@ -251,8 +251,8 @@ public class KinAccountIntegrationTest {
 
         final CountDownLatch latch = new CountDownLatch(1);
         final List<PaymentInfo> actualResults = new ArrayList<>();
-        KinAccount accountToWatch = watchSender ? kinAccountSender : kinAccountReceiver;
-        accountToWatch.createPaymentWatcher().startPaymentListener(new WatcherListener<PaymentInfo>() {
+        KinAccount accountToListen = sender ? kinAccountSender : kinAccountReceiver;
+        accountToListen.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 actualResults.add(data);
@@ -277,7 +277,7 @@ public class KinAccountIntegrationTest {
 
     @Test
     @LargeTest
-    public void createPaymentWatcher_StopWatching_NoEvents() throws Exception {
+    public void createPaymentListener_RemoveListener_NoEvents() throws Exception {
         KinAccount kinAccountSender = kinClient.addAccount(PASSPHRASE);
         KinAccount kinAccountReceiver = kinClient.addAccount(PASSPHRASE);
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
@@ -289,15 +289,16 @@ public class KinAccountIntegrationTest {
 
         final CountDownLatch latch = new CountDownLatch(1);
 
-        PaymentWatcher paymentWatcher = kinAccountReceiver.createPaymentWatcher();
-        paymentWatcher.startPaymentListener(new WatcherListener<PaymentInfo>() {
+        BlockchainEvents blockchainEvents = kinAccountReceiver.blockchainEvents();
+        ListenerRegistration listenerRegistration = blockchainEvents
+            .addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
                 fail("should not get eny event!");
                 latch.countDown();
             }
         });
-        paymentWatcher.stop();
+        listenerRegistration.remove();
 
         kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), PASSPHRASE, new BigDecimal("21.123"), null);

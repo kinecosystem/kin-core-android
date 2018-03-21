@@ -3,94 +3,84 @@ package kin.core;
 
 import static kin.core.Utils.checkNotNull;
 
+import android.support.annotation.NonNull;
 import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
-import org.stellar.sdk.CreateAccountOperation;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.MemoText;
 import org.stellar.sdk.Operation;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
-import org.stellar.sdk.requests.EventListener;
 import org.stellar.sdk.responses.TransactionResponse;
 
 /**
- * Watch blockchain network for ongoing payments involved specific account.
- * <p>Use {@link #startPaymentListener(WatcherListener)} to start
- * watching payment or {@link #startCreateAccountListener(WatcherListener)} to start
- * watching create account, new payments will be notified on the input {@link WatcherListener WatcherListener&lt;PaymentInfo&gt;}</p>
+ * Provides listeners, for various events happens on the blockchain.
  */
-public class PaymentWatcher {
+public class BlockchainEvents {
 
     private static final String CURSOR_FUTURE_ONLY = "now";
     private final Server server;
     private final KinAsset kinAsset;
     private final KeyPair accountKeyPair;
-    private ServerSentEvent serverSentEvent;
-    private boolean started;
 
-
-
-    PaymentWatcher(Server server, Account account, KinAsset kinAsset) {
+    BlockchainEvents(Server server, Account account, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
         accountKeyPair = KeyPair.fromAccountId(account.getAccountId());
     }
 
     /**
-     * Start watching for payment, use {@link #stop()} to stop watching, startPaymentListener can be called again after stop.
-     * <p><b>Note:</b> Events will be fired on background thread.</p>
+     * Creates and adds listener for payments concerning this account, use returned {@link ListenerRegistration} to stop
+     * listening. <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
      */
-    public void startPaymentListener(final WatcherListener<PaymentInfo> listener){
+    public ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener) {
         checkNotNull(listener, "listener");
-        setStarted();
-        serverSentEvent = server
+        ServerSentEvent serverSentEvent = server
             .transactions()
             .forAccount(accountKeyPair)
             .cursor(CURSOR_FUTURE_ONLY)
-            .stream(new EventListener<TransactionResponse>() {
+            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
                 @Override
                 public void onEvent(TransactionResponse transactionResponse) {
                     extractPaymentsFromTransaction(transactionResponse, listener);
                 }
             });
+        return new ListenerRegistration(serverSentEvent);
     }
 
     /**
-     * Start watching for create account, use {@link #stop()} to stop watching, startCreateAccountListener can be called again after stop.
-     * <p><b>Note:</b> Events will be fired on background thread.</p>
+     * Creates and adds listener for account creation event, use returned {@link ListenerRegistration} to stop
+     * listening. <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
      */
-    public void startCreateAccountListener(final WatcherListener<PaymentInfo> listener){
+    public ListenerRegistration addAccountCreationListener(final EventListener<Void> listener) {
         checkNotNull(listener, "listener");
-        setStarted();
-        serverSentEvent = server.transactions()
+        ServerSentEvent serverSentEvent = server.transactions()
             .forAccount(accountKeyPair)
-            .cursor(CURSOR_FUTURE_ONLY)
-            .stream(new EventListener<TransactionResponse>() {
+            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
+
+                private boolean eventOccurred = false;
+
                 @Override
                 public void onEvent(TransactionResponse transactionResponse) {
-                    extractCreateAccountFromTransaction(transactionResponse,listener);
+                    //account creation is one time operation, fire event only once
+                    if (!eventOccurred) {
+                        eventOccurred = true;
+                        listener.onEvent(null);
+                    }
                 }
             });
+        return new ListenerRegistration(serverSentEvent);
     }
-
-    private void setStarted() {
-        if (started) {
-            throw new IllegalStateException("Watcher already started");
-        }
-        started = true;
-    }
-
 
     private void extractPaymentsFromTransaction(TransactionResponse transactionResponse,
-        WatcherListener<PaymentInfo> listener) {
+        EventListener<PaymentInfo> listener) {
         List<Operation> operations = transactionResponse.getOperations();
         if (operations != null) {
             for (Operation operation : operations) {
@@ -107,29 +97,6 @@ public class PaymentWatcher {
                         );
                         listener.onEvent(paymentInfo);
                     }
-                }
-            }
-
-        }
-    }
-
-    private void extractCreateAccountFromTransaction(TransactionResponse transactionResponse,
-        WatcherListener<PaymentInfo> listener) {
-        List<Operation> operations = transactionResponse.getOperations();
-        if (operations != null) {
-            for (Operation operation : operations) {
-                if (operation instanceof CreateAccountOperation) {
-                    CreateAccountOperation createAccountOperation = (CreateAccountOperation) operation;
-                        PaymentInfo paymentInfo = new PaymentInfoImpl(
-                            transactionResponse.getCreatedAt(),
-                            createAccountOperation.getDestination().getAccountId(),
-                            extractSourceAccountId(transactionResponse, createAccountOperation),
-                            new BigDecimal(createAccountOperation.getStartingBalance()),
-                            new TransactionIdImpl(transactionResponse.getHash()),
-                            extractHashTextIfAny(transactionResponse)
-                        );
-                        listener.onEvent(paymentInfo);
-                        break;
                 }
             }
 
@@ -154,15 +121,5 @@ public class PaymentWatcher {
             memoString = ((MemoText) memo).getText();
         }
         return memoString;
-    }
-
-    /**
-     * Stop watching for payments, unregister listener.
-     */
-    public void stop() {
-        if (serverSentEvent != null) {
-            serverSentEvent.close();
-            started = false;
-        }
     }
 }

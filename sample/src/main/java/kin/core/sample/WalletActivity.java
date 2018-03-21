@@ -73,7 +73,7 @@ public class WalletActivity extends BaseActivity {
         deleteAccount.setOnClickListener(view -> showDeleteAlert());
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
-        watchPayments.setOnClickListener(view -> startActivity(WatchPaymentActivity.getIntent(WalletActivity.this)));
+        watchPayments.setOnClickListener(view -> startActivity(PaymentListenerActivity.getIntent(WalletActivity.this)));
         refresh.setOnClickListener(view -> updateBalance(true));
     }
 

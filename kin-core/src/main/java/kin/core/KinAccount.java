@@ -126,9 +126,7 @@ public interface KinAccount {
     void activateSync(@NonNull String passphrase) throws OperationFailedException;
 
     /**
-     * Creates a watcher for every payment done in kin that involves this account.
-     *
-     * @return {@link PaymentWatcher} watching payments
+     * Returns {@link BlockchainEvents} object, allows registering to various events on the blockchain network.
      */
-    PaymentWatcher createPaymentWatcher();
+    BlockchainEvents blockchainEvents();
 }
