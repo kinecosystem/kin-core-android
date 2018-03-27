@@ -10,7 +10,7 @@ import java.lang.annotation.Retention;
 
 @Retention(SOURCE)
 @IntDef({NOT_CREATED, NOT_ACTIVATED, ACTIVATED})
-@interface AccountStatus {
+public @interface AccountStatus {
 
     /**
      * Account was not created on blockchain network, account should be created and funded by a different account on

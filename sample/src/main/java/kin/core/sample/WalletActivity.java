@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import kin.core.AccountStatus;
 import kin.core.Balance;
 import kin.core.KinAccount;
 import kin.core.Request;
@@ -23,10 +24,11 @@ public class WalletActivity extends BaseActivity {
 
     public static final String TAG = WalletActivity.class.getSimpleName();
 
-    private TextView balance, publicKey;
+    private TextView balance, status, publicKey;
     private View getKinBtn;
-    private View balanceProgress;
+    private View balanceProgress, statusProgress;
     private Request<Balance> balanceRequest;
+    private Request<Integer> statusRequest;
 
     public static Intent getIntent(Context context) {
         return new Intent(context, WalletActivity.class);
@@ -43,14 +45,16 @@ public class WalletActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         updatePublicKey();
-        updateBalance(false);
+        updateAccountInfo(false);
     }
 
     private void initWidgets() {
         balance = findViewById(R.id.balance);
+        status = findViewById(R.id.status);
         publicKey = findViewById(R.id.public_key);
 
         balanceProgress = findViewById(R.id.balance_progress);
+        statusProgress = findViewById(R.id.status_progress);
 
         final View transaction = findViewById(R.id.send_transaction_btn);
         final View refresh = findViewById(R.id.refresh_btn);
@@ -74,7 +78,12 @@ public class WalletActivity extends BaseActivity {
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
         watchPayments.setOnClickListener(view -> startActivity(PaymentListenerActivity.getIntent(WalletActivity.this)));
-        refresh.setOnClickListener(view -> updateBalance(true));
+        refresh.setOnClickListener(view -> updateAccountInfo(true));
+    }
+
+    private void updateAccountInfo(boolean showDialog) {
+        updateBalance(showDialog);
+        updateStatus(showDialog);
     }
 
     private void showDeleteAlert() {
@@ -102,7 +111,7 @@ public class WalletActivity extends BaseActivity {
             onBoarding.onBoard(account, new Callbacks() {
                 @Override
                 public void onSuccess() {
-                    updateBalance(true);
+                    updateAccountInfo(true);
                     getKinBtn.setClickable(true);
                 }
 
@@ -115,7 +124,6 @@ public class WalletActivity extends BaseActivity {
         }
     }
 
-
     private void updatePublicKey() {
         String publicKeyStr = "";
         KinAccount account = getKinClient().getAccount(0);
@@ -123,6 +131,56 @@ public class WalletActivity extends BaseActivity {
             publicKeyStr = account.getPublicAddress();
         }
         publicKey.setText(publicKeyStr);
+    }
+
+
+    private void updateStatus(boolean showDialog) {
+        statusProgress.setVisibility(View.VISIBLE);
+        KinAccount account = getKinClient().getAccount(0);
+        if (account != null) {
+            statusRequest = account.getStatus();
+            if (showDialog) {
+                statusRequest.run(new DisplayCallback<Integer>(statusProgress, status) {
+                    @Override
+                    public void displayResult(Context context, View view, Integer result) {
+                        ((TextView) view).setText(accountStatusToString(result));
+                    }
+                });
+            } else {
+                statusRequest.run(new ResultCallback<Integer>() {
+                    @Override
+                    public void onResult(Integer result) {
+                        status.setText(accountStatusToString(result));
+                        statusProgress.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        status.setText(R.string.balance_error);
+                        statusProgress.setVisibility(View.GONE);
+                    }
+                });
+            }
+        } else {
+            status.setText(R.string.balance_error);
+        }
+    }
+
+    private String accountStatusToString(Integer result) {
+        String value = "";
+        switch (result) {
+            case AccountStatus.ACTIVATED:
+                value = "Activated";
+                break;
+            case AccountStatus.NOT_CREATED:
+                value = "Not Created";
+                break;
+            case AccountStatus.NOT_ACTIVATED:
+                value = "Not Activated";
+                break;
+
+        }
+        return value;
     }
 
     private void updateBalance(boolean showDialog) {
@@ -172,6 +230,9 @@ public class WalletActivity extends BaseActivity {
         super.onDestroy();
         if (balanceRequest != null) {
             balanceRequest.cancel(true);
+        }
+        if (statusRequest != null) {
+            statusRequest.cancel(true);
         }
         balance = null;
     }
