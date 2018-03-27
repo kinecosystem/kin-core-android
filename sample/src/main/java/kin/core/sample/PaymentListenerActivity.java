@@ -33,6 +33,8 @@ public class PaymentListenerActivity extends BaseActivity {
         initWidgets();
         KinClient kinClient = ((KinClientSampleApplication) getApplication()).getKinClient();
         account = kinClient.getAccount(0);
+        startBtn.setEnabled(true);
+        stopBtn.setEnabled(false);
     }
 
     private void initWidgets() {
