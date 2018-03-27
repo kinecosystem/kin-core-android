@@ -13,12 +13,12 @@ import org.stellar.sdk.Server;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
 
-class BalanceQuery {
+class AccountInfoRetriever {
 
     private final Server server;
     private final KinAsset kinAsset;
 
-    BalanceQuery(Server server, KinAsset kinAsset) {
+    AccountInfoRetriever(Server server, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
     }
@@ -60,5 +60,17 @@ class BalanceQuery {
         }
 
         return balance;
+    }
+
+    @AccountStatus
+    int getStatus(@NonNull Account account) throws OperationFailedException {
+        try {
+            getBalance(account);
+            return AccountStatus.ACTIVATED;
+        } catch (AccountNotFoundException e) {
+            return AccountStatus.NOT_CREATED;
+        } catch (AccountNotActivatedException e) {
+            return AccountStatus.NOT_ACTIVATED;
+        }
     }
 }

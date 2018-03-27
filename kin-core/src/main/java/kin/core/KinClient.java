@@ -20,7 +20,7 @@ public class KinClient {
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
-    private final BalanceQuery balanceQuery;
+    private final AccountInfoRetriever accountInfoRetriever;
     private final BlockchainEventsCreator blockchainEventsCreator;
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
@@ -37,19 +37,20 @@ public class KinClient {
         keyStore = initKeyStore(context.getApplicationContext());
         transactionSender = new TransactionSender(server, keyStore, provider.getKinAsset());
         accountActivator = new AccountActivator(server, keyStore, provider.getKinAsset());
-        balanceQuery = new BalanceQuery(server, provider.getKinAsset());
+        accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
         loadAccounts();
     }
 
     @VisibleForTesting
     KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
-        AccountActivator accountActivator, BalanceQuery balanceQuery, BlockchainEventsCreator blockchainEventsCreator) {
+        AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
+        BlockchainEventsCreator blockchainEventsCreator) {
         this.serviceProvider = serviceProvider;
         this.keyStore = keyStore;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
-        this.balanceQuery = balanceQuery;
+        this.accountInfoRetriever = accountInfoRetriever;
         this.blockchainEventsCreator = blockchainEventsCreator;
         loadAccounts();
     }
@@ -152,7 +153,8 @@ public class KinClient {
 
     @NonNull
     private KinAccountImpl createNewKinAccount(Account account) {
-        return new KinAccountImpl(account, transactionSender, accountActivator, balanceQuery, blockchainEventsCreator);
+        return new KinAccountImpl(account, transactionSender, accountActivator, accountInfoRetriever,
+            blockchainEventsCreator);
     }
 
 }

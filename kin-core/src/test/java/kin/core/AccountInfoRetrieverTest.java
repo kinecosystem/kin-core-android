@@ -29,7 +29,7 @@ import org.stellar.sdk.responses.HttpResponseException;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 23, manifest = Config.NONE)
-public class BalanceQueryTest {
+public class AccountInfoRetrieverTest {
 
     private static final String ACCOUNT_ID_KIN_ISSUER = "GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM";
     private static final String ACCOUNT_ID = "GBQUCJ755LJBUFFKFZCTV7XFA6JUR5NAAEJF66SPCN3XROHVKSG3VVUY";
@@ -59,6 +59,15 @@ public class BalanceQueryTest {
     }
 
     @Test
+    public void getStatus_CreatedAndActivated_StatusActivated() throws Exception {
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_success.json"));
+
+        int status = getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+
+        assertThat(status, equalTo(AccountStatus.ACTIVATED));
+    }
+
+    @Test
     public void getBalance_VerifyQueryAccountID() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_success.json"));
 
@@ -68,12 +77,20 @@ public class BalanceQueryTest {
     }
 
     @Test
-    public void getBalance_NoKinTrust() throws Exception {
+    public void getBalance_NoKinTrust_AccountNotActivatedException() throws Exception {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID)));
 
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @Test
+    public void getStatus_NoKinTrust_StatusNotActivated() throws Exception {
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
+
+        int status = getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+        assertThat(status, equalTo(AccountStatus.NOT_ACTIVATED));
     }
 
     @Test
@@ -86,7 +103,15 @@ public class BalanceQueryTest {
     }
 
     @Test
-    public void getBalance_IOException() throws Exception {
+    public void getStatus_SameIssuerDifferentAsset_StatusNotActivated() throws Exception {
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
+
+        int status = getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+        assertThat(status, equalTo(AccountStatus.NOT_ACTIVATED));
+    }
+
+    @Test
+    public void getBalance_IOException_OperationFailedException() throws Exception {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
@@ -96,7 +121,17 @@ public class BalanceQueryTest {
     }
 
     @Test
-    public void getBalance_NullResponse() throws Exception {
+    public void getStatus_IOException_OperationFailedException() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(isA(IOException.class));
+
+        getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @Test
+    public void getBalance_NullResponse_OperationFailedException() throws Exception {
         TestUtils.enqueueEmptyResponse(mockWebServer);
 
         expectedEx.expect(OperationFailedException.class);
@@ -106,7 +141,17 @@ public class BalanceQueryTest {
     }
 
     @Test
-    public void getBalance_AccountNotExists() throws Exception {
+    public void getStatus_NullResponse_OperationFailedException() throws Exception {
+        TestUtils.enqueueEmptyResponse(mockWebServer);
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectMessage(ACCOUNT_ID);
+
+        getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
+    @Test
+    public void getBalance_AccountNotExists_AccountNotFoundException() throws Exception {
         mockWebServer.enqueue(new MockResponse()
             .setResponseCode(404)
         );
@@ -117,7 +162,17 @@ public class BalanceQueryTest {
     }
 
     @Test
-    public void getBalance_HttpResponseError() throws Exception {
+    public void getStatus_AccountNotExists_StatusNotCreated() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(404)
+        );
+
+        int status = getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+        assertThat(status, equalTo(AccountStatus.NOT_CREATED));
+    }
+
+    @Test
+    public void getBalance_HttpResponseError_OperationFailedException() throws Exception {
         mockWebServer.enqueue(new MockResponse()
             .setResponseCode(500)
         );
@@ -127,23 +182,53 @@ public class BalanceQueryTest {
         getBalance(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
     }
 
+    @Test
+    public void getStatus_HttpResponseError_OperationFailedException() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(500)
+        );
+
+        expectedEx.expect(OperationFailedException.class);
+        expectedEx.expectCause(Matchers.<Throwable>instanceOf(HttpResponseException.class));
+        getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test
-    public void getBalance_NullInput() throws Exception {
+    public void getBalance_NullInput_IllegalArgumentException() throws Exception {
         mockWebServer.enqueue(new MockResponse()
             .setResponseCode(500)
         );
         expectedEx.expect(IllegalArgumentException.class);
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
-        balanceQuery.getBalance(null);
+        AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
+        accountInfoRetriever.getBalance(null);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void getStatus_NullInput_IllegalArgumentException() throws Exception {
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(500)
+        );
+        expectedEx.expect(IllegalArgumentException.class);
+        KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
+        AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
+        accountInfoRetriever.getStatus(null);
     }
 
     private Balance getBalance(String issuerAccountId, String accountId) throws OperationFailedException {
         KinAsset kinAsset = createKinAsset(issuerAccountId);
-        BalanceQuery balanceQuery = new BalanceQuery(server, kinAsset);
+        AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
         Account account = new Account("", accountId);
-        return balanceQuery.getBalance(account);
+        return accountInfoRetriever.getBalance(account);
+    }
+
+    private int getStatus(String issuerAccountId, String accountId) throws OperationFailedException {
+        KinAsset kinAsset = createKinAsset(issuerAccountId);
+        AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
+        Account account = new Account("", accountId);
+        return accountInfoRetriever.getStatus(account);
     }
 
 }

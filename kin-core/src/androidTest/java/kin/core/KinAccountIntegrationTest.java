@@ -88,6 +88,15 @@ public class KinAccountIntegrationTest {
 
     @Test
     @LargeTest
+    public void getStatusSync_AccountNotCreated_StatusNotCreated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.NOT_CREATED));
+    }
+
+    @Test
+    @LargeTest
     public void getBalanceSync_AccountNotActivated_AccountNotActivatedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
@@ -95,6 +104,16 @@ public class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expectMessage(kinAccount.getPublicAddress());
         kinAccount.getBalanceSync();
+    }
+
+    @Test
+    @LargeTest
+    public void getStatusSync_AccountNotActivated_StatusNotActivated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
+
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.NOT_ACTIVATED));
     }
 
     @Test
@@ -108,6 +127,18 @@ public class KinAccountIntegrationTest {
 
         fakeKinIssuer.fundWithKin(kinAccount.getPublicAddress(), "3.1415926");
         assertThat(kinAccount.getBalanceSync().value(), equalTo(new BigDecimal("3.1415926")));
+    }
+
+    @Test
+    @LargeTest
+    public void getStatusSync_CreateAndActivateAccount_StatusActivated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
+
+        kinAccount.activateSync();
+        assertThat(kinAccount.getBalanceSync().value(), equalTo(new BigDecimal("0.0000000")));
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.ACTIVATED));
     }
 
     @Test
@@ -330,6 +361,13 @@ public class KinAccountIntegrationTest {
         KinAccount kinAccount = kinClient.addAccount();
         kinClient.deleteAccount(0);
         kinAccount.getBalanceSync();
+    }
+
+    @Test(expected = AccountDeletedException.class)
+    public void getStatusSync_DeletedAccount_AccountDeletedException() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        kinClient.deleteAccount(0);
+        kinAccount.getStatusSync();
     }
 
     @Test(expected = AccountDeletedException.class)
