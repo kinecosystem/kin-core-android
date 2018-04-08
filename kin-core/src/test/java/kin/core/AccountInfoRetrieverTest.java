@@ -95,7 +95,8 @@ public class AccountInfoRetrieverTest {
 
     @Test
     public void getBalance_SameIssuerDifferentAsset_AccountNotActivatedException() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
+        mockWebServer.enqueue(TestUtils
+            .generateSuccessMockResponse(this.getClass(), "balance_res_same_issuer_different_asset_code.json"));
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID)));
 
@@ -104,7 +105,8 @@ public class AccountInfoRetrieverTest {
 
     @Test
     public void getStatus_SameIssuerDifferentAsset_StatusNotActivated() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "balance_res_no_kin_trust.json"));
+        mockWebServer.enqueue(TestUtils
+            .generateSuccessMockResponse(this.getClass(), "balance_res_same_issuer_different_asset_code.json"));
 
         int status = getStatus(ACCOUNT_ID_KIN_ISSUER, ACCOUNT_ID);
         assertThat(status, equalTo(AccountStatus.NOT_ACTIVATED));
