@@ -1,7 +1,6 @@
 package kin.core;
 
 
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;
@@ -347,42 +345,6 @@ public class KinAccountIntegrationTest {
         expectedEx.expect(InsufficientKinException.class);
         kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void activateSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.activateSync();
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void getBalanceSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.getBalanceSync();
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void getStatusSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.getStatusSync();
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void sendTransactionSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.sendTransactionSync("GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM",
-            new BigDecimal(10));
-    }
-
-    @Test
-    public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        assertNull(kinAccount.getPublicAddress());
     }
 
 }
