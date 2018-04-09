@@ -1,7 +1,6 @@
 package kin.core;
 
 
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;
@@ -88,6 +86,15 @@ public class KinAccountIntegrationTest {
 
     @Test
     @LargeTest
+    public void getStatusSync_AccountNotCreated_StatusNotCreated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.NOT_CREATED));
+    }
+
+    @Test
+    @LargeTest
     public void getBalanceSync_AccountNotActivated_AccountNotActivatedException() throws Exception {
         KinAccount kinAccount = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
@@ -95,6 +102,16 @@ public class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expectMessage(kinAccount.getPublicAddress());
         kinAccount.getBalanceSync();
+    }
+
+    @Test
+    @LargeTest
+    public void getStatusSync_AccountNotActivated_StatusNotActivated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
+
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.NOT_ACTIVATED));
     }
 
     @Test
@@ -108,6 +125,18 @@ public class KinAccountIntegrationTest {
 
         fakeKinIssuer.fundWithKin(kinAccount.getPublicAddress(), "3.1415926");
         assertThat(kinAccount.getBalanceSync().value(), equalTo(new BigDecimal("3.1415926")));
+    }
+
+    @Test
+    @LargeTest
+    public void getStatusSync_CreateAndActivateAccount_StatusActivated() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        fakeKinIssuer.createAccount(kinAccount.getPublicAddress());
+
+        kinAccount.activateSync();
+        assertThat(kinAccount.getBalanceSync().value(), equalTo(new BigDecimal("0.0000000")));
+        int status = kinAccount.getStatusSync();
+        assertThat(status, equalTo(AccountStatus.ACTIVATED));
     }
 
     @Test
@@ -316,35 +345,6 @@ public class KinAccountIntegrationTest {
         expectedEx.expect(InsufficientKinException.class);
         kinAccountSender
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), new BigDecimal("21.123"));
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void activateSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.activateSync();
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void getBalanceSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.getBalanceSync();
-    }
-
-    @Test(expected = AccountDeletedException.class)
-    public void sendTransactionSync_DeletedAccount_AccountDeletedException() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        kinAccount.sendTransactionSync("GBA2XHZRUAHEL4DZX7XNHR7HLBAUYPRNKLD2PIUKWV2LVVE6OJT4NDLM",
-            new BigDecimal(10));
-    }
-
-    @Test
-    public void getPublicAddress_DeletedAccount_EmptyPublicAddress() throws Exception {
-        KinAccount kinAccount = kinClient.addAccount();
-        kinClient.deleteAccount(0);
-        assertNull(kinAccount.getPublicAddress());
     }
 
 }

@@ -48,43 +48,83 @@
                 style="@style/KinButtonStyle.TestNet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right|center"
+                android:layout_gravity="right|top"
                 android:text="@string/refresh"/>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                    <TextView
-                        style="@style/KinText.Title.Bold"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="getBalance:"/>
+                        android:orientation="horizontal">
 
-                    <ProgressBar
-                        android:id="@+id/balance_progress"
-                        android:layout_width="@dimen/progress_size"
-                        android:layout_height="@dimen/progress_size"
-                        android:layout_marginLeft="@dimen/progress_margin"
-                        android:layout_gravity="bottom"
-                        android:visibility="gone"/>
+                        <TextView
+                            style="@style/KinText.Title.Bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="getBalance:"/>
+
+                        <ProgressBar
+                            android:id="@+id/balance_progress"
+                            android:layout_width="@dimen/progress_size"
+                            android:layout_height="@dimen/progress_size"
+                            android:layout_marginLeft="@dimen/progress_margin"
+                            android:layout_gravity="bottom"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/balance"
+                        style="@style/KinText.Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/sub_text_margin"
+                        android:gravity="left"
+                        tools:text="123.0"/>
+
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/balance"
-                    style="@style/KinText.Title"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/sub_text_margin"
-                    android:gravity="left"
-                    tools:text="123.0"/>
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/KinText.Title.Bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="getStatus:"/>
+
+                        <ProgressBar
+                            android:id="@+id/status_progress"
+                            android:layout_width="@dimen/progress_size"
+                            android:layout_height="@dimen/progress_size"
+                            android:layout_marginLeft="@dimen/progress_margin"
+                            android:layout_gravity="bottom"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/status"
+                        style="@style/KinText.Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/sub_text_margin"
+                        android:gravity="left"
+                        tools:text="ACTIVATED"/>
+
+                </LinearLayout>
             </LinearLayout>
         </FrameLayout>
 
@@ -107,9 +147,9 @@
         <Button
             android:id="@+id/watch_payments_btn"
             style="@style/KinButtonStyle.TestNet"
-            android:layout_marginTop="@dimen/button_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/button_margin"
             android:text="@string/payments_listener"/>
 
         <Button

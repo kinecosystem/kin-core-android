@@ -122,6 +122,25 @@ public interface KinAccount {
     void activateSync() throws OperationFailedException;
 
     /**
+     * Get current account status on blockchain network.
+     *
+     * @return account status, either {@link AccountStatus#NOT_CREATED}, {@link AccountStatus#NOT_ACTIVATED} or {@link
+     * AccountStatus#ACTIVATED}
+     * @throws OperationFailedException any other error
+     */
+    @AccountStatus
+    int getStatusSync() throws OperationFailedException;
+
+    /**
+     * Create {@link Request} for getting current account status on blockchain network.
+     * <p> See {@link KinAccount#getStatusSync()} for possibles errors</p>
+     *
+     * @return account status, either {@link AccountStatus#NOT_CREATED}, {@link AccountStatus#NOT_ACTIVATED} or {@link
+     * AccountStatus#ACTIVATED}
+     */
+    Request<Integer> getStatus();
+
+    /**
      * Returns {@link BlockchainEvents} object, allows registering to various events on the blockchain network.
      */
     BlockchainEvents blockchainEvents();

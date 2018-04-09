@@ -20,7 +20,7 @@ public class KinAccountImplTest {
     @Mock
     private TransactionSender mockTransactionSender;
     @Mock
-    private BalanceQuery mockBalanceQuery;
+    private AccountInfoRetriever mockAccountInfoRetriever;
     @Mock
     private AccountActivator mockAccountActivator;
     @Mock
@@ -37,7 +37,7 @@ public class KinAccountImplTest {
         KeyPair keyPair = KeyPair.random();
         expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
         kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
-            mockBalanceQuery, mockBlockchainEventsCreator);
+            mockAccountInfoRetriever, mockBlockchainEventsCreator);
     }
 
     @Test
@@ -92,12 +92,24 @@ public class KinAccountImplTest {
         initWithRandomAccount();
 
         Balance expectedBalance = new BalanceImpl(new BigDecimal("11.0"));
-        when(mockBalanceQuery.getBalance((Account) any())).thenReturn(expectedBalance);
+        when(mockAccountInfoRetriever.getBalance((Account) any())).thenReturn(expectedBalance);
 
         Balance balance = kinAccount.getBalanceSync();
 
         assertEquals(expectedBalance, balance);
-        verify(mockBalanceQuery).getBalance(expectedRandomAccount);
+        verify(mockAccountInfoRetriever).getBalance(expectedRandomAccount);
+    }
+
+    @Test
+    public void getStatusSync() throws Exception {
+        initWithRandomAccount();
+
+        when(mockAccountInfoRetriever.getStatus((Account) any())).thenReturn(AccountStatus.ACTIVATED);
+
+        int status = kinAccount.getStatusSync();
+
+        assertEquals(AccountStatus.ACTIVATED, status);
+        verify(mockAccountInfoRetriever).getStatus(expectedRandomAccount);
     }
 
     @Test
@@ -133,6 +145,14 @@ public class KinAccountImplTest {
 
         kinAccount.markAsDeleted();
         kinAccount.getBalanceSync();
+    }
+
+    @Test(expected = AccountDeletedException.class)
+    public void getStatusSync_DeletedAccount_Exception() throws Exception {
+        initWithRandomAccount();
+
+        kinAccount.markAsDeleted();
+        kinAccount.getStatusSync();
     }
 
     @Test(expected = AccountDeletedException.class)

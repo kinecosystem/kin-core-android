@@ -54,6 +54,17 @@ abstract class AbstractKinAccount implements KinAccount {
         });
     }
 
+    @NonNull
+    @Override
+    public Request<Integer> getStatus() {
+        return new Request<>(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return getStatusSync();
+            }
+        });
+    }
+
     @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object obj) {
