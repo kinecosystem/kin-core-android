@@ -9,11 +9,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import kin.core.ServiceProvider.KinAsset;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.LedgerEntryChange;
+import org.stellar.sdk.LedgerEntryChanges;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.MemoText;
 import org.stellar.sdk.Operation;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
+import org.stellar.sdk.TrustLineLedgerEntryChange;
 import org.stellar.sdk.responses.TransactionResponse;
 
 /**
@@ -29,12 +32,64 @@ public class BlockchainEvents {
     BlockchainEvents(Server server, Account account, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
-        accountKeyPair = KeyPair.fromAccountId(account.getAccountId());
+        this.accountKeyPair = KeyPair.fromAccountId(account.getAccountId());
     }
 
     /**
-     * Creates and adds listener for payments concerning this account, use returned {@link ListenerRegistration} to stop
-     * listening. <p><b>Note:</b> Events will be fired on background thread.</p>
+     * Creates and adds listener for balance changes of this account, use returned {@link ListenerRegistration} to
+     * stop listening. <p><b>Note:</b> Events will be fired on background thread.</p>
+     *
+     * @param listener listener object for payment events
+     */
+    public ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener) {
+        checkNotNull(listener, "listener");
+        ServerSentEvent serverSentEvent = server
+            .transactions()
+            .forAccount(accountKeyPair)
+            .cursor(CURSOR_FUTURE_ONLY)
+            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
+                @Override
+                public void onEvent(TransactionResponse transactionResponse) {
+                    extractBalanceChangeFromTransaction(transactionResponse, listener);
+                }
+            });
+        return new ListenerRegistration(serverSentEvent);
+    }
+
+    private void extractBalanceChangeFromTransaction(TransactionResponse transactionResponse,
+        @NonNull EventListener<Balance> listener) {
+        List<LedgerEntryChanges> ledgerChanges = transactionResponse.getLedgerChanges();
+        if (ledgerChanges != null) {
+            for (LedgerEntryChanges ledgerChange : ledgerChanges) {
+                LedgerEntryChange[] ledgerEntryUpdates = ledgerChange.getLedgerEntryUpdates();
+                if (ledgerEntryUpdates != null) {
+                    for (LedgerEntryChange ledgerEntryUpdate : ledgerEntryUpdates) {
+                        extractBalanceFromTrustLineUpdate(listener, ledgerEntryUpdate);
+                    }
+                }
+            }
+        }
+    }
+
+    private void extractBalanceFromTrustLineUpdate(@NonNull EventListener<Balance> listener,
+        LedgerEntryChange ledgerEntryUpdate) {
+        if (ledgerEntryUpdate instanceof TrustLineLedgerEntryChange) {
+            TrustLineLedgerEntryChange trustLineUpdate = (TrustLineLedgerEntryChange) ledgerEntryUpdate;
+            KeyPair account = trustLineUpdate.getAccount();
+            if (account != null) {
+                if (accountKeyPair.getAccountId().equals(account.getAccountId())
+                    && kinAsset.isKinAsset(trustLineUpdate.getAsset())) {
+                    BalanceImpl balance = new BalanceImpl(
+                        new BigDecimal(trustLineUpdate.getBalance()));
+                    listener.onEvent(balance);
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates and adds listener for payments concerning this account, use returned {@link ListenerRegistration} to
+     * stop listening. <p><b>Note:</b> Events will be fired on background thread.</p>
      *
      * @param listener listener object for payment events
      */
