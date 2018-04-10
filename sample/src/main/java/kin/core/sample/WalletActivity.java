@@ -3,11 +3,13 @@ package kin.core.sample;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.TextView;
 import kin.core.AccountStatus;
 import kin.core.Balance;
 import kin.core.KinAccount;
+import kin.core.ListenerRegistration;
 import kin.core.Request;
 import kin.core.ResultCallback;
 import kin.core.exception.DeleteAccountException;
@@ -29,6 +31,8 @@ public class WalletActivity extends BaseActivity {
     private View balanceProgress, statusProgress;
     private Request<Balance> balanceRequest;
     private Request<Integer> statusRequest;
+    private KinAccount account;
+    private ListenerRegistration balanceListenerRegistration;
 
     public static Intent getIntent(Context context) {
         return new Intent(context, WalletActivity.class);
@@ -38,6 +42,8 @@ public class WalletActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wallet_activity);
+
+        account = getKinClient().getAccount(0);
         initWidgets();
     }
 
@@ -52,6 +58,8 @@ public class WalletActivity extends BaseActivity {
         balance = findViewById(R.id.balance);
         status = findViewById(R.id.status);
         publicKey = findViewById(R.id.public_key);
+
+        SwitchCompat balanceListenSwitch = findViewById(R.id.auto_refresh_switch);
 
         balanceProgress = findViewById(R.id.balance_progress);
         statusProgress = findViewById(R.id.status_progress);
@@ -79,11 +87,24 @@ public class WalletActivity extends BaseActivity {
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
         watchPayments.setOnClickListener(view -> startActivity(PaymentListenerActivity.getIntent(WalletActivity.this)));
         refresh.setOnClickListener(view -> updateAccountInfo(true));
+        balanceListenSwitch
+            .setOnCheckedChangeListener((buttonView, isChecked) -> handleAutoBalanceSwitchChanges(refresh, isChecked));
     }
 
     private void updateAccountInfo(boolean showDialog) {
         updateBalance(showDialog);
         updateStatus(showDialog);
+    }
+
+    private void handleAutoBalanceSwitchChanges(View refresh, boolean isChecked) {
+        refresh.setEnabled(!isChecked);
+        if (isChecked) {
+            balanceListenerRegistration = account.blockchainEvents()
+                .addBalanceListener(
+                    updatedBalance -> runOnUiThread(() -> balance.setText(updatedBalance.value().toPlainString())));
+        } else {
+            balanceListenerRegistration.remove();
+        }
     }
 
     private void showDeleteAlert() {
@@ -101,7 +122,7 @@ public class WalletActivity extends BaseActivity {
     }
 
     private void getKin() {
-        final KinAccount account = getKinClient().getAccount(0);
+        final KinAccount account = this.account;
         if (account != null) {
             balance.setText(null);
             balanceProgress.setVisibility(View.VISIBLE);
@@ -126,7 +147,6 @@ public class WalletActivity extends BaseActivity {
 
     private void updatePublicKey() {
         String publicKeyStr = "";
-        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             publicKeyStr = account.getPublicAddress();
         }
@@ -136,7 +156,6 @@ public class WalletActivity extends BaseActivity {
 
     private void updateStatus(boolean showDialog) {
         statusProgress.setVisibility(View.VISIBLE);
-        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             statusRequest = account.getStatus();
             if (showDialog) {
@@ -185,7 +204,6 @@ public class WalletActivity extends BaseActivity {
 
     private void updateBalance(boolean showDialog) {
         balanceProgress.setVisibility(View.VISIBLE);
-        KinAccount account = getKinClient().getAccount(0);
         if (account != null) {
             balanceRequest = account.getBalance();
             if (showDialog) {

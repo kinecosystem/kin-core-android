@@ -54,4 +54,9 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="KinSwitch">
+        <item name="thumbTint">@color/switch_color</item>
+        <item name="trackTint">@color/switch_color</item>
+    </style>
+
 </resources>
