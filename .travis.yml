@@ -32,6 +32,7 @@ android:
 before_script:
   - sudo apt-get install nodejs
   - sudo apt-get install npm
+  - sudo apt-get install python3-pip
   - npm config set strict-ssl false
   - sudo npm cache clean -f
   - sudo npm install -g n
@@ -39,7 +40,7 @@ before_script:
   # setup UI automation
   - sudo npm install -g appium --unsafe-perm=true --allow-root
   - sudo npm install -g wd --unsafe-perm=true --allow-root
-  - sudo pip install Appium-Python-Client pytest requests
+  - sudo pip3 install Appium-Python-Client pytest requests
   - appium &
   - git clone https://github.com/kinfoundation/Kin-Stellar-SampleApp-Automation.git
   # setup android emulator
@@ -55,4 +56,4 @@ script:
   - adb install -r ./kin-core/build/outputs/apk/androidTest/debug/kin-core-debug-androidTest.apk
   - adb install -r ./sample/build/outputs/apk/debug/sample-debug.apk
   - ./run_android_test_ci.sh
-  - pytest -v -x ./Kin-Stellar-SampleApp-Automation/Android_Sanity.py
+  - python3 -m pytest -v -x ./Kin-Stellar-SampleApp-Automation/Android_Sanity.py
