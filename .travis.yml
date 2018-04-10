@@ -18,8 +18,7 @@ cache:
 env:
   global:
     - ANDROID_API_LEVEL=26
-    - EMULATOR_API_LEVEL=16
-
+    - EMULATOR_API_LEVEL=21
 android:
   components:
   - tools
@@ -31,9 +30,21 @@ android:
   - sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
 
 before_script:
+  - sudo apt-get install nodejs
+  - sudo apt-get install npm
+  - npm config set strict-ssl false
+  - sudo npm cache clean -f
+  - sudo npm install -g n
+  - sudo n stable
+  # setup UI automation
+  - sudo npm install -g appium --unsafe-perm=true --allow-root
+  - sudo npm install -g wd --unsafe-perm=true --allow-root
+  - sudo pip install Appium-Python-Client pytest requests
+  - appium &
+  - git clone https://github.com/kinfoundation/Kin-Stellar-SampleApp-Automation.git
   # setup android emulator
   - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window -camera-back none -camera-front none -verbose -memory 2048 &
+  - emulator -avd test -no-skin -no-window -camera-back none -camera-front none -verbose -memory 2048 &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
@@ -42,5 +53,6 @@ script:
   - ./gradlew :kin-core:test
   - ./gradlew kin-core:assembleDebugAndroidTest
   - adb install -r ./kin-core/build/outputs/apk/androidTest/debug/kin-core-debug-androidTest.apk
+  - adb install -r ./sample/build/outputs/apk/debug/sample-debug.apk
   - ./run_android_test_ci.sh
-
+  - pytest -v -x ./Kin-Stellar-SampleApp-Automation/Android_Sanity.py
