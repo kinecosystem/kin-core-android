@@ -9,7 +9,7 @@ ext {
     mockWebServerVersion = '3.8.1'
     robolectricVersion = '3.6.1'
     hamcrestVersion = '1.3'
-    stellarSDKVersion = '12aef74af04b1d1e5edbedd62121fafbf351ab6a'
+    stellarSDKVersion = '3b05787858d847be59f3dc6333ed44887ce5cc1b'
 
     //Packages
     supportPackage = 'com.android.support'
