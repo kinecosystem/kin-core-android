@@ -36,98 +36,91 @@
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/delim_margin"
             android:background="@color/grey"/>
-
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            >
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/get_balance_txt"
+                style="@style/KinText.Title.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="getBalance:"/>
+
+            <ProgressBar
+                android:id="@+id/balance_progress"
+                android:layout_width="@dimen/progress_size"
+                android:layout_height="@dimen/progress_size"
+                android:layout_marginLeft="@dimen/progress_margin"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="bottom"
+                android:layout_toRightOf="@id/get_balance_txt"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/auto_refresh_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:theme="@style/KinSwitch"
+                android:text="Auto Refresh"
+                />
 
             <Button
                 android:id="@+id/refresh_btn"
                 style="@style/KinButtonStyle.TestNet"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/auto_refresh_switch"
                 android:layout_gravity="right|top"
                 android:text="@string/refresh"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+            <TextView
+                android:id="@+id/balance"
+                style="@style/KinText.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sub_text_margin"
+                android:layout_below="@id/get_balance_txt"
+                android:gravity="left"
+                tools:text="123.0"/>
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+            <TextView
+                android:id="@+id/get_status_text"
+                style="@style/KinText.Title.Bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/refresh_btn"
+                android:text="getStatus:"/>
 
-                        <TextView
-                            style="@style/KinText.Title.Bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="getBalance:"/>
-
-                        <ProgressBar
-                            android:id="@+id/balance_progress"
-                            android:layout_width="@dimen/progress_size"
-                            android:layout_height="@dimen/progress_size"
-                            android:layout_marginLeft="@dimen/progress_margin"
-                            android:layout_gravity="bottom"
-                            android:visibility="gone"/>
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/balance"
-                        style="@style/KinText.Title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/sub_text_margin"
-                        android:gravity="left"
-                        tools:text="123.0"/>
-
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            style="@style/KinText.Title.Bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="getStatus:"/>
-
-                        <ProgressBar
-                            android:id="@+id/status_progress"
-                            android:layout_width="@dimen/progress_size"
-                            android:layout_height="@dimen/progress_size"
-                            android:layout_marginLeft="@dimen/progress_margin"
-                            android:layout_gravity="bottom"
-                            android:visibility="gone"/>
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/status"
-                        style="@style/KinText.Title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/sub_text_margin"
-                        android:gravity="left"
-                        tools:text="ACTIVATED"/>
-
-                </LinearLayout>
-            </LinearLayout>
-        </FrameLayout>
-
+            <ProgressBar
+                android:id="@+id/status_progress"
+                android:layout_width="@dimen/progress_size"
+                android:layout_height="@dimen/progress_size"
+                android:layout_marginLeft="@dimen/progress_margin"
+                android:layout_below="@id/refresh_btn"
+                android:layout_gravity="bottom"
+                android:layout_toRightOf="@id/get_status_text"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+            <TextView
+                android:id="@+id/status"
+                style="@style/KinText.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sub_text_margin"
+                android:layout_below="@id/get_status_text"
+                android:gravity="left"
+                tools:text="ACTIVATED"/>
+        </RelativeLayout>
 
         <View
             android:id="@+id/spacer"
