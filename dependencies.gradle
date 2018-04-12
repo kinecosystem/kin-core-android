@@ -9,7 +9,7 @@ ext {
     mockWebServerVersion = '3.8.1'
     robolectricVersion = '3.6.1'
     hamcrestVersion = '1.3'
-    stellarSDKVersion = 'bfc53061e14ff6d2b83b44f5adba5ce1d1a91466'
+    gsonVersion = '2.4'
 
     //Packages
     supportPackage = 'com.android.support'
@@ -19,9 +19,8 @@ ext {
     okHttpPackage = 'com.squareup.okhttp3'
     robolectricPackage = 'org.robolectric'
     hamcrestPackage = 'org.hamcrest'
-    kinFoundationPackage = 'com.github.kinfoundation'
+    gsonPackage = 'com.google.code.gson'
 
-    stellarSDK = buildDependency(kinFoundationPackage, 'android-stellar-sdk', stellarSDKVersion)
     supportDependencies = [
             supportAnnotations : buildDependency(supportPackage, 'support-annotations', supportVersion)
     ]
@@ -34,7 +33,8 @@ ext {
             androidTestRules    : buildDependency(androidTestPackage, 'rules', androidTestVersion),
             mockWebServer       : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
             robolectric         : buildDependency(robolectricPackage, 'robolectric', robolectricVersion),
-            hamcrest            : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion)
+            hamcrest            : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
+            gson                    : buildDependency(gsonPackage, 'gson', gsonVersion)
     ]
 }
 

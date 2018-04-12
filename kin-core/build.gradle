@@ -27,13 +27,14 @@ android {
 }
 
 dependencies {
-    implementation stellarSDK
+    implementation project(':android-stellar-sdk')
     implementation supportDependencies.supportAnnotations
 
     testImplementation testingDependencies.junit
     testImplementation testingDependencies.mockito
     testImplementation testingDependencies.mockWebServer
     testImplementation testingDependencies.robolectric
+    testImplementation testingDependencies.gson
 
     androidTestImplementation testingDependencies.mockitoAndroid
     androidTestImplementation testingDependencies.androidTestRunner
