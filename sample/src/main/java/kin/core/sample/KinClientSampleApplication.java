@@ -19,7 +19,7 @@ public class KinClientSampleApplication extends Application {
 
     public KinClient createKinClient(NetWorkType type) {
         String providerUrl;
-        int netWorkId;
+        String netWorkId;
         switch (type) {
             case MAIN:
                 providerUrl = MAIN_NET_URL;

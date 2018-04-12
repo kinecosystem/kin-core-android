@@ -1,14 +1,11 @@
 package kin.core;
 
-import static java.lang.annotation.RetentionPolicy.SOURCE;
-
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import java.lang.annotation.Retention;
 import org.stellar.sdk.Asset;
 import org.stellar.sdk.AssetTypeCreditAlphaNum;
 import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.Network;
 import org.stellar.sdk.responses.AccountResponse;
 
 /**
@@ -19,38 +16,31 @@ public class ServiceProvider {
     /**
      * main blockchain network
      */
-    public static final int NETWORK_ID_MAIN = 1;
+    public static final String NETWORK_ID_MAIN = Network.getPublicNetwork().getNetworkPassphrase();
     /**
      * test blockchain network
      */
-    public static final int NETWORK_ID_TEST = 2;
+    public static final String NETWORK_ID_TEST = Network.getTestNetwork().getNetworkPassphrase();
 
     private static final String MAIN_NETWORK_ISSUER = "GBGFNADX2FTYVCLDCVFY5ZRTVEMS4LV6HKMWOY7XJKVXMBIWVDESCJW5";
     private static final String TEST_NETWORK_ISSUER = "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V";
     private static final String KIN_ASSET_CODE = "KIN";
 
     private final String providerUrl;
-    @NetworkId
-    private final int networkId;
-    private final KinAsset kinAsset;
-
-    @Retention(SOURCE)
-    @IntDef({NETWORK_ID_MAIN, NETWORK_ID_TEST})
-    public @interface NetworkId {
-
-    }
+    private final Network network;
+    @Nullable
+    private KinAsset kinAsset;
 
     /**
      * A ServiceProvider used to connect to a horizon network.
      * <p>
      *
      * @param providerUrl the horizon server to use
-     * @param networkId either {@link #NETWORK_ID_MAIN} or {@link #NETWORK_ID_TEST}
+     * @param networkId the network id, use {@link #NETWORK_ID_MAIN} or {@link #NETWORK_ID_TEST} for public main/testnet
      */
-    public ServiceProvider(String providerUrl, @NetworkId int networkId) {
+    public ServiceProvider(String providerUrl, String networkId) {
         this.providerUrl = providerUrl;
-        this.networkId = networkId;
-        this.kinAsset = new KinAsset(getAssetCode(), getIssuerAccountId());
+        this.network = new Network(networkId);
     }
 
     /**
@@ -73,16 +63,23 @@ public class ServiceProvider {
         return providerUrl;
     }
 
-    final public int getNetworkId() {
-        return networkId;
+    final public String getNetworkId() {
+        return network.getNetworkPassphrase();
     }
 
     final public boolean isMainNet() {
-        return networkId == NETWORK_ID_MAIN;
+        return NETWORK_ID_MAIN.equals(network.getNetworkPassphrase());
     }
 
     final KinAsset getKinAsset() {
+        if (kinAsset == null) {
+            kinAsset = new KinAsset(getAssetCode(), getIssuerAccountId());
+        }
         return kinAsset;
+    }
+
+    final Network getNetwork() {
+        return network;
     }
 
     static class KinAsset {
