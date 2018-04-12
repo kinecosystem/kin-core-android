@@ -34,6 +34,7 @@ dependencies {
     testImplementation testingDependencies.mockito
     testImplementation testingDependencies.mockWebServer
     testImplementation testingDependencies.robolectric
+    testImplementation testingDependencies.gson
 
     androidTestImplementation testingDependencies.mockitoAndroid
     androidTestImplementation testingDependencies.androidTestRunner
