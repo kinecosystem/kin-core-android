@@ -177,26 +177,19 @@ ListenerRegistration listenerRegistration = account.blockchainEvents()
 ```
 For unregister the listener use `listenerRegistration.remove()` method.
 
-### Watching Account Creation
-When the account is first created by another account it can be observed.
-<br/>First, Create a `PaymentWatcher`
-object:
-```java
-PaymentWatcher watcher = account.createPaymentWatcher();
-```
+### Listening to account creation
+Account creation on the blockchain network, can be observed, by adding create account listener using `BlockchainEvents`:
 
-For start watching, use `startCreateAccountListener` method, by providing listener of `WatcherListener<PaymentInfo>`:
 ```java
-blockchainEvents.startCreateAccountListener(new WatcherListener<PaymentInfo>() {
-    @Override
-    public void onEvent(PaymentInfo payment) {
-        Log.d("example", String
-            .format("payment event, to = %s, from = %s, amount = %s", payment.sourcePublicKey(),
-                payment.destinationPublicKey(), payment.amount().toPlainString());
-    }
-});
+ListenerRegistration listenerRegistration = account.blockchainEvents()
+            .addAccountCreationListener(new EventListener<Void>() {
+                @Override
+                public void onEvent(Void result) {
+                    Log.d("example", "Account has created.);                     
+                }
+            });
 ```
-The payment amount will represent the created account native balance.
+For unregister the listener use `listenerRegistration.remove()` method.
 
 ### Sync vs Async
 
