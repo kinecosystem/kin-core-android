@@ -1,1 +1,2 @@
-include ':sample', ':kin-core'
+include ':sample', ':kin-core', ':android-stellar-sdk'
+project(":android-stellar-sdk").projectDir = file("android-stellar-sdk/android-stellar-sdk")
