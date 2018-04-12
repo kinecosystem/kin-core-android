@@ -56,11 +56,7 @@ public class KinClient {
     }
 
     private Server initServer() {
-        if (serviceProvider.isMainNet()) {
-            Network.usePublicNetwork();
-        } else {
-            Network.useTestNetwork();
-        }
+        Network.use(serviceProvider.getNetwork());
         return new Server(serviceProvider.getProviderUrl());
     }
 
