@@ -11,10 +11,19 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        kintest_keystore {
+            keyAlias 'kintest'
+            keyPassword 'kintest'
+            storeFile file('../kintest.keystore')
+            storePassword 'kintest'
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.kintest_keystore
         }
     }
     compileOptions {
