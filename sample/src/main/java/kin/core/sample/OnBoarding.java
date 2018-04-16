@@ -13,19 +13,16 @@ import kin.core.ListenerRegistration;
 import kin.core.ResultCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 class OnBoarding {
 
-    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-    private static final String URL_CREATE_ACCOUNT = "http://188.166.34.7:8000/create_account";
-    private static final String URL_FUND = "http://188.166.34.7:8000/fund";
+    private static final String URL_CREATE_ACCOUNT = "http://friendbot-kik.kininfrastructure.com/?addr=";
+    private static final int FUND_KIN_AMOUNT = 6000;
+    private static final String URL_FUND =
+        "http://159.65.84.173:5000/fund?account=%s&amount=" + String.valueOf(FUND_KIN_AMOUNT);
     private final OkHttpClient okHttpClient;
     private final Handler handler;
     private ListenerRegistration listenerRegistration;
@@ -63,8 +60,8 @@ class OnBoarding {
 
     private void createAccount(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
         Request request = new Request.Builder()
-            .url(URL_CREATE_ACCOUNT)
-            .post(createRequestBody(account))
+            .url(URL_CREATE_ACCOUNT + account.getPublicAddress())
+            .get()
             .build();
         okHttpClient.newCall(request)
             .enqueue(new Callback() {
@@ -80,22 +77,6 @@ class OnBoarding {
                     }
                 }
             });
-    }
-
-    @NonNull
-    private RequestBody createRequestBody(@NonNull KinAccount account) {
-        return RequestBody.create(MEDIA_TYPE_JSON, createPublicAddressJsonString(account.getPublicAddress()));
-    }
-
-    @NonNull
-    private String createPublicAddressJsonString(@NonNull String publicAddress) {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("public_address", publicAddress);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return json.toString();
     }
 
     private void activateAccount(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
@@ -116,8 +97,8 @@ class OnBoarding {
 
     private void fundAccountWithKin(KinAccount account, @NonNull Callbacks callbacks) {
         Request request = new Request.Builder()
-            .url(URL_FUND)
-            .post(createRequestBody(account))
+            .url(String.format(URL_FUND, account.getPublicAddress()))
+            .get()
             .build();
         okHttpClient.newCall(request)
             .enqueue(new Callback() {
