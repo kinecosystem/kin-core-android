@@ -117,6 +117,7 @@ public class WalletActivity extends BaseActivity {
             getKinClient().deleteAccount(0);
             onBackPressed();
         } catch (DeleteAccountException e) {
+            Utils.logError(e, "deleteAccount");
             KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
         }
     }
@@ -138,6 +139,7 @@ public class WalletActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(Exception e) {
+                    Utils.logError(e, "onBoarding");
                     KinAlertDialog.createErrorDialog(WalletActivity.this, e.getMessage()).show();
                     getKinBtn.setClickable(true);
                 }
@@ -175,6 +177,7 @@ public class WalletActivity extends BaseActivity {
 
                     @Override
                     public void onError(Exception e) {
+                        Utils.logError(e, "updateStatus");
                         status.setText(R.string.balance_error);
                         statusProgress.setVisibility(View.GONE);
                     }
@@ -223,6 +226,7 @@ public class WalletActivity extends BaseActivity {
 
                     @Override
                     public void onError(Exception e) {
+                        Utils.logError(e, "updateBalance");
                         balance.setText(R.string.balance_error);
                         balanceProgress.setVisibility(View.GONE);
                     }

@@ -112,6 +112,7 @@ public class TransactionActivity extends BaseActivity {
             try {
                 sendTransaction(toAddressInput.getText().toString(), amount, memoInput.getText().toString());
             } catch (OperationFailedException e) {
+                Utils.logError(e, "sendTransaction");
                 KinAlertDialog.createErrorDialog(TransactionActivity.this, e.getMessage()).show();
             }
         });

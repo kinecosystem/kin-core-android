@@ -1,6 +1,9 @@
 package kin.core.sample;
 
 import android.content.Context;
+import android.util.Log;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Utils {
 
@@ -17,5 +20,12 @@ public class Utils {
                 .newPlainText("copied text", textToCopy);
             clipboard.setPrimaryClip(clip);
         }
+    }
+
+    public static void logError(Throwable t, String operationName) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        Log.e("KinSampleApp", operationName + "error = " + sw.toString());
     }
 }
