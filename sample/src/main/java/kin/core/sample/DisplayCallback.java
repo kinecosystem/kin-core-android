@@ -10,6 +10,7 @@ import kin.core.ResultCallback;
  */
 public abstract class DisplayCallback<T> implements ResultCallback<T> {
 
+    private static final String TAG = DisplayCallback.class.getSimpleName();
     private View progressBar;
     private View displayView;
 
@@ -35,6 +36,7 @@ public abstract class DisplayCallback<T> implements ResultCallback<T> {
 
     @Override
     public void onError(Exception e) {
+        Utils.logError(e, "DisplayCallback");
         progressBar.setVisibility(View.GONE);
         KinAlertDialog.createErrorDialog(progressBar.getContext(), e.getMessage()).show();
     }

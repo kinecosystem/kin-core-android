@@ -41,6 +41,7 @@ public class CreateWalletActivity extends BaseActivity {
             kinClient.addAccount();
             startActivity(WalletActivity.getIntent(this));
         } catch (CreateAccountException e) {
+            Utils.logError(e, "createAccount");
             KinAlertDialog.createErrorDialog(this, e.getMessage()).show();
         }
     }

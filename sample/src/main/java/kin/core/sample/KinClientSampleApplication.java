@@ -6,9 +6,9 @@ import kin.core.ServiceProvider;
 
 public class KinClientSampleApplication extends Application {
 
-    //based on parity
-    private final String TEST_NET_URL = "https://horizon-testnet.stellar.org";
+    private final String TEST_NET_URL = "https://horizon-kik.kininfrastructure.com";
     private final String MAIN_NET_URL = "https://horizon.stellar.org";
+    private final String TEST_NET_NETWORK_ID = "private testnet";
 
     public enum NetWorkType {
         MAIN,
@@ -27,14 +27,19 @@ public class KinClientSampleApplication extends Application {
                 break;
             case TEST:
                 providerUrl = TEST_NET_URL;
-                netWorkId = ServiceProvider.NETWORK_ID_TEST;
+                netWorkId = TEST_NET_NETWORK_ID;
                 break;
             default:
                 providerUrl = TEST_NET_URL;
-                netWorkId = ServiceProvider.NETWORK_ID_TEST;
+                netWorkId = TEST_NET_NETWORK_ID;
         }
         kinClient = new KinClient(this,
-            new ServiceProvider(providerUrl, netWorkId));
+            new ServiceProvider(providerUrl, netWorkId) {
+                @Override
+                protected String getIssuerAccountId() {
+                    return "GBQ3DQOA7NF52FVV7ES3CR3ZMHUEY4LTHDAQKDTO6S546JCLFPEQGCPK";
+                }
+            });
         return kinClient;
     }
 
