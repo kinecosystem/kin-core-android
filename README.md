@@ -16,10 +16,10 @@ repositories {
 dependencies {
     ...
 
-    compile "com.github.kinfoundation:kin-core-android:<latest release>"
+    compile "com.github.kinecosystem:kin-core-android:<latest release>"
 }
 ```
-For latest release version go to https://github.com/kinfoundation/kin-core-android/releases
+For latest release version go to https://github.com/kinecosystem/kin-core-android/releases
 
 ## Usage
 ### Connecting to a service provider

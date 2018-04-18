@@ -15,7 +15,7 @@ import kin.sdk.core.sample.R;
 public class ChooseNetworkActivity extends BaseActivity {
 
     public static final String TAG = ChooseNetworkActivity.class.getSimpleName();
-    private static final String KIN_FOUNDATION_URL = "https://github.com/kinfoundation";
+    private static final String KIN_FOUNDATION_URL = "https://github.com/kinecosystem";
 
     public static Intent getIntent(Context context) {
         return new Intent(context, ChooseNetworkActivity.class);
