@@ -1,2 +1,4 @@
-include ':sample', ':kin-core', ':android-stellar-sdk'
+include ':sample', ':kin-core'
+if (!System.env.JITPACK)
+    include ':android-stellar-sdk'
 project(":android-stellar-sdk").projectDir = file("android-stellar-sdk/android-stellar-sdk")
