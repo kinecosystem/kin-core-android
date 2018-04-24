@@ -173,7 +173,7 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
 });
 ```
 
-#####Memo
+####Memo
 Arbitrary data can be added to a transfer operation using the memo parameter,
 the memo is a `String` of up to 28 characters.
 
