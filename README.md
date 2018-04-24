@@ -69,9 +69,9 @@ kinClient.deleteAccount(int index);
 ``` 
 
 ### Onboarding
-Before an account can be used, it must be created on Stellar blockchain, by a different entity (Server) that has an account 
-on Stellar network.
-and then must the account must be activated, before it can receive or send KIN.
+A first step before an account can be used, is to create the account on Stellar blockchain, by a different entity (Server side) that has an account on Stellar network.
+
+The second step is to activate this account on the client side, using `activate` method. The account will not be able to receive or send KIN before activation.
 
 
 ```java
