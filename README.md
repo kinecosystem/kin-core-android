@@ -90,6 +90,39 @@ activationRequest.run(new ResultCallback<Void>() {
 ``` 
 For a complete example of this process, take a look at Sample App `OnBoarding` class.
 
+#### Query Account Status
+
+Current account status on the blockchain can be queried using `getStatus` method,  
+status will be one of the following 3 options:
+* `AccountStatus.NOT_CREATED` - Account is not created yet on the blockchain network.
+* `AccountStatus.NOT_ACTIVATED` - Account was created but not activated yet, the account cannot send or receive KIN yet.
+* `AccountStatus.ACTIVATED` - Account was created and activated, account can send and receive KIN.
+
+```java
+Request<Integer> statusRequest = account.getStatus();
+statusRequest.run(new ResultCallback<Integer>() {
+    @Override
+    public void onResult(Integer result) {
+        switch (result) {
+            case AccountStatus.ACTIVATED:
+                //you're good to go!!!
+                break;
+            case AccountStatus.NOT_ACTIVATED:
+                //activate account using account.activate() for sending/receiving KIN
+                break;
+            case AccountStatus.NOT_CREATED:
+                //first create an account on the blockchain, second activate the account using account.activate()
+                break;
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+});
+```
+
 ### Public Address
 Your account can be identified via it's public address. To retrieve the account public address use:
 ```java
