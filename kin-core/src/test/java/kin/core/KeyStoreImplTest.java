@@ -3,7 +3,6 @@ package kin.core;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -33,32 +32,6 @@ public class KeyStoreImplTest {
     public ExpectedException expectedEx = ExpectedException.none();
     private KeyStoreImpl keyStore;
 
-    private static class FakeEncryptor implements Encryptor {
-
-        @Override
-        public String encrypt(String secret) throws CryptoException {
-            return "{FAKE}" + secret + "{FAKE}";
-        }
-
-        @Override
-        public String decrypt(String encryptedSecret) throws CryptoException {
-            return encryptedSecret.replace("{FAKE}", "");
-        }
-    }
-
-    private static class ExceptionThrowerEncryptor implements Encryptor {
-
-        @Override
-        public String encrypt(String secret) throws CryptoException {
-            throw new CryptoException(new Exception("Some bad things happened"));
-        }
-
-        @Override
-        public String decrypt(String encryptedSecret) throws CryptoException {
-            throw new CryptoException(new Exception("Some bad things happened"));
-        }
-    }
-
     private static class ExceptionThrowerStore implements Store {
 
         HashMap<String, String> map = new HashMap<>();
@@ -82,7 +55,7 @@ public class KeyStoreImplTest {
 
     @Before
     public void setup() {
-        keyStore = new KeyStoreImpl(new FakeStore(), new FakeEncryptor());
+        keyStore = new KeyStoreImpl(new FakeStore());
     }
 
     @Test
@@ -90,21 +63,12 @@ public class KeyStoreImplTest {
         Account account = keyStore.newAccount();
         KeyPair keyPair = keyStore.decryptAccount(account);
         assertEquals(account.getAccountId(), keyPair.getAccountId());
-        assertNotEquals(account.getEncryptedSeed(), String.valueOf(keyPair.getSecretSeed()));
-    }
-
-    @Test
-    public void newAccount_CryptoException_CreateAccountException() throws Exception {
-        keyStore = new KeyStoreImpl(new FakeStore(), new ExceptionThrowerEncryptor());
-
-        expectedEx.expect(CreateAccountException.class);
-        expectedEx.expectCause(isA(CryptoException.class));
-        keyStore.newAccount();
+        assertEquals(account.getEncryptedSeed(), String.valueOf(keyPair.getSecretSeed()));
     }
 
     @Test
     public void newAccount_JsonException_CreateAccountException() throws Exception {
-        keyStore = new KeyStoreImpl(new ExceptionThrowerStore(), new FakeEncryptor());
+        keyStore = new KeyStoreImpl(new ExceptionThrowerStore());
 
         expectedEx.expect(CreateAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -130,7 +94,7 @@ public class KeyStoreImplTest {
         when(stubStore.getString(anyString()))
             .thenReturn("not a real json");
 
-        keyStore = new KeyStoreImpl(stubStore, new FakeEncryptor());
+        keyStore = new KeyStoreImpl(stubStore);
 
         expectedEx.expect(LoadAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -155,7 +119,7 @@ public class KeyStoreImplTest {
         when(stubStore.getString(anyString()))
             .thenCallRealMethod()
             .thenReturn("not a real json");
-        keyStore = new KeyStoreImpl(stubStore, new FakeEncryptor());
+        keyStore = new KeyStoreImpl(stubStore);
 
         keyStore.newAccount();
         expectedEx.expect(DeleteAccountException.class);

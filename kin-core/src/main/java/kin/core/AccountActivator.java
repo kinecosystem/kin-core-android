@@ -44,7 +44,7 @@ class AccountActivator {
             } else {
                 throw new OperationFailedException(httpError);
             }
-        } catch (IOException | CryptoException e) {
+        } catch (IOException e) {
             throw new OperationFailedException(e);
         }
     }
@@ -64,7 +64,7 @@ class AccountActivator {
     }
 
     private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, AccountResponse accountResponse)
-        throws IOException, CryptoException {
+        throws IOException {
         Transaction allowKinTrustTransaction = new Transaction.Builder(accountResponse).addOperation(
             new ChangeTrustOperation.Builder(kinAsset.getStellarAsset(), TRUST_NO_LIMIT_VALUE)
                 .build()

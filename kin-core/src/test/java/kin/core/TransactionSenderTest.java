@@ -88,7 +88,7 @@ public class TransactionSenderTest {
         server = new Server(url);
     }
 
-    private void mockKeyStoreResponse() throws CryptoException {
+    private void mockKeyStoreResponse() {
         when(mockKeyStore.decryptAccount(any(Account.class)))
             .thenAnswer(
                 new Answer<Object>() {
@@ -310,18 +310,6 @@ public class TransactionSenderTest {
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage("transaction");
-
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
-    }
-
-    @Test
-    public void sendTransaction_CryptoException_OperationFailedException() throws Exception {
-        when(mockKeyStore.decryptAccount((Account) any())).thenThrow(CryptoException.class);
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
-
-        expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(CryptoException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }

@@ -80,7 +80,7 @@ public class AccountActivatorTest {
         server = new Server(url);
     }
 
-    private void mockKeyStoreResponse() throws CryptoException {
+    private void mockKeyStoreResponse() {
         when(mockKeyStore.decryptAccount(any(Account.class)))
             .thenAnswer(
                 new Answer<Object>() {

@@ -19,11 +19,9 @@ class KeyStoreImpl implements KeyStore {
     private static final String JSON_KEY_ENCRYPTED_SEED = "seed";
 
     private final Store store;
-    private final Encryptor encryptor;
 
-    KeyStoreImpl(Store store, Encryptor encryptor) {
+    KeyStoreImpl(Store store) {
         this.store = store;
-        this.encryptor = encryptor;
     }
 
     @NonNull
@@ -79,18 +77,18 @@ class KeyStoreImpl implements KeyStore {
     public Account newAccount() throws CreateAccountException {
         try {
             KeyPair newKeyPair = KeyPair.random();
-            String encryptedSeed = encryptor.encrypt(String.valueOf(newKeyPair.getSecretSeed()));
+            String encryptedSeed = String.valueOf(newKeyPair.getSecretSeed());
             String publicKey = newKeyPair.getAccountId();
             JSONObject accountsJson = addKeyPairToAccounts(encryptedSeed, publicKey);
             store.saveString(STORE_KEY_ACCOUNTS, accountsJson.toString());
             return new Account(encryptedSeed, publicKey);
-        } catch (CryptoException | JSONException e) {
+        } catch (JSONException e) {
             throw new CreateAccountException(e);
         }
     }
 
     private JSONObject addKeyPairToAccounts(@NonNull String encryptedSeed, @NonNull String accountId)
-        throws CryptoException, JSONException {
+        throws JSONException {
         JSONArray jsonArray = loadJsonArray();
         if (jsonArray == null) {
             jsonArray = new JSONArray();
@@ -106,8 +104,8 @@ class KeyStoreImpl implements KeyStore {
     }
 
     @Override
-    public KeyPair decryptAccount(Account account) throws CryptoException {
-        String secretSeed = encryptor.decrypt(account.getEncryptedSeed());
+    public KeyPair decryptAccount(Account account) {
+        String secretSeed = account.getEncryptedSeed();
         return KeyPair.fromSecretSeed(secretSeed);
     }
 

@@ -62,8 +62,7 @@ public class KinClient {
 
     private KeyStore initKeyStore(Context context) {
         SharedPrefStore store = new SharedPrefStore(context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE));
-        Encryptor encryptor = EncryptorFactory.create(context, store);
-        return new KeyStoreImpl(store, encryptor);
+        return new KeyStoreImpl(store);
     }
 
     private void loadAccounts() {

@@ -58,11 +58,7 @@ class TransactionSender {
     }
 
     private KeyPair decryptAccount(@NonNull Account from) throws OperationFailedException {
-        try {
-            return keyStore.decryptAccount(from);
-        } catch (CryptoException e) {
-            throw new OperationFailedException(e);
-        }
+        return keyStore.decryptAccount(from);
     }
 
     private void checkParams(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,

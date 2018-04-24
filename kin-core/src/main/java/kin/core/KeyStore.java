@@ -15,7 +15,7 @@ interface KeyStore {
 
     Account newAccount() throws CreateAccountException;
 
-    KeyPair decryptAccount(Account account) throws CryptoException;
+    KeyPair decryptAccount(Account account);
 
     void clearAllAccounts();
 }
