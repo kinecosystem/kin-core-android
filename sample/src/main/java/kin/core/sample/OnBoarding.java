@@ -72,11 +72,14 @@ class OnBoarding {
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (response.code() != 200) {
+                    int code = response.code();
+                    response.close();
+                    if (code != 200) {
                         fireOnFailure(callbacks, new Exception("Create account - response code is " + response.code()));
                     }
                 }
             });
+
     }
 
     private void activateAccount(@NonNull KinAccount account, @NonNull Callbacks callbacks) {
@@ -110,7 +113,9 @@ class OnBoarding {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response)
                     throws IOException {
-                    if (response.code() == 200) {
+                    int code = response.code();
+                    response.close();
+                    if (code == 200) {
                         //will trigger a call to get updated balance
                         fireOnSuccess(callbacks);
                     } else {
