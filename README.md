@@ -69,7 +69,30 @@ kinClient.deleteAccount(int index);
 ``` 
 
 ### Onboarding
-A first step before an account can be used, is to create the account on Stellar blockchain, by a different entity (Server side) that has an account on Stellar network.
+A first step before an account can be used, is to create the account on Stellar blockchain and fund it with native Stellar
+asset for fees purposes, this funding should be done by the digital service servers.  
+When working against KIN test network, the Fee Faucet Service can be used for this purpose:
+
+```java
+Request request = new Request.Builder()
+            .url("http://friendbot-kik.kininfrastructure.com/?addr=" + account.getPublicAddress())
+            .get()
+            .build();
+okHttpClient.newCall(request)
+    .enqueue(new Callback() {
+        @Override
+        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            if (response.code() == 200) {
+                //account was created successfully, continue to the second phase - account activation
+            }
+        }
+    });
+```
 
 The second step is to activate this account on the client side, using `activate` method. The account will not be able to receive or send KIN before activation.
 
@@ -87,7 +110,32 @@ activationRequest.run(new ResultCallback<Void>() {
         e.printStackTrace();
     }
 });
-``` 
+```
+ 
+Third, optional step is to fund the created account with KIN.  
+When working against KIN test network, the KIN Faucet Service can be used for this purpose:
+```java
+Request request = new Request.Builder()
+            .url("http://159.65.84.173:5000/fund?account=" + account.getPublicAddress() + "&amount=" + FUND_KIN_AMOUNT)
+            .get()
+            .build();
+okHttpClient.newCall(request)
+    .enqueue(new Callback() {
+        @Override
+        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onResponse(@NonNull Call call, @NonNull Response response)
+            throws IOException {
+            if (response.code() == 200) {
+              //Account was funded with KIN succesfully
+            }
+        }
+    });
+```
+
 For a complete example of this process, take a look at Sample App `OnBoarding` class.
 
 #### Query Account Status
