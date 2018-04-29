@@ -4,12 +4,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.isA;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import java.util.HashMap;
 import java.util.List;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.DeleteAccountException;
@@ -32,27 +30,6 @@ public class KeyStoreImplTest {
     public ExpectedException expectedEx = ExpectedException.none();
     private KeyStoreImpl keyStore;
 
-    private static class ExceptionThrowerStore implements Store {
-
-        HashMap<String, String> map = new HashMap<>();
-
-        @Override
-        public void saveString(@NonNull String key, @NonNull String value) {
-            map.put(key, value);
-        }
-
-        @Nullable
-        @Override
-        public String getString(@NonNull String key) {
-            return "NotJsonString";
-        }
-
-        @Override
-        public void clear(@NonNull String key) {
-            map.remove(key);
-        }
-    }
-
     @Before
     public void setup() {
         keyStore = new KeyStoreImpl(new FakeStore());
@@ -68,7 +45,11 @@ public class KeyStoreImplTest {
 
     @Test
     public void newAccount_JsonException_CreateAccountException() throws Exception {
-        keyStore = new KeyStoreImpl(new ExceptionThrowerStore());
+        Store mockStore = mock(Store.class);
+        when(mockStore.getString(anyString()))
+            .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
+            .thenReturn("not a real json");
+        keyStore = new KeyStoreImpl(mockStore);
 
         expectedEx.expect(CreateAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -90,11 +71,11 @@ public class KeyStoreImplTest {
 
     @Test
     public void loadAccounts_JsonException_LoadAccountException() throws Exception {
-        Store stubStore = spy(FakeStore.class);
-        when(stubStore.getString(anyString()))
+        Store mockStore = mock(Store.class);
+        when(mockStore.getString(anyString()))
+            .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
             .thenReturn("not a real json");
-
-        keyStore = new KeyStoreImpl(stubStore);
+        keyStore = new KeyStoreImpl(mockStore);
 
         expectedEx.expect(LoadAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -117,6 +98,7 @@ public class KeyStoreImplTest {
     public void deleteAccount_JsonException_DeleteAccountException() throws Exception {
         Store stubStore = spy(FakeStore.class);
         when(stubStore.getString(anyString()))
+            .thenCallRealMethod()
             .thenCallRealMethod()
             .thenReturn("not a real json");
         keyStore = new KeyStoreImpl(stubStore);

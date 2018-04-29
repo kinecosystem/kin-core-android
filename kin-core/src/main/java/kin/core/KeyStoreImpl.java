@@ -13,10 +13,12 @@ import org.stellar.sdk.KeyPair;
 
 class KeyStoreImpl implements KeyStore {
 
+    static final String ENCRYPTION_VERSION_NAME = "none";
     private static final String STORE_KEY_ACCOUNTS = "accounts";
     private static final String JSON_KEY_ACCOUNTS_ARRAY = "accounts";
     private static final String JSON_KEY_PUBLIC_KEY = "public_key";
     private static final String JSON_KEY_ENCRYPTED_SEED = "seed";
+    static final String VERSION_KEY = "encryptor_ver";
 
     private final Store store;
 
@@ -45,10 +47,16 @@ class KeyStoreImpl implements KeyStore {
     }
 
     private JSONArray loadJsonArray() throws JSONException {
-        String seedsJson = store.getString(STORE_KEY_ACCOUNTS);
-        if (seedsJson != null) {
-            JSONObject json = new JSONObject(seedsJson);
-            return json.getJSONArray(JSON_KEY_ACCOUNTS_ARRAY);
+        String version = store.getString(VERSION_KEY);
+        //ensure current version, drop data if it's a different version
+        if (ENCRYPTION_VERSION_NAME.equals(version)) {
+            String seedsJson = store.getString(STORE_KEY_ACCOUNTS);
+            if (seedsJson != null) {
+                JSONObject json = new JSONObject(seedsJson);
+                return json.getJSONArray(JSON_KEY_ACCOUNTS_ARRAY);
+            }
+        } else {
+            store.saveString(VERSION_KEY, ENCRYPTION_VERSION_NAME);
         }
         return null;
     }
