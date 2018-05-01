@@ -26,7 +26,7 @@ public class KinAccountImplTest {
     @Mock
     private BlockchainEventsCreator mockBlockchainEventsCreator;
     private KinAccountImpl kinAccount;
-    private Account expectedRandomAccount;
+    private KeyPair expectedRandomAccount;
 
     @Before
     public void setUp() throws Exception {
@@ -34,8 +34,7 @@ public class KinAccountImplTest {
     }
 
     private void initWithRandomAccount() {
-        KeyPair keyPair = KeyPair.random();
-        expectedRandomAccount = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+        expectedRandomAccount = KeyPair.random();
         kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
     }
@@ -55,7 +54,7 @@ public class KinAccountImplTest {
         BigDecimal expectedAmount = new BigDecimal("12.2");
         TransactionId expectedTransactionId = new TransactionIdImpl("myId");
 
-        when(mockTransactionSender.sendTransaction((Account) any(), (String) any(), (BigDecimal) any()))
+        when(mockTransactionSender.sendTransaction((KeyPair) any(), (String) any(), (BigDecimal) any()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
@@ -76,7 +75,7 @@ public class KinAccountImplTest {
         String memo = "Dummy Memo";
 
         when(mockTransactionSender
-            .sendTransaction((Account) any(), anyString(), (BigDecimal) any(), anyString()))
+            .sendTransaction((KeyPair) any(), anyString(), (BigDecimal) any(), anyString()))
             .thenReturn(expectedTransactionId);
 
         TransactionId transactionId = kinAccount
@@ -92,24 +91,24 @@ public class KinAccountImplTest {
         initWithRandomAccount();
 
         Balance expectedBalance = new BalanceImpl(new BigDecimal("11.0"));
-        when(mockAccountInfoRetriever.getBalance((Account) any())).thenReturn(expectedBalance);
+        when(mockAccountInfoRetriever.getBalance(anyString())).thenReturn(expectedBalance);
 
         Balance balance = kinAccount.getBalanceSync();
 
         assertEquals(expectedBalance, balance);
-        verify(mockAccountInfoRetriever).getBalance(expectedRandomAccount);
+        verify(mockAccountInfoRetriever).getBalance(expectedRandomAccount.getAccountId());
     }
 
     @Test
     public void getStatusSync() throws Exception {
         initWithRandomAccount();
 
-        when(mockAccountInfoRetriever.getStatus((Account) any())).thenReturn(AccountStatus.ACTIVATED);
+        when(mockAccountInfoRetriever.getStatus(anyString())).thenReturn(AccountStatus.ACTIVATED);
 
         int status = kinAccount.getStatusSync();
 
         assertEquals(AccountStatus.ACTIVATED, status);
-        verify(mockAccountInfoRetriever).getStatus(expectedRandomAccount);
+        verify(mockAccountInfoRetriever).getStatus(expectedRandomAccount.getAccountId());
     }
 
     @Test
@@ -127,7 +126,7 @@ public class KinAccountImplTest {
 
         kinAccount.blockchainEvents();
 
-        verify(mockBlockchainEventsCreator).create(expectedRandomAccount);
+        verify(mockBlockchainEventsCreator).create(expectedRandomAccount.getAccountId());
     }
 
     @Test(expected = AccountDeletedException.class)

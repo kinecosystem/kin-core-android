@@ -29,10 +29,10 @@ public class BlockchainEvents {
     private final KinAsset kinAsset;
     private final KeyPair accountKeyPair;
 
-    BlockchainEvents(Server server, Account account, KinAsset kinAsset) {
+    BlockchainEvents(Server server, String accountId, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
-        this.accountKeyPair = KeyPair.fromAccountId(account.getAccountId());
+        this.accountKeyPair = KeyPair.fromAccountId(accountId);
     }
 
     /**

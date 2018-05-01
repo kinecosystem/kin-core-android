@@ -13,31 +13,30 @@ import org.stellar.sdk.KeyPair;
 
 class KeyStoreImpl implements KeyStore {
 
+    static final String ENCRYPTION_VERSION_NAME = "none";
     private static final String STORE_KEY_ACCOUNTS = "accounts";
     private static final String JSON_KEY_ACCOUNTS_ARRAY = "accounts";
     private static final String JSON_KEY_PUBLIC_KEY = "public_key";
     private static final String JSON_KEY_ENCRYPTED_SEED = "seed";
+    private static final String VERSION_KEY = "encryptor_ver";
 
     private final Store store;
-    private final Encryptor encryptor;
 
-    KeyStoreImpl(Store store, Encryptor encryptor) {
+    KeyStoreImpl(@NonNull Store store) {
         this.store = store;
-        this.encryptor = encryptor;
     }
 
     @NonNull
     @Override
-    public List<Account> loadAccounts() throws LoadAccountException {
-        ArrayList<Account> accounts = new ArrayList<>();
+    public List<KeyPair> loadAccounts() throws LoadAccountException {
+        ArrayList<KeyPair> accounts = new ArrayList<>();
         try {
             JSONArray jsonArray = loadJsonArray();
             if (jsonArray != null) {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject accountJson = jsonArray.getJSONObject(i);
-                    String encryptedSeed = accountJson.getString(JSON_KEY_ENCRYPTED_SEED);
-                    String publicKey = accountJson.getString(JSON_KEY_PUBLIC_KEY);
-                    accounts.add(new Account(encryptedSeed, publicKey));
+                    String seed = accountJson.getString(JSON_KEY_ENCRYPTED_SEED);
+                    accounts.add(KeyPair.fromSecretSeed(seed));
                 }
             }
         } catch (JSONException e) {
@@ -47,10 +46,16 @@ class KeyStoreImpl implements KeyStore {
     }
 
     private JSONArray loadJsonArray() throws JSONException {
-        String seedsJson = store.getString(STORE_KEY_ACCOUNTS);
-        if (seedsJson != null) {
-            JSONObject json = new JSONObject(seedsJson);
-            return json.getJSONArray(JSON_KEY_ACCOUNTS_ARRAY);
+        String version = store.getString(VERSION_KEY);
+        //ensure current version, drop data if it's a different version
+        if (ENCRYPTION_VERSION_NAME.equals(version)) {
+            String seedsJson = store.getString(STORE_KEY_ACCOUNTS);
+            if (seedsJson != null) {
+                JSONObject json = new JSONObject(seedsJson);
+                return json.getJSONArray(JSON_KEY_ACCOUNTS_ARRAY);
+            }
+        } else {
+            store.saveString(VERSION_KEY, ENCRYPTION_VERSION_NAME);
         }
         return null;
     }
@@ -76,21 +81,21 @@ class KeyStoreImpl implements KeyStore {
     }
 
     @Override
-    public Account newAccount() throws CreateAccountException {
+    public KeyPair newAccount() throws CreateAccountException {
         try {
             KeyPair newKeyPair = KeyPair.random();
-            String encryptedSeed = encryptor.encrypt(String.valueOf(newKeyPair.getSecretSeed()));
+            String encryptedSeed = String.valueOf(newKeyPair.getSecretSeed());
             String publicKey = newKeyPair.getAccountId();
             JSONObject accountsJson = addKeyPairToAccounts(encryptedSeed, publicKey);
             store.saveString(STORE_KEY_ACCOUNTS, accountsJson.toString());
-            return new Account(encryptedSeed, publicKey);
-        } catch (CryptoException | JSONException e) {
+            return newKeyPair;
+        } catch (JSONException e) {
             throw new CreateAccountException(e);
         }
     }
 
     private JSONObject addKeyPairToAccounts(@NonNull String encryptedSeed, @NonNull String accountId)
-        throws CryptoException, JSONException {
+        throws JSONException {
         JSONArray jsonArray = loadJsonArray();
         if (jsonArray == null) {
             jsonArray = new JSONArray();
@@ -103,12 +108,6 @@ class KeyStoreImpl implements KeyStore {
         JSONObject json = new JSONObject();
         json.put(JSON_KEY_ACCOUNTS_ARRAY, jsonArray);
         return json;
-    }
-
-    @Override
-    public KeyPair decryptAccount(Account account) throws CryptoException {
-        String secretSeed = encryptor.decrypt(account.getEncryptedSeed());
-        return KeyPair.fromSecretSeed(secretSeed);
     }
 
     @Override

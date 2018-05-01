@@ -26,19 +26,19 @@ class AccountInfoRetriever {
     /**
      * Get balance for the specified account.
      *
-     * @param account the {@link KeyPair} to check balance
+     * @param accountId the account ID to check balance
      * @return the account {@link Balance}
      * @throws AccountNotFoundException if account not created yet
      * @throws AccountNotActivatedException if account has no Kin trust
      * @throws OperationFailedException any other error
      */
-    Balance getBalance(@NonNull Account account) throws OperationFailedException {
-        Utils.checkNotNull(account, "account");
+    Balance getBalance(@NonNull String accountId) throws OperationFailedException {
+        Utils.checkNotNull(accountId, "account");
         Balance balance = null;
         try {
-            AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
+            AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(accountId));
             if (accountResponse == null) {
-                throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
+                throw new OperationFailedException("can't retrieve data for account " + accountId);
             }
             for (AccountResponse.Balance assetBalance : accountResponse.getBalances()) {
                 if (kinAsset.isKinAsset(assetBalance.getAsset())) {
@@ -48,7 +48,7 @@ class AccountInfoRetriever {
             }
         } catch (HttpResponseException httpError) {
             if (httpError.getStatusCode() == 404) {
-                throw new AccountNotFoundException(account.getAccountId());
+                throw new AccountNotFoundException(accountId);
             } else {
                 throw new OperationFailedException(httpError);
             }
@@ -56,16 +56,16 @@ class AccountInfoRetriever {
             throw new OperationFailedException(e);
         }
         if (balance == null) {
-            throw new AccountNotActivatedException(account.getAccountId());
+            throw new AccountNotActivatedException(accountId);
         }
 
         return balance;
     }
 
     @AccountStatus
-    int getStatus(@NonNull Account account) throws OperationFailedException {
+    int getStatus(@NonNull String accountId) throws OperationFailedException {
         try {
-            getBalance(account);
+            getBalance(accountId);
             return AccountStatus.ACTIVATED;
         } catch (AccountNotFoundException e) {
             return AccountStatus.NOT_CREATED;
