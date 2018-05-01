@@ -1,6 +1,8 @@
 package kin.core.sample;
 
 import android.app.Application;
+import android.os.StrictMode;
+import android.os.StrictMode.VmPolicy;
 import kin.core.KinClient;
 import kin.core.ServiceProvider;
 
@@ -41,6 +43,16 @@ public class KinClientSampleApplication extends Application {
                 }
             });
         return kinClient;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        StrictMode.setVmPolicy(new VmPolicy.Builder()
+            .detectAll()
+            .penaltyLog()
+            .build());
     }
 
     public KinClient getKinClient() {

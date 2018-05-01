@@ -248,7 +248,6 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(IOException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
@@ -260,7 +259,6 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(IOException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }

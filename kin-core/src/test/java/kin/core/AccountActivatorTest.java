@@ -197,7 +197,6 @@ public class AccountActivatorTest {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(IOException.class));
 
         accountActivator.activate(account);
     }
