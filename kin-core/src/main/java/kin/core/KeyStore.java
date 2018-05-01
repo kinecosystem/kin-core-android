@@ -9,13 +9,11 @@ import org.stellar.sdk.KeyPair;
 interface KeyStore {
 
     @NonNull
-    List<Account> loadAccounts() throws LoadAccountException;
+    List<KeyPair> loadAccounts() throws LoadAccountException;
 
     void deleteAccount(int index) throws DeleteAccountException;
 
-    Account newAccount() throws CreateAccountException;
-
-    KeyPair decryptAccount(Account account);
+    KeyPair newAccount() throws CreateAccountException;
 
     void clearAllAccounts();
 }

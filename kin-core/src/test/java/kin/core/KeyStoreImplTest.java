@@ -1,6 +1,7 @@
 package kin.core;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.core.Is.isA;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -12,7 +13,6 @@ import java.util.List;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.DeleteAccountException;
 import org.json.JSONException;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,19 +28,14 @@ public class KeyStoreImplTest {
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
-    private KeyStoreImpl keyStore;
-
-    @Before
-    public void setup() {
-        keyStore = new KeyStoreImpl(new FakeStore());
-    }
 
     @Test
     public void newAccount() throws Exception {
-        Account account = keyStore.newAccount();
-        KeyPair keyPair = keyStore.decryptAccount(account);
-        assertEquals(account.getAccountId(), keyPair.getAccountId());
-        assertEquals(account.getEncryptedSeed(), String.valueOf(keyPair.getSecretSeed()));
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyPair account = keyStore.newAccount();
+        assertNotNull(account);
+        assertNotNull(account.getPublicKey());
+        assertNotNull(account.getSecretSeed());
     }
 
     @Test
@@ -49,7 +44,7 @@ public class KeyStoreImplTest {
         when(mockStore.getString(anyString()))
             .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
             .thenReturn("not a real json");
-        keyStore = new KeyStoreImpl(mockStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore);
 
         expectedEx.expect(CreateAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -58,15 +53,14 @@ public class KeyStoreImplTest {
 
     @Test
     public void loadAccounts() throws Exception {
-        Account account1 = keyStore.newAccount();
-        Account account2 = keyStore.newAccount();
-        List<Account> accounts = keyStore.loadAccounts();
-        Account actualAccount1 = accounts.get(0);
-        Account actualAccount2 = accounts.get(1);
-        assertEquals(account1.getEncryptedSeed(), actualAccount1.getEncryptedSeed());
-        assertEquals(account1.getAccountId(), actualAccount1.getAccountId());
-        assertEquals(account2.getEncryptedSeed(), actualAccount2.getEncryptedSeed());
-        assertEquals(account2.getAccountId(), actualAccount2.getAccountId());
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyPair account1 = keyStore.newAccount();
+        KeyPair account2 = keyStore.newAccount();
+        List<KeyPair> accounts = keyStore.loadAccounts();
+        KeyPair actualAccount1 = accounts.get(0);
+        KeyPair actualAccount2 = accounts.get(1);
+        assertEquals(String.valueOf(account1.getSecretSeed()), String.valueOf(actualAccount1.getSecretSeed()));
+        assertEquals(String.valueOf(account2.getSecretSeed()), String.valueOf(actualAccount2.getSecretSeed()));
     }
 
     @Test
@@ -75,7 +69,7 @@ public class KeyStoreImplTest {
         when(mockStore.getString(anyString()))
             .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
             .thenReturn("not a real json");
-        keyStore = new KeyStoreImpl(mockStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore);
 
         expectedEx.expect(LoadAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -84,14 +78,14 @@ public class KeyStoreImplTest {
 
     @Test
     public void deleteAccount() throws Exception {
-        Account account1 = keyStore.newAccount();
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyPair account1 = keyStore.newAccount();
         keyStore.newAccount();
         keyStore.deleteAccount(1);
 
-        List<Account> accounts = keyStore.loadAccounts();
+        List<KeyPair> accounts = keyStore.loadAccounts();
         assertEquals(1, accounts.size());
-        assertEquals(account1.getAccountId(), accounts.get(0).getAccountId());
-        assertEquals(account1.getEncryptedSeed(), accounts.get(0).getEncryptedSeed());
+        assertEquals(String.valueOf(account1.getSecretSeed()), String.valueOf(accounts.get(0).getSecretSeed()));
     }
 
     @Test
@@ -101,7 +95,7 @@ public class KeyStoreImplTest {
             .thenCallRealMethod()
             .thenCallRealMethod()
             .thenReturn("not a real json");
-        keyStore = new KeyStoreImpl(stubStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(stubStore);
 
         keyStore.newAccount();
         expectedEx.expect(DeleteAccountException.class);
@@ -111,6 +105,7 @@ public class KeyStoreImplTest {
 
     @Test
     public void clearAllAccounts() throws Exception {
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
         keyStore.newAccount();
         keyStore.newAccount();
         keyStore.clearAllAccounts();

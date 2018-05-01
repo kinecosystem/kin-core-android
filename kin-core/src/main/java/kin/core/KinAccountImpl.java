@@ -5,24 +5,25 @@ import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
+import org.stellar.sdk.KeyPair;
 
 
 final class KinAccountImpl extends AbstractKinAccount {
 
-    private final Account account;
+    private final KeyPair account;
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
     private final AccountInfoRetriever accountInfoRetriever;
     private final BlockchainEvents blockchainEvents;
     private boolean isDeleted = false;
 
-    KinAccountImpl(Account account, TransactionSender transactionSender, AccountActivator accountActivator,
+    KinAccountImpl(KeyPair account, TransactionSender transactionSender, AccountActivator accountActivator,
         AccountInfoRetriever accountInfoRetriever, BlockchainEventsCreator blockchainEventsCreator) {
         this.account = account;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
         this.accountInfoRetriever = accountInfoRetriever;
-        this.blockchainEvents = blockchainEventsCreator.create(account);
+        this.blockchainEvents = blockchainEventsCreator.create(account.getAccountId());
     }
 
     @Override
@@ -53,7 +54,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @Override
     public Balance getBalanceSync() throws OperationFailedException {
         checkValidAccount();
-        return accountInfoRetriever.getBalance(account);
+        return accountInfoRetriever.getBalance(account.getAccountId());
     }
 
     @Override
@@ -65,7 +66,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @Override
     public int getStatusSync() throws OperationFailedException {
         checkValidAccount();
-        return accountInfoRetriever.getStatus(account);
+        return accountInfoRetriever.getStatus(account.getAccountId());
     }
 
     @Override

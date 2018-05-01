@@ -11,9 +11,9 @@ import org.stellar.sdk.KeyPair;
  */
 class FakeKeyStore implements KeyStore {
 
-    private List<Account> accounts;
+    private List<KeyPair> accounts;
 
-    FakeKeyStore(List<Account> preloadedAccounts) {
+    FakeKeyStore(List<KeyPair> preloadedAccounts) {
         accounts = new ArrayList<>(preloadedAccounts);
     }
 
@@ -28,22 +28,15 @@ class FakeKeyStore implements KeyStore {
 
     @NonNull
     @Override
-    public List<Account> loadAccounts() {
+    public List<KeyPair> loadAccounts() {
         return accounts;
     }
 
     @Override
-    public Account newAccount() {
-
-        KeyPair keyPair = KeyPair.random();
-        Account account = new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    public KeyPair newAccount() {
+        KeyPair account = KeyPair.random();
         accounts.add(account);
         return account;
-    }
-
-    @Override
-    public KeyPair decryptAccount(Account account) {
-        return KeyPair.fromSecretSeed(account.getEncryptedSeed());
     }
 
     @Override

@@ -92,7 +92,7 @@ public class KinClientTest {
 
     @Test
     public void getAccount_ExistingAccount_AddMultipleAccount() throws Exception {
-        Account account1 = createKeyStoreWithRandomAccount();
+        KeyPair account1 = createKeyStoreWithRandomAccount();
 
         kinClient = createNewKinClient();
 
@@ -113,8 +113,8 @@ public class KinClientTest {
 
     @Test
     public void getAccount_ExistingMultipleAccount() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
         kinClient = createNewKinClient();
@@ -135,9 +135,8 @@ public class KinClientTest {
     }
 
     @NonNull
-    private Account createRandomAccount() {
-        KeyPair keyPair = KeyPair.random();
-        return new Account(new String(keyPair.getSecretSeed()), keyPair.getAccountId());
+    private KeyPair createRandomAccount() {
+        return KeyPair.random();
     }
 
     @Test
@@ -149,7 +148,7 @@ public class KinClientTest {
 
     @Test
     public void getAccount_ExistingAccount_SameAccount() throws Exception {
-        Account account = createKeyStoreWithRandomAccount();
+        KeyPair account = createKeyStoreWithRandomAccount();
 
         KinAccount kinAccount = kinClient.getAccount(0);
 
@@ -157,9 +156,9 @@ public class KinClientTest {
     }
 
     @NonNull
-    private Account createKeyStoreWithRandomAccount() {
-        Account account = createRandomAccount();
-        ArrayList<Account> accounts = new ArrayList<>();
+    private KeyPair createKeyStoreWithRandomAccount() {
+        KeyPair account = createRandomAccount();
+        ArrayList<KeyPair> accounts = new ArrayList<>();
         accounts.add(account);
         fakeKeyStore = new FakeKeyStore(accounts);
         kinClient = createNewKinClient();
@@ -180,8 +179,8 @@ public class KinClientTest {
 
     @Test
     public void hasAccount_ExistingMultipleAccounts_True() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
@@ -201,8 +200,8 @@ public class KinClientTest {
 
     @Test
     public void deleteAccount_MultipleAccounts() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
@@ -216,8 +215,8 @@ public class KinClientTest {
 
     @Test
     public void deleteAccount_AtIndex() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
@@ -230,8 +229,8 @@ public class KinClientTest {
 
     @Test
     public void deleteAccount_IndexOutOfBounds() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
@@ -245,8 +244,8 @@ public class KinClientTest {
 
     @Test
     public void deleteAccount_NegativeIndex() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2));
 
@@ -260,9 +259,9 @@ public class KinClientTest {
 
     @Test
     public void getAccountCount() throws Exception {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
-        Account account3 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
+        KeyPair account3 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
         kinClient = createNewKinClient();
@@ -280,9 +279,9 @@ public class KinClientTest {
 
     @Test
     public void clearAllAccounts() {
-        Account account1 = createRandomAccount();
-        Account account2 = createRandomAccount();
-        Account account3 = createRandomAccount();
+        KeyPair account1 = createRandomAccount();
+        KeyPair account2 = createRandomAccount();
+        KeyPair account3 = createRandomAccount();
 
         fakeKeyStore = new FakeKeyStore(Arrays.asList(account1, account2, account3));
         kinClient = createNewKinClient();

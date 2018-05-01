@@ -27,41 +27,34 @@ class TransactionSender {
     private static final int MEMO_LENGTH_LIMIT = 28; //Stellar text memo length limitation
     private static final String INSUFFICIENT_KIN_RESULT_CODE = "op_underfunded";
     private final Server server; //horizon server
-    private final KeyStore keyStore;
     private final KinAsset kinAsset;
 
-    TransactionSender(Server server, KeyStore keyStore, KinAsset kinAsset) {
+    TransactionSender(Server server, KinAsset kinAsset) {
         this.server = server;
-        this.keyStore = keyStore;
         this.kinAsset = kinAsset;
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress,
+    TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress,
         @NonNull BigDecimal amount)
         throws OperationFailedException {
         return sendTransaction(from, publicAddress, amount, null);
     }
 
     @NonNull
-    TransactionId sendTransaction(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+    TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
         @Nullable String memo)
         throws OperationFailedException {
 
         checkParams(from, publicAddress, amount, memo);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
-        KeyPair secretSeedKeyPair = decryptAccount(from);
-        AccountResponse sourceAccount = loadSourceAccount(secretSeedKeyPair);
-        Transaction transaction = buildTransaction(secretSeedKeyPair, amount, addressee, sourceAccount, memo);
+        AccountResponse sourceAccount = loadSourceAccount(from);
+        Transaction transaction = buildTransaction(from, amount, addressee, sourceAccount, memo);
         return sendTransaction(transaction);
     }
 
-    private KeyPair decryptAccount(@NonNull Account from) throws OperationFailedException {
-        return keyStore.decryptAccount(from);
-    }
-
-    private void checkParams(@NonNull Account from, @NonNull String publicAddress, @NonNull BigDecimal amount,
+    private void checkParams(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
         @Nullable String memo) {
         Utils.checkNotNull(from, "account");
         Utils.checkNotNull(amount, "amount");

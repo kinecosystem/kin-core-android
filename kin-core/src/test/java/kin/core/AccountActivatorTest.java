@@ -10,8 +10,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -32,8 +30,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.stellar.sdk.KeyPair;
@@ -57,7 +53,7 @@ public class AccountActivatorTest {
     private KeyStore mockKeyStore;
     private Server server;
     private MockWebServer mockWebServer;
-    private Account account;
+    private KeyPair account;
     private AccountActivator accountActivator;
 
     @Before
@@ -65,12 +61,11 @@ public class AccountActivatorTest {
         MockitoAnnotations.initMocks(this);
 
         mockServer();
-        mockKeyStoreResponse();
         Network.useTestNetwork();
 
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        accountActivator = new AccountActivator(server, mockKeyStore, kinAsset);
-        account = new Account(SECRET_SEED_FROM, ACCOUNT_ID_FROM);
+        accountActivator = new AccountActivator(server, kinAsset);
+        account = KeyPair.fromSecretSeed(SECRET_SEED_FROM);
     }
 
     private void mockServer() throws IOException {
@@ -78,17 +73,6 @@ public class AccountActivatorTest {
         mockWebServer.start();
         String url = mockWebServer.url("").toString();
         server = new Server(url);
-    }
-
-    private void mockKeyStoreResponse() {
-        when(mockKeyStore.decryptAccount(any(Account.class)))
-            .thenAnswer(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        return KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed());
-                    }
-                });
     }
 
     @Test
@@ -207,7 +191,7 @@ public class AccountActivatorTest {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        accountActivator = new AccountActivator(server, mockKeyStore, kinAsset);
+        accountActivator = new AccountActivator(server, kinAsset);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "activate_account_no_kin.json"));
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
