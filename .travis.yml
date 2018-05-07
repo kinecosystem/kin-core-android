@@ -42,5 +42,5 @@ script:
   #skip large network related test in KinAccountIntegrationTest class
   - ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest
 
-  after_success:
-    - bash <(curl -s https://codecov.io/bash)
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
