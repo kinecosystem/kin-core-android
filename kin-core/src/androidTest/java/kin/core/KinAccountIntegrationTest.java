@@ -2,6 +2,8 @@ package kin.core;
 
 
 import static junit.framework.Assert.fail;
+import static kin.core.IntegConsts.TEST_NETWORK_ID;
+import static kin.core.IntegConsts.TEST_NETWORK_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,7 +34,6 @@ import org.stellar.sdk.responses.TransactionResponse;
 @SuppressWarnings({"deprecation", "ConstantConditions"})
 public class KinAccountIntegrationTest {
 
-    private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
     private static FakeKinIssuer fakeKinIssuer;
     private KinClient kinClient;
 
@@ -47,7 +48,7 @@ public class KinAccountIntegrationTest {
     private class TestServiceProvider extends ServiceProvider {
 
         TestServiceProvider() {
-            super(TEST_NETWORK_URL, NETWORK_ID_TEST);
+            super(TEST_NETWORK_URL, TEST_NETWORK_ID);
         }
 
         @Override

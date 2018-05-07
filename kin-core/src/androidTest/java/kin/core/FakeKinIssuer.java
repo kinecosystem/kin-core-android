@@ -2,10 +2,11 @@ package kin.core;
 
 
 import static junit.framework.Assert.assertTrue;
+import static kin.core.IntegConsts.TEST_NETWORK_URL;
+import static kin.core.IntegConsts.URL_CREATE_ACCOUNT;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.stellar.sdk.Asset;
@@ -23,11 +24,6 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 class FakeKinIssuer {
 
     private static final int TIMEOUT_SEC = 20;
-    private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
-    private static final String TEST_NETWORK_SCHEME = "https";
-    private static final String TEST_NETWORK_HOST = "horizon-testnet.stellar.org";
-    private static final String TEST_NETWORK_PATH_SEGMENT = "friendbot";
-    private static final String TEST_NETWORK_QUERY_PARAM = "addr";
 
     private final Server server;
     private final KeyPair issuerKeyPair;
@@ -45,15 +41,9 @@ class FakeKinIssuer {
     }
 
     private void createAndFundWithLumens(String accountId) throws IOException {
-        HttpUrl url = new HttpUrl.Builder()
-            .scheme(TEST_NETWORK_SCHEME)
-            .host(TEST_NETWORK_HOST)
-            .addPathSegment(TEST_NETWORK_PATH_SEGMENT)
-            .addQueryParameter(TEST_NETWORK_QUERY_PARAM, accountId)
-            .build();
         OkHttpClient client = new OkHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder()
-            .url(url).build();
+            .url(URL_CREATE_ACCOUNT + accountId).build();
         Response response = client.newCall(request).execute();
         assertTrue(response != null && response.body() != null && response.code() == 200);
     }
