@@ -222,15 +222,13 @@ public class AccountInfoRetrieverTest {
     private Balance getBalance(String issuerAccountId, String accountId) throws OperationFailedException {
         KinAsset kinAsset = createKinAsset(issuerAccountId);
         AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
-        Account account = new Account("", accountId);
-        return accountInfoRetriever.getBalance(account);
+        return accountInfoRetriever.getBalance(accountId);
     }
 
     private int getStatus(String issuerAccountId, String accountId) throws OperationFailedException {
         KinAsset kinAsset = createKinAsset(issuerAccountId);
         AccountInfoRetriever accountInfoRetriever = new AccountInfoRetriever(server, kinAsset);
-        Account account = new Account("", accountId);
-        return accountInfoRetriever.getStatus(account);
+        return accountInfoRetriever.getStatus(accountId);
     }
 
 }

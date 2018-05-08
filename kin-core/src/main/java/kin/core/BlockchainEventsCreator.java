@@ -15,7 +15,7 @@ class BlockchainEventsCreator {
         this.kinAsset = kinAsset;
     }
 
-    BlockchainEvents create(Account account) {
-        return new BlockchainEvents(server, account, kinAsset);
+    BlockchainEvents create(String accountId) {
+        return new BlockchainEvents(server, accountId, kinAsset);
     }
 }

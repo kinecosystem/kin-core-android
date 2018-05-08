@@ -20,15 +20,13 @@ class AccountActivator {
     private static final String TRUST_NO_LIMIT_VALUE = "922337203685.4775807";
     private final Server server; //horizon server
     private final KinAsset kinAsset;
-    private final KeyStore keyStore;
 
-    AccountActivator(Server server, KeyStore keyStore, KinAsset kinAsset) {
+    AccountActivator(Server server, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
-        this.keyStore = keyStore;
     }
 
-    void activate(@NonNull Account account) throws OperationFailedException {
+    void activate(@NonNull KeyPair account) throws OperationFailedException {
         verifyParams(account);
         AccountResponse accountResponse;
         try {
@@ -44,33 +42,33 @@ class AccountActivator {
             } else {
                 throw new OperationFailedException(httpError);
             }
-        } catch (IOException | CryptoException e) {
+        } catch (IOException e) {
             throw new OperationFailedException(e);
         }
     }
 
-    private void verifyParams(@NonNull Account account) {
+    private void verifyParams(@NonNull KeyPair account) {
         Utils.checkNotNull(account, "account");
     }
 
     @NonNull
-    private AccountResponse getAccountDetails(@NonNull Account account) throws IOException, OperationFailedException {
+    private AccountResponse getAccountDetails(@NonNull KeyPair account) throws IOException, OperationFailedException {
         AccountResponse accountResponse;
-        accountResponse = server.accounts().account(KeyPair.fromAccountId(account.getAccountId()));
+        accountResponse = server.accounts().account(account);
         if (accountResponse == null) {
             throw new OperationFailedException("can't retrieve data for account " + account.getAccountId());
         }
         return accountResponse;
     }
 
-    private SubmitTransactionResponse sendAllowKinTrustOperation(Account account, AccountResponse accountResponse)
-        throws IOException, CryptoException {
+    private SubmitTransactionResponse sendAllowKinTrustOperation(KeyPair account, AccountResponse accountResponse)
+        throws IOException {
         Transaction allowKinTrustTransaction = new Transaction.Builder(accountResponse).addOperation(
             new ChangeTrustOperation.Builder(kinAsset.getStellarAsset(), TRUST_NO_LIMIT_VALUE)
                 .build()
         )
             .build();
-        allowKinTrustTransaction.sign(keyStore.decryptAccount(account));
+        allowKinTrustTransaction.sign(account);
         return server.submitTransaction(allowKinTrustTransaction);
     }
 

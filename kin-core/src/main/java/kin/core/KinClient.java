@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.DeleteAccountException;
+import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 
@@ -35,8 +36,8 @@ public class KinClient {
         this.serviceProvider = provider;
         Server server = initServer();
         keyStore = initKeyStore(context.getApplicationContext());
-        transactionSender = new TransactionSender(server, keyStore, provider.getKinAsset());
-        accountActivator = new AccountActivator(server, keyStore, provider.getKinAsset());
+        transactionSender = new TransactionSender(server, provider.getKinAsset());
+        accountActivator = new AccountActivator(server, provider.getKinAsset());
         accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
         loadAccounts();
@@ -62,19 +63,18 @@ public class KinClient {
 
     private KeyStore initKeyStore(Context context) {
         SharedPrefStore store = new SharedPrefStore(context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE));
-        Encryptor encryptor = EncryptorFactory.create(context, store);
-        return new KeyStoreImpl(store, encryptor);
+        return new KeyStoreImpl(store);
     }
 
     private void loadAccounts() {
-        List<Account> accounts = null;
+        List<KeyPair> accounts = null;
         try {
             accounts = keyStore.loadAccounts();
         } catch (LoadAccountException e) {
             e.printStackTrace();
         }
         if (accounts != null && !accounts.isEmpty()) {
-            for (Account account : accounts) {
+            for (KeyPair account : accounts) {
                 kinAccounts.add(createNewKinAccount(account));
             }
         }
@@ -89,7 +89,7 @@ public class KinClient {
      */
     public @NonNull
     KinAccount addAccount() throws CreateAccountException {
-        Account account = keyStore.newAccount();
+        KeyPair account = keyStore.newAccount();
         KinAccountImpl newAccount = createNewKinAccount(account);
         kinAccounts.add(newAccount);
         return newAccount;
@@ -148,7 +148,7 @@ public class KinClient {
     }
 
     @NonNull
-    private KinAccountImpl createNewKinAccount(Account account) {
+    private KinAccountImpl createNewKinAccount(KeyPair account) {
         return new KinAccountImpl(account, transactionSender, accountActivator, accountInfoRetriever,
             blockchainEventsCreator);
     }

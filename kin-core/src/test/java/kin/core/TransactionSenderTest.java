@@ -11,8 +11,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,8 +34,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.stellar.sdk.FormatException;
@@ -66,19 +62,18 @@ public class TransactionSenderTest {
     private Server server;
     private MockWebServer mockWebServer;
     private TransactionSender transactionSender;
-    private Account account;
+    private KeyPair account;
 
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         mockServer();
-        mockKeyStoreResponse();
         Network.useTestNetwork();
 
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, mockKeyStore, kinAsset);
-        account = new Account(SECRET_SEED_FROM, ACCOUNT_ID_FROM);
+        transactionSender = new TransactionSender(server, kinAsset);
+        account = KeyPair.fromSecretSeed(SECRET_SEED_FROM);
     }
 
     private void mockServer() throws IOException {
@@ -88,16 +83,6 @@ public class TransactionSenderTest {
         server = new Server(url);
     }
 
-    private void mockKeyStoreResponse() throws CryptoException {
-        when(mockKeyStore.decryptAccount(any(Account.class)))
-            .thenAnswer(
-                new Answer<Object>() {
-                    @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        return KeyPair.fromSecretSeed(((Account) invocation.getArguments()[0]).getEncryptedSeed());
-                    }
-                });
-    }
 
     @Test
     public void sendTransaction_success() throws Exception {
@@ -248,7 +233,6 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(IOException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
@@ -260,7 +244,6 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(IOException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }
@@ -270,7 +253,7 @@ public class TransactionSenderTest {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, mockKeyStore, kinAsset);
+        transactionSender = new TransactionSender(server, kinAsset);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
@@ -310,18 +293,6 @@ public class TransactionSenderTest {
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage("transaction");
-
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
-    }
-
-    @Test
-    public void sendTransaction_CryptoException_OperationFailedException() throws Exception {
-        when(mockKeyStore.decryptAccount((Account) any())).thenThrow(CryptoException.class);
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
-
-        expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectCause(isA(CryptoException.class));
 
         transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
     }

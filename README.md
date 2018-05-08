@@ -69,9 +69,32 @@ kinClient.deleteAccount(int index);
 ``` 
 
 ### Onboarding
-Before an account can be used, it must be created on Stellar blockchain, by a different entity (Server) that has an account 
-on Stellar network.
-and then must the account must be activated, before it can receive or send KIN.
+A first step before an account can be used, is to create the account on Stellar blockchain and fund it with native Stellar
+asset for fees purposes, this funding should be done by the digital service servers.  
+When working against KIN test network, the Fee Faucet Service can be used for this purpose:
+
+```java
+Request request = new Request.Builder()
+            .url("http://friendbot-kik.kininfrastructure.com/?addr=" + account.getPublicAddress())
+            .get()
+            .build();
+okHttpClient.newCall(request)
+    .enqueue(new Callback() {
+        @Override
+        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            if (response.code() == 200) {
+                //account was created successfully, continue to the second phase - account activation
+            }
+        }
+    });
+```
+
+The second step is to activate this account on the client side, using `activate` method. The account will not be able to receive or send KIN before activation.
 
 
 ```java
@@ -87,8 +110,66 @@ activationRequest.run(new ResultCallback<Void>() {
         e.printStackTrace();
     }
 });
-``` 
+```
+ 
+Third, optional step is to fund the created account with KIN.  
+When working against KIN test network, the KIN Faucet Service can be used for this purpose:
+```java
+Request request = new Request.Builder()
+            .url("http://159.65.84.173:5000/fund?account=" + account.getPublicAddress() + "&amount=" + FUND_KIN_AMOUNT)
+            .get()
+            .build();
+okHttpClient.newCall(request)
+    .enqueue(new Callback() {
+        @Override
+        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onResponse(@NonNull Call call, @NonNull Response response)
+            throws IOException {
+            if (response.code() == 200) {
+              //Account was funded with KIN succesfully
+            }
+        }
+    });
+```
+
 For a complete example of this process, take a look at Sample App `OnBoarding` class.
+
+#### Query Account Status
+
+Current account status on the blockchain can be queried using `getStatus` method,  
+status will be one of the following 3 options:
+* `AccountStatus.NOT_CREATED` - Account is not created yet on the blockchain network.
+* `AccountStatus.NOT_ACTIVATED` - Account was created but not activated yet, the account cannot send or receive KIN yet.
+* `AccountStatus.ACTIVATED` - Account was created and activated, account can send and receive KIN.
+
+```java
+Request<Integer> statusRequest = account.getStatus();
+statusRequest.run(new ResultCallback<Integer>() {
+    @Override
+    public void onResult(Integer result) {
+        switch (result) {
+            case AccountStatus.ACTIVATED:
+                //you're good to go!!!
+                break;
+            case AccountStatus.NOT_ACTIVATED:
+                //activate account using account.activate() for sending/receiving KIN
+                break;
+            case AccountStatus.NOT_CREATED:
+                //first create an account on the blockchain, second activate the account using account.activate()
+                break;
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+});
+```
 
 ### Public Address
 Your account can be identified via it's public address. To retrieve the account public address use:
@@ -140,7 +221,7 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
 });
 ```
 
-#####Memo
+#### Memo
 Arbitrary data can be added to a transfer operation using the memo parameter,
 the memo is a `String` of up to 28 characters.
 

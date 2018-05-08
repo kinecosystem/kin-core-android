@@ -56,8 +56,7 @@ public class BlockchainEventsTest {
         Network.useTestNetwork();
 
         KinAsset kinAsset = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST).getKinAsset();
-        Account account = new Account("", ACCOUNT_ID);
-        blockchainEvents = new BlockchainEvents(server, account, kinAsset);
+        blockchainEvents = new BlockchainEvents(server, ACCOUNT_ID, kinAsset);
         createResponsesQueue();
     }
 
