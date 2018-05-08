@@ -20,21 +20,34 @@ ext {
     robolectricPackage = 'org.robolectric'
     hamcrestPackage = 'org.hamcrest'
     gsonPackage = 'com.google.code.gson'
+    kinecosystem = 'com.github.kinecosystem'
+
+    //when building in jitpack, extract android-stellar-sdk commit we work on
+    if (System.env.JITPACK) {
+        //get current commit of kin-core
+        GIT_COMMIT = 'git rev-parse HEAD'.execute().text.trim()
+        currentGitHash = GIT_COMMIT
+        //extract current commit of android-stellar-sdk using current commit of kin-core
+        getSubModuleHash = 'git ls-tree ' + currentGitHash + ' android-stellar-sdk'
+        getSubModuleResult = getSubModuleHash.execute().text.trim()
+        stellarSDKVersion = getSubModuleResult.split()[2]
+        stellarSDK = buildDependency(kinecosystem, 'android-stellar-sdk', stellarSDKVersion)
+    }
 
     supportDependencies = [
-            supportAnnotations : buildDependency(supportPackage, 'support-annotations', supportVersion)
+            supportAnnotations: buildDependency(supportPackage, 'support-annotations', supportVersion)
     ]
 
     testingDependencies = [
-            junit               : buildDependency(junitPackage, 'junit', junitVersion),
-            mockitoAndroid      : buildDependency(mockitoPackage, 'mockito-android', mockitoAndroidVersion),
-            mockito             : buildDependency(mockitoPackage, 'mockito-core', mockitoVersion),
-            androidTestRunner   : buildDependency(androidTestPackage, 'runner', androidTestVersion),
-            androidTestRules    : buildDependency(androidTestPackage, 'rules', androidTestVersion),
-            mockWebServer       : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
-            robolectric         : buildDependency(robolectricPackage, 'robolectric', robolectricVersion),
-            hamcrest            : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
-            gson                    : buildDependency(gsonPackage, 'gson', gsonVersion)
+            junit            : buildDependency(junitPackage, 'junit', junitVersion),
+            mockitoAndroid   : buildDependency(mockitoPackage, 'mockito-android', mockitoAndroidVersion),
+            mockito          : buildDependency(mockitoPackage, 'mockito-core', mockitoVersion),
+            androidTestRunner: buildDependency(androidTestPackage, 'runner', androidTestVersion),
+            androidTestRules : buildDependency(androidTestPackage, 'rules', androidTestVersion),
+            mockWebServer    : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
+            robolectric      : buildDependency(robolectricPackage, 'robolectric', robolectricVersion),
+            hamcrest         : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
+            gson             : buildDependency(gsonPackage, 'gson', gsonVersion)
     ]
 }
 
