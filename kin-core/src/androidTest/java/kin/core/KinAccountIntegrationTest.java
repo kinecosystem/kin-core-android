@@ -275,9 +275,19 @@ public class KinAccountIntegrationTest {
         kinAccountReceiver.activateSync();
         fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
-        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch fundingLatch = new CountDownLatch(1);
+        kinAccountSender.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
+            @Override
+            public void onEvent(PaymentInfo data) {
+                fundingLatch.countDown();
+            }
+        });
+        fundingLatch.await(10, TimeUnit.SECONDS);
+
         final List<PaymentInfo> actualResults = new ArrayList<>();
         KinAccount accountToListen = sender ? kinAccountSender : kinAccountReceiver;
+
+        final CountDownLatch latch = new CountDownLatch(1);
         accountToListen.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
