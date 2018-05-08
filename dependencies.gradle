@@ -11,6 +11,17 @@ ext {
     hamcrestVersion = '1.3'
     gsonVersion = '2.4'
 
+    //Packages
+    supportPackage = 'com.android.support'
+    mockitoPackage = 'org.mockito'
+    junitPackage = 'junit'
+    androidTestPackage = 'com.android.support.test'
+    okHttpPackage = 'com.squareup.okhttp3'
+    robolectricPackage = 'org.robolectric'
+    hamcrestPackage = 'org.hamcrest'
+    gsonPackage = 'com.google.code.gson'
+    kinecosystem = 'com.github.kinecosystem'
+
     //when building in jitpack, extract android-stellar-sdk commit we work on
     if (System.env.JITPACK) {
         //get current commit of kin-core
@@ -22,17 +33,6 @@ ext {
         stellarSDKVersion = getSubModuleResult.split()[2]
         stellarSDK = buildDependency(kinecosystem, 'android-stellar-sdk', stellarSDKVersion)
     }
-
-    //Packages
-    supportPackage = 'com.android.support'
-    mockitoPackage = 'org.mockito'
-    junitPackage = 'junit'
-    androidTestPackage = 'com.android.support.test'
-    okHttpPackage = 'com.squareup.okhttp3'
-    robolectricPackage = 'org.robolectric'
-    hamcrestPackage = 'org.hamcrest'
-    gsonPackage = 'com.google.code.gson'
-    kinecosystem = 'com.github.kinecosystem'
 
     supportDependencies = [
             supportAnnotations: buildDependency(supportPackage, 'support-annotations', supportVersion)
