@@ -284,14 +284,22 @@ public class KinAccountIntegrationTest {
         });
         fundingLatch.await(10, TimeUnit.SECONDS);
 
-        final List<PaymentInfo> actualResults = new ArrayList<>();
+        final List<PaymentInfo> actualPaymentsResults = new ArrayList<>();
+        final List<Balance> actualBalanceResults = new ArrayList<>();
         KinAccount accountToListen = sender ? kinAccountSender : kinAccountReceiver;
 
-        final CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(2);
         accountToListen.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
-                actualResults.add(data);
+                actualPaymentsResults.add(data);
+                latch.countDown();
+            }
+        });
+        accountToListen.blockchainEvents().addBalanceListener(new EventListener<Balance>() {
+            @Override
+            public void onEvent(Balance data) {
+                actualBalanceResults.add(data);
                 latch.countDown();
             }
         });
@@ -302,13 +310,17 @@ public class KinAccountIntegrationTest {
             .sendTransactionSync(kinAccountReceiver.getPublicAddress(), expectedAmount, expectedMemo);
 
         latch.await(10, TimeUnit.SECONDS);
-        assertThat(actualResults.size(), equalTo(1));
-        PaymentInfo paymentInfo = actualResults.get(0);
+        assertThat(actualPaymentsResults.size(), equalTo(1));
+        PaymentInfo paymentInfo = actualPaymentsResults.get(0);
         assertThat(paymentInfo.amount(), equalTo(expectedAmount));
         assertThat(paymentInfo.destinationPublicKey(), equalTo(kinAccountReceiver.getPublicAddress()));
         assertThat(paymentInfo.sourcePublicKey(), equalTo(kinAccountSender.getPublicAddress()));
         assertThat(paymentInfo.memo(), equalTo(expectedMemo));
         assertThat(paymentInfo.hash().id(), equalTo(expectedTransactionId.id()));
+
+        assertThat(actualBalanceResults.size(), equalTo(1));
+        Balance balance = actualBalanceResults.get(0);
+        assertThat(balance.value(), equalTo(new BigDecimal(sender ? "78.877" : "21.123")));
     }
 
     @Test

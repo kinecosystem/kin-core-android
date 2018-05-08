@@ -3,6 +3,7 @@ package kin.core;
 import static kin.core.TestUtils.loadResource;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -235,6 +236,49 @@ public class BlockchainEventsTest {
         assertThat(eventsCount[0], equalTo(1));
     }
 
+    @Test
+    public void addBalanceListener() throws Exception {
+        enqueueTransactionsResponses();
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        final List<Balance> actualResults = new ArrayList<>();
+        blockchainEvents.addBalanceListener(new EventListener<Balance>() {
+            @Override
+            public void onEvent(Balance data) {
+                actualResults.add(data);
+                if (actualResults.size() == 2) {
+                    latch.countDown();
+                }
+            }
+        });
+        latch.await(1, TimeUnit.SECONDS);
+
+        assertThat(actualResults.size(), equalTo(2));
+        Balance balance1 = actualResults.get(0);
+        Balance balance2 = actualResults.get(1);
+
+        assertThat(balance1, notNullValue());
+        assertThat(balance2, notNullValue());
+        assertThat(balance1.value(), equalTo(new BigDecimal("5387.216")));
+        assertThat(balance2.value(), equalTo(new BigDecimal("5239.89036")));
+    }
+
+    @Test
+    public void addBalanceListener_StopListener_NoEvents() throws Exception {
+        final int[] eventsCount = {0};
+        ListenerRegistration listenerRegistration = blockchainEvents
+            .addBalanceListener(new EventListener<Balance>() {
+                @Override
+                public void onEvent(Balance data) {
+                    eventsCount[0]++;
+                }
+            });
+        listenerRegistration.remove();
+        enqueueCreateAccountResponses();
+        Thread.sleep(500);
+        assertThat(eventsCount[0], equalTo(0));
+    }
+
     @SuppressWarnings("ConstantConditions")
     @Test
     public void addPaymentListener_NullListener_IllegalArgumentException() throws Exception {
@@ -249,5 +293,13 @@ public class BlockchainEventsTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("listener");
         blockchainEvents.addAccountCreationListener(null);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    public void addBalanceListener_NullListener_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("listener");
+        blockchainEvents.addBalanceListener(null);
     }
 }
