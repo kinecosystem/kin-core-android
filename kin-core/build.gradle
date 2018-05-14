@@ -42,7 +42,12 @@ android {
 }
 
 dependencies {
-    implementation project(':android-stellar-sdk')
+    //in jitpack build without submodules
+    if (System.env.JITPACK) {
+        implementation stellarSDK
+    } else {
+        implementation project(':android-stellar-sdk')
+    }
     implementation supportDependencies.supportAnnotations
 
     testImplementation testingDependencies.junit
