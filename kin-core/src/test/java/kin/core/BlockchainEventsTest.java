@@ -259,6 +259,7 @@ public class BlockchainEventsTest {
 
         assertThat(balance1, notNullValue());
         assertThat(balance2, notNullValue());
+        //expected balances values are the ones encoded at transactions responses jsons (see enqueueTransactionsResponses)
         assertThat(balance1.value(), equalTo(new BigDecimal("5387.216")));
         assertThat(balance2.value(), equalTo(new BigDecimal("5239.89036")));
     }

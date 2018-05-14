@@ -266,6 +266,11 @@ public class KinAccountIntegrationTest {
     }
 
     private void listenToPayments(boolean sender) throws Exception {
+        //create and sets 2 accounts (receiver/sender), fund one account, and then
+        //send transaction from the funded account to the other, observe this transaction using listeners
+        BigDecimal fundingAmount = new BigDecimal("100");
+        BigDecimal transactionAmount = new BigDecimal("21.123");
+
         KinAccount kinAccountSender = kinClient.addAccount();
         KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
@@ -273,22 +278,16 @@ public class KinAccountIntegrationTest {
 
         kinAccountSender.activateSync();
         kinAccountReceiver.activateSync();
-        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
-        final CountDownLatch fundingLatch = new CountDownLatch(1);
-        kinAccountSender.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
-            @Override
-            public void onEvent(PaymentInfo data) {
-                fundingLatch.countDown();
-            }
-        });
-        fundingLatch.await(10, TimeUnit.SECONDS);
-
+        //register listeners for testing
         final List<PaymentInfo> actualPaymentsResults = new ArrayList<>();
         final List<Balance> actualBalanceResults = new ArrayList<>();
         KinAccount accountToListen = sender ? kinAccountSender : kinAccountReceiver;
 
-        final CountDownLatch latch = new CountDownLatch(2);
+        int eventsCount = sender ? 4 : 2; ///in case of observing the sender we'll get 2 events (1 for funding 1 for the
+        //transaction) in case of receiver - only 1 event.
+        //multiply by 2, as we 2 listeners (balance and payment)
+        final CountDownLatch latch = new CountDownLatch(eventsCount);
         accountToListen.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
@@ -304,23 +303,27 @@ public class KinAccountIntegrationTest {
             }
         });
 
-        BigDecimal expectedAmount = new BigDecimal("21.123");
+        //send the transaction we want to observe
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
         String expectedMemo = "memo";
         TransactionId expectedTransactionId = kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), expectedAmount, expectedMemo);
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), transactionAmount, expectedMemo);
 
+        //verify data notified by listeners
+        int transactionIndex =
+            sender ? 1 : 0; //in case of observing the sender we'll get 2 events (1 for funding 1 for the
+        //transaction) in case of receiver - only 1 event
         latch.await(10, TimeUnit.SECONDS);
-        assertThat(actualPaymentsResults.size(), equalTo(1));
-        PaymentInfo paymentInfo = actualPaymentsResults.get(0);
-        assertThat(paymentInfo.amount(), equalTo(expectedAmount));
+        PaymentInfo paymentInfo = actualPaymentsResults.get(transactionIndex);
+        assertThat(paymentInfo.amount(), equalTo(transactionAmount));
         assertThat(paymentInfo.destinationPublicKey(), equalTo(kinAccountReceiver.getPublicAddress()));
         assertThat(paymentInfo.sourcePublicKey(), equalTo(kinAccountSender.getPublicAddress()));
         assertThat(paymentInfo.memo(), equalTo(expectedMemo));
         assertThat(paymentInfo.hash().id(), equalTo(expectedTransactionId.id()));
 
-        assertThat(actualBalanceResults.size(), equalTo(1));
-        Balance balance = actualBalanceResults.get(0);
-        assertThat(balance.value(), equalTo(new BigDecimal(sender ? "78.877" : "21.123")));
+        Balance balance = actualBalanceResults.get(transactionIndex);
+        assertThat(balance.value(),
+            equalTo(sender ? fundingAmount.subtract(transactionAmount) : transactionAmount));
     }
 
     @Test

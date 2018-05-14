@@ -10,6 +10,7 @@ ext {
     robolectricVersion = '3.6.1'
     hamcrestVersion = '1.3'
     gsonVersion = '2.4'
+    jacocoVersion = '0.8.0'
 
     //Packages
     supportPackage = 'com.android.support'

@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jacoco:org.jacoco.core:${jacocoVersion}"
+    }
+}
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 
@@ -65,7 +74,7 @@ artifacts {
 
 //jacoco unified code coverage
 jacoco {
-    toolVersion = '0.8.0'
+    toolVersion = jacocoVersion
 }
 
 tasks.withType(Test) {
