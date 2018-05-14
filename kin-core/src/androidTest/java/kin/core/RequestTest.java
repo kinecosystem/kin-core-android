@@ -20,8 +20,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class RequestTest {
 
-    private static final int TASK_DURATION_MILLIS = 10;
-    private static final int TIMEOUT_DURATION_MILLIS = 100;
+    private static final int TASK_DURATION_MILLIS = 100;
+    private static final int TIMEOUT_DURATION_MILLIS = 500;
 
     public interface Consumer<T> {
 

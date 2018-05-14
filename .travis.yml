@@ -39,8 +39,8 @@ before_script:
 
 script:
   - ./gradlew :sample:assembleDebug
-  - ./gradlew :kin-core:test
-  - ./gradlew kin-core:assembleDebugAndroidTest
-  - adb install -r ./kin-core/build/outputs/apk/androidTest/debug/kin-core-debug-androidTest.apk
-  - ./run_android_test_ci.sh
+  #skip large network related test in KinAccountIntegrationTest class
+  - ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

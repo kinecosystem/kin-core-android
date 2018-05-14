@@ -2,6 +2,8 @@ package kin.core;
 
 
 import static junit.framework.Assert.fail;
+import static kin.core.IntegConsts.TEST_NETWORK_ID;
+import static kin.core.IntegConsts.TEST_NETWORK_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -32,7 +34,6 @@ import org.stellar.sdk.responses.TransactionResponse;
 @SuppressWarnings({"deprecation", "ConstantConditions"})
 public class KinAccountIntegrationTest {
 
-    private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
     private static FakeKinIssuer fakeKinIssuer;
     private KinClient kinClient;
 
@@ -47,7 +48,7 @@ public class KinAccountIntegrationTest {
     private class TestServiceProvider extends ServiceProvider {
 
         TestServiceProvider() {
-            super(TEST_NETWORK_URL, NETWORK_ID_TEST);
+            super(TEST_NETWORK_URL, TEST_NETWORK_ID);
         }
 
         @Override
@@ -265,6 +266,11 @@ public class KinAccountIntegrationTest {
     }
 
     private void listenToPayments(boolean sender) throws Exception {
+        //create and sets 2 accounts (receiver/sender), fund one account, and then
+        //send transaction from the funded account to the other, observe this transaction using listeners
+        BigDecimal fundingAmount = new BigDecimal("100");
+        BigDecimal transactionAmount = new BigDecimal("21.123");
+
         KinAccount kinAccountSender = kinClient.addAccount();
         KinAccount kinAccountReceiver = kinClient.addAccount();
         fakeKinIssuer.createAccount(kinAccountSender.getPublicAddress());
@@ -272,32 +278,52 @@ public class KinAccountIntegrationTest {
 
         kinAccountSender.activateSync();
         kinAccountReceiver.activateSync();
-        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        final List<PaymentInfo> actualResults = new ArrayList<>();
+        //register listeners for testing
+        final List<PaymentInfo> actualPaymentsResults = new ArrayList<>();
+        final List<Balance> actualBalanceResults = new ArrayList<>();
         KinAccount accountToListen = sender ? kinAccountSender : kinAccountReceiver;
+
+        int eventsCount = sender ? 4 : 2; ///in case of observing the sender we'll get 2 events (1 for funding 1 for the
+        //transaction) in case of receiver - only 1 event.
+        //multiply by 2, as we 2 listeners (balance and payment)
+        final CountDownLatch latch = new CountDownLatch(eventsCount);
         accountToListen.blockchainEvents().addPaymentListener(new EventListener<PaymentInfo>() {
             @Override
             public void onEvent(PaymentInfo data) {
-                actualResults.add(data);
+                actualPaymentsResults.add(data);
+                latch.countDown();
+            }
+        });
+        accountToListen.blockchainEvents().addBalanceListener(new EventListener<Balance>() {
+            @Override
+            public void onEvent(Balance data) {
+                actualBalanceResults.add(data);
                 latch.countDown();
             }
         });
 
-        BigDecimal expectedAmount = new BigDecimal("21.123");
+        //send the transaction we want to observe
+        fakeKinIssuer.fundWithKin(kinAccountSender.getPublicAddress(), "100");
         String expectedMemo = "memo";
         TransactionId expectedTransactionId = kinAccountSender
-            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), expectedAmount, expectedMemo);
+            .sendTransactionSync(kinAccountReceiver.getPublicAddress(), transactionAmount, expectedMemo);
 
+        //verify data notified by listeners
+        int transactionIndex =
+            sender ? 1 : 0; //in case of observing the sender we'll get 2 events (1 for funding 1 for the
+        //transaction) in case of receiver - only 1 event
         latch.await(10, TimeUnit.SECONDS);
-        assertThat(actualResults.size(), equalTo(1));
-        PaymentInfo paymentInfo = actualResults.get(0);
-        assertThat(paymentInfo.amount(), equalTo(expectedAmount));
+        PaymentInfo paymentInfo = actualPaymentsResults.get(transactionIndex);
+        assertThat(paymentInfo.amount(), equalTo(transactionAmount));
         assertThat(paymentInfo.destinationPublicKey(), equalTo(kinAccountReceiver.getPublicAddress()));
         assertThat(paymentInfo.sourcePublicKey(), equalTo(kinAccountSender.getPublicAddress()));
         assertThat(paymentInfo.memo(), equalTo(expectedMemo));
         assertThat(paymentInfo.hash().id(), equalTo(expectedTransactionId.id()));
+
+        Balance balance = actualBalanceResults.get(transactionIndex);
+        assertThat(balance.value(),
+            equalTo(sender ? fundingAmount.subtract(transactionAmount) : transactionAmount));
     }
 
     @Test
