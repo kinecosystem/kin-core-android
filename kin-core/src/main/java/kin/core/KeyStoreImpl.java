@@ -55,7 +55,7 @@ class KeyStoreImpl implements KeyStore {
                 return json.getJSONArray(JSON_KEY_ACCOUNTS_ARRAY);
             }
         } else {
-            store.saveString(STORE_KEY_ACCOUNTS, "");
+            store.clear(STORE_KEY_ACCOUNTS);
             store.saveString(VERSION_KEY, ENCRYPTION_VERSION_NAME);
         }
         return null;
