@@ -1,6 +1,9 @@
-# Kin core SDK for Android
-Android library responsible for creating a new Stellar account and managing KIN balance and transactions.
 ![Kin Token](kin_android.png)
+# Kin core SDK for Android
+[![Build Status](https://travis-ci.org/kinecosystem/kin-core-android.svg?branch=dev)](https://travis-ci.org/kinecosystem/kin-core-android)
+[![codecov](https://codecov.io/gh/kinecosystem/kin-core-android/branch/dev/graph/badge.svg)](https://codecov.io/gh/kinecosystem/kin-core-android)
+
+Android library responsible for creating a new Stellar account and managing KIN balance and transactions.
 
 ## Build
 
