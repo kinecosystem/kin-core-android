@@ -3,7 +3,10 @@ package kin.core;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.isA;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -49,6 +52,19 @@ public class KeyStoreImplTest {
         expectedEx.expect(CreateAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
         keyStore.newAccount();
+    }
+
+    @Test
+    public void loadAccounts_OldVersionData_DropOldData() throws Exception {
+        FakeStore fakeStore = new FakeStore();
+        fakeStore.saveString(KeyStoreImpl.VERSION_KEY, "some_version");
+        fakeStore.saveString(KeyStoreImpl.STORE_KEY_ACCOUNTS,
+            "{&quot;accounts&quot;:[{&quot;seed&quot;:&quot;{\\&quot;iv\\&quot;:\\&quot;nVGsoEHgjW4xw2gx\\\\n\\&quot;,\\&quot;cipher\\&quot;:\\&quot;kEC64vaQu\\\\\\/erpFvvnrY+sWm\\\\\\/o4GjmjPfgG31zQTwvp0taxo\\\\\\/04PoaisjfEQxrydRwBGFvG\\\\\\/nG345\\\\ntXMn+x2H0jnaPWWCznPA\\\\n\\&quot;}&quot;,&quot;public_key&quot;:&quot;GBYPGYWPWHWSVTQGTUCH2IICIP2PRLN3QYSUX5NOHHMNDQW26A4WK2IK&quot;}]}");
+        KeyStoreImpl keyStore = new KeyStoreImpl(fakeStore);
+
+        keyStore.loadAccounts();
+        assertThat(fakeStore.getString(KeyStoreImpl.VERSION_KEY), equalTo(KeyStoreImpl.ENCRYPTION_VERSION_NAME));
+        assertThat(fakeStore.getString(KeyStoreImpl.STORE_KEY_ACCOUNTS), nullValue());
     }
 
     @Test
