@@ -20,10 +20,10 @@ public class ServiceProvider {
     /**
      * test blockchain network
      */
-    public static final String NETWORK_ID_TEST = Network.getTestNetwork().getNetworkPassphrase();
+    public static final String NETWORK_ID_TEST = "private testnet";
 
     private static final String MAIN_NETWORK_ISSUER = "GBGFNADX2FTYVCLDCVFY5ZRTVEMS4LV6HKMWOY7XJKVXMBIWVDESCJW5";
-    private static final String TEST_NETWORK_ISSUER = "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V";
+    private static final String TEST_NETWORK_ISSUER = "GBQ3DQOA7NF52FVV7ES3CR3ZMHUEY4LTHDAQKDTO6S546JCLFPEQGCPK";
     private static final String KIN_ASSET_CODE = "KIN";
 
     private final String providerUrl;
