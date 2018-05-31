@@ -35,7 +35,7 @@ public class KinClientSampleApplication extends Application {
                 providerUrl = TEST_NET_URL;
                 netWorkId = TEST_NET_NETWORK_ID;
         }
-        kinClient = new KinClient(this,
+        kinClient = new KinClient(this, "sample_app",
             new ServiceProvider(providerUrl, netWorkId) {
                 @Override
                 protected String getIssuerAccountId() {

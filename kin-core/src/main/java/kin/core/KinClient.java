@@ -16,7 +16,7 @@ import org.stellar.sdk.Server;
  */
 public class KinClient {
 
-    private static final String STORE_NAME = "KinKeyStore";
+    private static final String STORE_NAME_PREFIX = "KinKeyStore_";
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
@@ -30,12 +30,13 @@ public class KinClient {
      * KinClient is an account manager for a {@link KinAccount}.
      *
      * @param context the android application context
-     * @param provider the service provider provides blockchain network parameters
+     * @param id unique id for identifying this client, different ids will store a different accounts
+     * @param provider the service provider - provides blockchain network parameters
      */
-    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
+    public KinClient(@NonNull Context context, @NonNull String id, @NonNull ServiceProvider provider) {
         this.serviceProvider = provider;
         Server server = initServer();
-        keyStore = initKeyStore(context.getApplicationContext());
+        keyStore = initKeyStore(context.getApplicationContext(), id);
         transactionSender = new TransactionSender(server, provider.getKinAsset());
         accountActivator = new AccountActivator(server, provider.getKinAsset());
         accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
@@ -61,8 +62,10 @@ public class KinClient {
         return new Server(serviceProvider.getProviderUrl());
     }
 
-    private KeyStore initKeyStore(Context context) {
-        SharedPrefStore store = new SharedPrefStore(context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE));
+    private KeyStore initKeyStore(Context context, String id) {
+        Utils.checkNotEmptyString(id, "id");
+        SharedPrefStore store = new SharedPrefStore(
+            context.getSharedPreferences(STORE_NAME_PREFIX + id, Context.MODE_PRIVATE));
         return new KeyStoreImpl(store);
     }
 
@@ -117,6 +120,7 @@ public class KinClient {
     /**
      * Returns the number of existing accounts
      */
+    @SuppressWarnings("WeakerAccess")
     public int getAccountCount() {
         return kinAccounts.size();
     }
@@ -135,6 +139,7 @@ public class KinClient {
     /**
      * Deletes all accounts.
      */
+    @SuppressWarnings("WeakerAccess")
     public void clearAllAccounts() {
         keyStore.clearAllAccounts();
         for (KinAccountImpl kinAccount : kinAccounts) {

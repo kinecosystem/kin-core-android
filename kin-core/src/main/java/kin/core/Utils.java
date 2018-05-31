@@ -30,4 +30,11 @@ final class Utils {
             throw new IllegalArgumentException(paramName + " == null");
         }
     }
+
+    @SuppressWarnings("SameParameterValue")
+    static void checkNotEmptyString(String str, String paramName) {
+        if (str == null || str.isEmpty()) {
+            throw new IllegalArgumentException(paramName + " is null or empty");
+        }
+    }
 }
