@@ -66,7 +66,7 @@ public class KinAccountIntegrationTest {
     @Before
     public void setup() throws IOException {
         ServiceProvider serviceProvider = new TestServiceProvider();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, "test");
         kinClient.clearAllAccounts();
     }
 

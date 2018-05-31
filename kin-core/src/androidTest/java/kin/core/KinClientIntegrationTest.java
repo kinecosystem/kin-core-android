@@ -25,6 +25,8 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("deprecation")
 public class KinClientIntegrationTest {
 
+    public static final String STORE_KEY_TEST = "test";
+    public static final String STORE_KEY_TEST2 = "test2";
     private ServiceProvider serviceProvider;
     private KinClient kinClient;
     private KinClient kinClient2;
@@ -35,20 +37,20 @@ public class KinClientIntegrationTest {
     @Before
     public void setup() {
         serviceProvider = new ServiceProvider(TEST_NETWORK_URL, TEST_NETWORK_ID);
-        kinClient = createNewKinClient("test");
-        kinClient2 = createNewKinClient("test2");
+        kinClient = createNewKinClient(STORE_KEY_TEST);
+        kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         kinClient.clearAllAccounts();
         kinClient2.clearAllAccounts();
     }
 
-    private KinClient createNewKinClient(String id) {
-        return new KinClient(InstrumentationRegistry.getTargetContext(), id, serviceProvider);
+    private KinClient createNewKinClient(String storeKey) {
+        return new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, storeKey);
     }
 
     @After
     public void teardown() {
-        kinClient = createNewKinClient("test");
-        kinClient2 = createNewKinClient("test2");
+        kinClient = createNewKinClient(STORE_KEY_TEST);
+        kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         kinClient.clearAllAccounts();
         kinClient2.clearAllAccounts();
     }
@@ -92,7 +94,7 @@ public class KinClientIntegrationTest {
     @Test
     public void getAccount_ExistingAccount_AddMultipleAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
         KinAccount kinAccount2 = kinClient.addAccount();
         KinAccount kinAccount3 = kinClient.addAccount();
 
@@ -112,7 +114,7 @@ public class KinClientIntegrationTest {
     public void getAccount_ExistingMultipleAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
         KinAccount kinAccount2 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
 
@@ -140,7 +142,7 @@ public class KinClientIntegrationTest {
     @Test
     public void getAccount_ExistingAccount_SameAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         KinAccount kinAccount = kinClient.getAccount(0);
 
@@ -155,7 +157,7 @@ public class KinClientIntegrationTest {
     @Test
     public void hasAccount_ExistingAccount_True() throws Exception {
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         assertTrue(kinClient.hasAccount());
     }
@@ -164,7 +166,7 @@ public class KinClientIntegrationTest {
     public void hasAccount_ExistingMultipleAccounts_True() throws Exception {
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         assertTrue(kinClient.hasAccount());
     }
@@ -172,7 +174,7 @@ public class KinClientIntegrationTest {
     @Test
     public void deleteAccount() throws Exception {
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         assertTrue(kinClient.hasAccount());
         kinClient.deleteAccount(0);
@@ -183,7 +185,7 @@ public class KinClientIntegrationTest {
     public void deleteAccount_MultipleAccounts() throws Exception {
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         kinClient.deleteAccount(0);
 
@@ -196,7 +198,7 @@ public class KinClientIntegrationTest {
     public void deleteAccount_AtIndex() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         kinClient.deleteAccount(1);
 
@@ -233,7 +235,7 @@ public class KinClientIntegrationTest {
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2);
@@ -251,7 +253,7 @@ public class KinClientIntegrationTest {
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
 
         kinClient.clearAllAccounts();
 
@@ -262,7 +264,7 @@ public class KinClientIntegrationTest {
     public void getServiceProvider() throws Exception {
         String url = "https://www.myawesomeserver.com";
         ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test", serviceProvider);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
         ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
@@ -275,13 +277,14 @@ public class KinClientIntegrationTest {
     public void testMultipleKinAccounts_AddAccount_DifferentAccounts() throws Exception {
         KinAccount account = kinClient.addAccount();
 
-        kinClient2 = createNewKinClient("test2");
+        kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         assertThat(kinClient2.getAccount(0), nullValue());
 
         KinAccount account2 = kinClient2.addAccount();
 
-        kinClient = createNewKinClient("test");
+        kinClient = createNewKinClient(STORE_KEY_TEST);
         assertThat(kinClient.getAccount(0), equalTo(account));
+        assertThat(kinClient2.getAccount(0), equalTo(account2));
         assertThat(account, not(equalTo(account2)));
     }
 
@@ -290,7 +293,7 @@ public class KinClientIntegrationTest {
         KinAccount account = kinClient2.addAccount();
 
         kinClient.clearAllAccounts();
-        kinClient2 = createNewKinClient("test2");
+        kinClient2 = createNewKinClient(STORE_KEY_TEST2);
 
         assertThat(kinClient2.getAccount(0), equalTo(account));
     }
@@ -298,10 +301,5 @@ public class KinClientIntegrationTest {
     @Test(expected = IllegalArgumentException.class)
     public void initKinClient_NullId_Exception() {
         kinClient = createNewKinClient(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void initKinClient_EmptyId_Exception() {
-        kinClient = createNewKinClient("");
     }
 }

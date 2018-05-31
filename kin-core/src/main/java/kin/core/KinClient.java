@@ -28,20 +28,30 @@ public class KinClient {
 
     /**
      * KinClient is an account manager for a {@link KinAccount}.
-     *
-     * @param context the android application context
-     * @param id unique id for identifying this client, different ids will store a different accounts
+     *  @param context the android application context
      * @param provider the service provider - provides blockchain network parameters
+     * @param storeKey the key for storing this client data, different keys will store a different accounts
      */
-    public KinClient(@NonNull Context context, @NonNull String id, @NonNull ServiceProvider provider) {
+    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider, @NonNull String storeKey) {
+        Utils.checkNotNull(storeKey, "storeKey");
         this.serviceProvider = provider;
         Server server = initServer();
-        keyStore = initKeyStore(context.getApplicationContext(), id);
+        keyStore = initKeyStore(context.getApplicationContext(), storeKey);
         transactionSender = new TransactionSender(server, provider.getKinAsset());
         accountActivator = new AccountActivator(server, provider.getKinAsset());
         accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
         loadAccounts();
+    }
+
+    /**
+     * KinClient is an account manager for a {@link KinAccount}.
+     *
+     * @param context the android application context
+     * @param provider the service provider - provides blockchain network parameters
+     */
+    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
+        this(context, provider, "");
     }
 
     @VisibleForTesting
@@ -63,7 +73,6 @@ public class KinClient {
     }
 
     private KeyStore initKeyStore(Context context, String id) {
-        Utils.checkNotEmptyString(id, "id");
         SharedPrefStore store = new SharedPrefStore(
             context.getSharedPreferences(STORE_NAME_PREFIX + id, Context.MODE_PRIVATE));
         return new KeyStoreImpl(store);

@@ -24,8 +24,9 @@ public class KinAccountTest {
 
     @Before
     public void setup() throws IOException {
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), "test",
-            new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST));
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(),
+            new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST), "test"
+        );
         kinClient.clearAllAccounts();
     }
 
