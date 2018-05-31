@@ -35,13 +35,13 @@ public class KinClientSampleApplication extends Application {
                 providerUrl = TEST_NET_URL;
                 netWorkId = TEST_NET_NETWORK_ID;
         }
-        kinClient = new KinClient(this,
-            new ServiceProvider(providerUrl, netWorkId) {
-                @Override
-                protected String getIssuerAccountId() {
-                    return "GBQ3DQOA7NF52FVV7ES3CR3ZMHUEY4LTHDAQKDTO6S546JCLFPEQGCPK";
-                }
-            });
+        kinClient = new KinClient(this, new ServiceProvider(providerUrl, netWorkId) {
+            @Override
+            protected String getIssuerAccountId() {
+                return "GBQ3DQOA7NF52FVV7ES3CR3ZMHUEY4LTHDAQKDTO6S546JCLFPEQGCPK";
+            }
+        }, "sample_app"
+        );
         return kinClient;
     }
 
