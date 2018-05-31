@@ -25,8 +25,8 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("deprecation")
 public class KinClientIntegrationTest {
 
-    public static final String STORE_KEY_TEST = "test";
-    public static final String STORE_KEY_TEST2 = "test2";
+    private static final String STORE_KEY_TEST = "test";
+    private static final String STORE_KEY_TEST2 = "test2";
     private ServiceProvider serviceProvider;
     private KinClient kinClient;
     private KinClient kinClient2;
@@ -274,7 +274,7 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void testMultipleKinAccounts_AddAccount_DifferentAccounts() throws Exception {
+    public void multipleKinClients_AddAccount_DifferentAccounts() throws Exception {
         KinAccount account = kinClient.addAccount();
 
         kinClient2 = createNewKinClient(STORE_KEY_TEST2);
@@ -289,7 +289,7 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void testMultipleKinAccounts_DeleteAccount_DifferentAccounts() throws Exception {
+    public void multipleKinClients_DeleteAccount_DifferentAccounts() throws Exception {
         KinAccount account = kinClient2.addAccount();
 
         kinClient.clearAllAccounts();
