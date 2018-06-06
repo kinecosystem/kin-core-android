@@ -257,7 +257,7 @@ public class BlockchainEventsTest {
                 }
             }
         });
-        latch.await(100, TimeUnit.SECONDS);
+        latch.await(1, TimeUnit.SECONDS);
 
         assertThat(actualResults.size(), equalTo(2));
         Balance balance1 = actualResults.get(0);
