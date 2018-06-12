@@ -35,7 +35,7 @@ public class KinClientSampleApplication extends Application {
                 netWorkId = ServiceProvider.NETWORK_ID_TEST;
         }
         kinClient = new KinClient(this,
-            new ServiceProvider(providerUrl, netWorkId));
+            new ServiceProvider(providerUrl, netWorkId), "sample_app");
         return kinClient;
     }
 
