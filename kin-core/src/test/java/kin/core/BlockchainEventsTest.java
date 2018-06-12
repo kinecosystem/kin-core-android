@@ -56,7 +56,13 @@ public class BlockchainEventsTest {
         mockServer();
         Network.useTestNetwork();
 
-        KinAsset kinAsset = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST).getKinAsset();
+        //use custom issuer that fake responses are use, to prevent testnet issuer address changes affect the tests
+        KinAsset kinAsset = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST) {
+            @Override
+            protected String getIssuerAccountId() {
+                return "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V";
+            }
+        }.getKinAsset();
         blockchainEvents = new BlockchainEvents(server, ACCOUNT_ID, kinAsset);
         createResponsesQueue();
     }
