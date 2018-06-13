@@ -13,7 +13,7 @@
     <string name="balance">Balance</string>
     <string name="transaction">Transaction</string>
     <string name="send_transaction">Send Transaction</string>
-    <string name="get_kin">Get KIN</string>
+    <string name="onboard">Onboard Account</string>
     <string name="delete_wallet">Delete Wallet</string>
     <string name="delete_wallet_warning">Are you sure you want to delete your wallet?</string>
     <string name="delete">Delete</string>
