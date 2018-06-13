@@ -27,7 +27,7 @@ public class WalletActivity extends BaseActivity {
     public static final String TAG = WalletActivity.class.getSimpleName();
 
     private TextView balance, status, publicKey;
-    private View getKinBtn;
+    private View onboardBtn;
     private View balanceProgress, statusProgress;
     private Request<Balance> balanceRequest;
     private Request<Integer> statusRequest;
@@ -66,19 +66,19 @@ public class WalletActivity extends BaseActivity {
 
         final View transaction = findViewById(R.id.send_transaction_btn);
         final View refresh = findViewById(R.id.refresh_btn);
-        getKinBtn = findViewById(R.id.get_kin_btn);
+        onboardBtn = findViewById(R.id.onboard_btn);
         final View deleteAccount = findViewById(R.id.delete_account_btn);
         final View watchPayments = findViewById(R.id.watch_payments_btn);
 
         if (isMainNet()) {
             transaction.setBackgroundResource(R.drawable.button_main_network_bg);
             refresh.setBackgroundResource(R.drawable.button_main_network_bg);
-            getKinBtn.setVisibility(View.GONE);
+            onboardBtn.setVisibility(View.GONE);
         } else {
-            getKinBtn.setVisibility(View.VISIBLE);
-            getKinBtn.setOnClickListener(view -> {
-                getKinBtn.setClickable(false);
-                getKin();
+            onboardBtn.setVisibility(View.VISIBLE);
+            onboardBtn.setOnClickListener(view -> {
+                onboardBtn.setClickable(false);
+                onboardAccount();
             });
         }
 
@@ -122,26 +122,26 @@ public class WalletActivity extends BaseActivity {
         }
     }
 
-    private void getKin() {
+    private void onboardAccount() {
         final KinAccount account = this.account;
         if (account != null) {
             balance.setText(null);
             balanceProgress.setVisibility(View.VISIBLE);
-            getKinBtn.setClickable(false);
+            onboardBtn.setClickable(false);
 
             OnBoarding onBoarding = new OnBoarding();
             onBoarding.onBoard(account, new Callbacks() {
                 @Override
                 public void onSuccess() {
                     updateAccountInfo(true);
-                    getKinBtn.setClickable(true);
+                    onboardBtn.setClickable(true);
                 }
 
                 @Override
                 public void onFailure(Exception e) {
                     Utils.logError(e, "onBoarding");
                     KinAlertDialog.createErrorDialog(WalletActivity.this, e.getMessage()).show();
-                    getKinBtn.setClickable(true);
+                    onboardBtn.setClickable(true);
                 }
             });
         }
