@@ -39,7 +39,7 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, up-to 28 characters, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
     @NonNull
@@ -69,7 +69,7 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, up-to 28 characters, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
