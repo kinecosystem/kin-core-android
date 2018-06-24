@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.DeleteAccountException;
 import org.stellar.sdk.KeyPair;
@@ -17,6 +18,7 @@ import org.stellar.sdk.Server;
 public class KinClient {
 
     private static final String STORE_NAME_PREFIX = "KinKeyStore_";
+    private static final int TRANSACTIONS_TIMEOUT = 30;
     private final ServiceProvider serviceProvider;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
@@ -28,7 +30,8 @@ public class KinClient {
 
     /**
      * KinClient is an account manager for a {@link KinAccount}.
-     *  @param context the android application context
+     *
+     * @param context the android application context
      * @param provider the service provider - provides blockchain network parameters
      * @param storeKey the key for storing this client data, different keys will store a different accounts
      */
@@ -69,7 +72,7 @@ public class KinClient {
 
     private Server initServer() {
         Network.use(serviceProvider.getNetwork());
-        return new Server(serviceProvider.getProviderUrl());
+        return new Server(serviceProvider.getProviderUrl(), TRANSACTIONS_TIMEOUT, TimeUnit.SECONDS);
     }
 
     private KeyStore initKeyStore(Context context, String id) {
