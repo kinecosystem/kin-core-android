@@ -3,7 +3,6 @@ package kin.core
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import kin.core.IntegConsts.TEST_NETWORK_ID
 import kin.core.IntegConsts.TEST_NETWORK_URL
 import kin.core.exception.AccountNotActivatedException
@@ -323,7 +322,6 @@ class KinAccountIntegrationTest {
             task.invoke()
             Any()
         }
-                .subscribeOn(Schedulers.io())
     }
 
     private fun onboardAccounts(activateSender: Boolean = true, activateReceiver: Boolean = true, senderFundAmount: Int = 0,
