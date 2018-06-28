@@ -59,7 +59,6 @@ dependencies {
     androidTestImplementation testingDependencies.androidTestRules
     androidTestImplementation testingDependencies.hamcrest
     androidTestImplementation testingDependencies.multidex
-    androidTestImplementation testingDependencies.rxjava
     androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }

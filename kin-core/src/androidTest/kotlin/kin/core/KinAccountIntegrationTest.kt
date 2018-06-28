@@ -2,7 +2,6 @@ package kin.core
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
-import io.reactivex.Observable
 import kin.core.IntegConsts.TEST_NETWORK_ID
 import kin.core.IntegConsts.TEST_NETWORK_URL
 import kin.core.exception.AccountNotActivatedException
@@ -144,7 +143,7 @@ class KinAccountIntegrationTest {
                 .addPaymentListener { _ -> latch.countDown() }
 
         val transactionId = kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"),
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"),
                         expectedMemo)
         assertThat(kinAccountSender.balanceSync.value(), equalTo(BigDecimal("78.8770000")))
         assertThat(kinAccountReceiver.balanceSync.value(), equalTo(BigDecimal("21.1230000")))
@@ -170,7 +169,7 @@ class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotFoundException::class.java)
         expectedEx.expectMessage(kinAccountReceiver.publicAddress)
         kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"))
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
     }
 
     @Test
@@ -185,7 +184,7 @@ class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotFoundException::class.java)
         expectedEx.expectMessage(kinAccountSender.publicAddress)
         kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"))
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
     }
 
     @Test
@@ -197,7 +196,7 @@ class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotActivatedException::class.java)
         expectedEx.expectMessage(kinAccountReceiver.publicAddress)
         kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"))
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
     }
 
     @Test
@@ -214,7 +213,7 @@ class KinAccountIntegrationTest {
         expectedEx.expect(AccountNotActivatedException::class.java)
         expectedEx.expectMessage(kinAccountSender.publicAddress)
         kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"))
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
     }
 
     @Test
@@ -248,11 +247,11 @@ class KinAccountIntegrationTest {
         val eventsCount = if (sender) 4 else 2 ///in case of observing the sender we'll get 2 events (1 for funding 1 for the
         //transaction) in case of receiver - only 1 event. multiply by 2, as we 2 listeners (balance and payment)
         val latch = CountDownLatch(eventsCount)
-        accountToListen.blockchainEvents().addPaymentListener { data ->
+        val paymentListener = accountToListen.blockchainEvents().addPaymentListener { data ->
             actualPaymentsResults.add(data)
             latch.countDown()
         }
-        accountToListen.blockchainEvents().addBalanceListener { data ->
+        val balanceListener = accountToListen.blockchainEvents().addBalanceListener { data ->
             actualBalanceResults.add(data)
             latch.countDown()
         }
@@ -261,12 +260,14 @@ class KinAccountIntegrationTest {
         fakeKinIssuer.fundWithKin(kinAccountSender.publicAddress.orEmpty(), "100")
         val expectedMemo = "memo"
         val expectedTransactionId = kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, transactionAmount, expectedMemo)
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), transactionAmount, expectedMemo)
 
         //verify data notified by listeners
         val transactionIndex = if (sender) 1 else 0 //in case of observing the sender we'll get 2 events (1 for funding 1 for the
         //transaction) in case of receiver - only 1 event
         latch.await(10, TimeUnit.SECONDS)
+        paymentListener.remove()
+        balanceListener.remove()
         val paymentInfo = actualPaymentsResults[transactionIndex]
         assertThat(paymentInfo.amount(), equalTo(transactionAmount))
         assertThat(paymentInfo.destinationPublicKey(), equalTo(kinAccountReceiver.publicAddress))
@@ -307,30 +308,15 @@ class KinAccountIntegrationTest {
 
         expectedEx.expect(InsufficientKinException::class.java)
         kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress!!, BigDecimal("21.123"))
-    }
-
-    private fun runTasksInParralelAndWait(vararg tasks: () -> (Unit)) {
-        //use rx-java to parralelize tasks that are not dependant on each other
-        Observable.zip(tasks.map { taskObservable(it) }) { objects -> objects[0] }
-                .ignoreElements()
-                .blockingAwait()
-    }
-
-    private fun taskObservable(task: () -> (Unit)): Observable<Any> {
-        return Observable.fromCallable {
-            task.invoke()
-            Any()
-        }
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
     }
 
     private fun onboardAccounts(activateSender: Boolean = true, activateReceiver: Boolean = true, senderFundAmount: Int = 0,
                                 receiverFundAmount: Int = 0): Pair<KinAccount, KinAccount> {
         val kinAccountSender = kinClient.addAccount()
         val kinAccountReceiver = kinClient.addAccount()
-        runTasksInParralelAndWait(
-                { onboardSingleAccount(kinAccountSender, activateSender, senderFundAmount) },
-                { onboardSingleAccount(kinAccountReceiver, activateReceiver, receiverFundAmount) })
+        onboardSingleAccount(kinAccountSender, activateSender, senderFundAmount)
+        onboardSingleAccount(kinAccountReceiver, activateReceiver, receiverFundAmount)
         return Pair(kinAccountSender, kinAccountReceiver)
     }
 
