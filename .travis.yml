@@ -44,6 +44,7 @@ before_script:
   - ./init.sh
 
 script:
+  - cd ../..
   - ./gradlew :sample:assembleDebug
   - ./gradlew jacocoTestReport
 
