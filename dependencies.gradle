@@ -11,6 +11,8 @@ ext {
     hamcrestVersion = '1.3'
     gsonVersion = '2.4'
     jacocoVersion = '0.8.0'
+    multiDexVersion = '1.0.3'
+    rxjavaVersion = '2.1.7'
 
     //Packages
     supportPackage = 'com.android.support'
@@ -22,6 +24,7 @@ ext {
     hamcrestPackage = 'org.hamcrest'
     gsonPackage = 'com.google.code.gson'
     kinecosystem = 'com.github.kinecosystem'
+    rxjava2Package = 'io.reactivex.rxjava2'
 
     //when building in jitpack, extract android-stellar-sdk commit we work on
     if (System.env.JITPACK) {
@@ -48,7 +51,10 @@ ext {
             mockWebServer    : buildDependency(okHttpPackage, 'mockwebserver', mockWebServerVersion),
             robolectric      : buildDependency(robolectricPackage, 'robolectric', robolectricVersion),
             hamcrest         : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
-            gson             : buildDependency(gsonPackage, 'gson', gsonVersion)
+            gson             : buildDependency(gsonPackage, 'gson', gsonVersion),
+            multidex         : buildDependency(supportPackage, 'multidex', multiDexVersion),
+            rxjava           : buildDependency(rxjava2Package, 'rxjava', rxjavaVersion)
+
     ]
 }
 

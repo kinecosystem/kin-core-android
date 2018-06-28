@@ -6,7 +6,7 @@ ext {
 }
 
 buildscript {
-
+    ext.kotlin_version = '1.2.30'
     repositories {
         google()
         jcenter()
@@ -14,6 +14,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:3.0.1"
         classpath 'org.jacoco:org.jacoco.core:0.8.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     }
 }

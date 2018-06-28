@@ -1,5 +1,8 @@
-sudo: false
+sudo: required
 language: android
+
+services:
+  - docker
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -36,11 +39,12 @@ before_script:
   - emulator -avd test -no-skin -no-audio -no-window -camera-back none -camera-front none -verbose -memory 2048 &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+  - git clone https://github.com/kinecosystem/stellar-ops.git
+  - stellar-ops/image/init.sh
 
 script:
   - ./gradlew :sample:assembleDebug
-  #skip large network related test in KinAccountIntegrationTest class
-  - ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest
+  - ./gradlew jacocoTestReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
