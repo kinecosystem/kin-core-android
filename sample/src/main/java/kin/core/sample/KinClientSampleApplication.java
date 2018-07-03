@@ -8,8 +8,8 @@ import kin.core.ServiceProvider;
 
 public class KinClientSampleApplication extends Application {
 
-    private final String TEST_NET_URL = "https://horizon-kik.kininfrastructure.com";
-    private final String MAIN_NET_URL = "https://horizon.stellar.org";
+    private final static String TEST_NET_URL = "https://horizon-playground.kininfrastructure.com/";
+    private final static String MAIN_NET_URL = "https://horizon-kin-ecosystem.kininfrastructure.com/";
 
     public enum NetWorkType {
         MAIN,
