@@ -9,7 +9,7 @@ import kin.core.ServiceProvider;
 public class KinClientSampleApplication extends Application {
 
     private final static String TEST_NET_URL = "https://horizon-playground.kininfrastructure.com/";
-    private final static String MAIN_NET_URL = "https://horizon-kin-ecosystem.kininfrastructure.com/";
+    private final static String MAIN_NET_URL = "https://horizon-ecosystem.kininfrastructure.com/";
 
     public enum NetWorkType {
         MAIN,
