@@ -16,14 +16,14 @@ public class ServiceProvider {
     /**
      * main blockchain network
      */
-    public static final String NETWORK_ID_MAIN = Network.getPublicNetwork().getNetworkPassphrase();
+    public static final String NETWORK_ID_MAIN = "Public Global Kin Ecosystem Network ; June 2018";
     /**
      * test blockchain network
      */
-    public static final String NETWORK_ID_TEST = "private testnet";
+    public static final String NETWORK_ID_TEST = "Kin Playground Network ; June 2018";
 
-    private static final String MAIN_NETWORK_ISSUER = "GBGFNADX2FTYVCLDCVFY5ZRTVEMS4LV6HKMWOY7XJKVXMBIWVDESCJW5";
-    private static final String TEST_NETWORK_ISSUER = "GBQ3DQOA7NF52FVV7ES3CR3ZMHUEY4LTHDAQKDTO6S546JCLFPEQGCPK";
+    private static final String MAIN_NETWORK_ISSUER = "GDF42M3IPERQCBLWFEZKQRK77JQ65SCKTU3CW36HZVCX7XX5A5QXZIVK";
+    private static final String TEST_NETWORK_ISSUER = "GBC3SG6NGTSZ2OMH3FFGB7UVRQWILW367U4GSOOF4TFSZONV42UJXUH7";
     private static final String KIN_ASSET_CODE = "KIN";
 
     private final String providerUrl;
