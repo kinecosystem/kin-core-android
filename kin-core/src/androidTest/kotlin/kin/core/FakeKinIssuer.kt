@@ -31,11 +31,9 @@ constructor() {
         val client = OkHttpClient()
         val request = okhttp3.Request.Builder()
                 .url(URL_CREATE_ACCOUNT + accountId).build()
-        val response = client.newCall(request).execute()
-        val succeeded = response?.body() != null && response.code() == 200
-        response?.let {
-            if (!succeeded) {
-                Log.d("test", "createAndFundWithLumens error, error code = ${response.code()}, message = ${response.message()}")
+        client.newCall(request).execute()?.let {
+            if (it.body() == null || it.code() != 200) {
+                Log.d("test", "createAndFundWithLumens error, error code = ${it.code()}, message = ${it.message()}")
             }
         }
     }

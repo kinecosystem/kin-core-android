@@ -59,8 +59,8 @@ dependencies {
     androidTestImplementation testingDependencies.androidTestRules
     androidTestImplementation testingDependencies.hamcrest
     androidTestImplementation testingDependencies.multidex
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    androidTestImplementation testingDependencies.kotlin
+    androidTestImplementation testingDependencies.kotlinJUnitTest
 }
 
 //bundle javadocs with published aar

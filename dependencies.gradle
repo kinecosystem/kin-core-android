@@ -12,7 +12,6 @@ ext {
     gsonVersion = '2.4'
     jacocoVersion = '0.8.0'
     multiDexVersion = '1.0.3'
-    rxjavaVersion = '2.1.7'
 
     //Packages
     supportPackage = 'com.android.support'
@@ -24,6 +23,7 @@ ext {
     hamcrestPackage = 'org.hamcrest'
     gsonPackage = 'com.google.code.gson'
     kinecosystem = 'com.github.kinecosystem'
+    kotlinPackage = 'org.jetbrains.kotlin'
 
     //when building in jitpack, extract android-stellar-sdk commit we work on
     if (System.env.JITPACK) {
@@ -51,8 +51,9 @@ ext {
             robolectric      : buildDependency(robolectricPackage, 'robolectric', robolectricVersion),
             hamcrest         : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
             gson             : buildDependency(gsonPackage, 'gson', gsonVersion),
-            multidex         : buildDependency(supportPackage, 'multidex', multiDexVersion)
-
+            multidex         : buildDependency(supportPackage, 'multidex', multiDexVersion),
+            kotlin           : buildDependency(kotlinPackage, 'kotlin-stdlib-jre7', kotlin_version),
+            kotlinJUnitTest  : buildDependency(kotlinPackage, 'kotlin-test-junit', kotlin_version)
     ]
 }
 
