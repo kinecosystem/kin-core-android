@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'jacoco'
 
 // maven plugin and group definition
@@ -16,7 +17,8 @@ android {
         versionCode 1
         versionName "1.0"
         consumerProguardFiles 'proguard-rules.pro'
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "kin.core.MultiDexAndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -29,6 +31,11 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+
+    sourceSets {
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
 }
 
@@ -51,8 +58,12 @@ dependencies {
     androidTestImplementation testingDependencies.androidTestRunner
     androidTestImplementation testingDependencies.androidTestRules
     androidTestImplementation testingDependencies.hamcrest
+    androidTestImplementation testingDependencies.multidex
+    androidTestImplementation testingDependencies.kotlin
+    androidTestImplementation testingDependencies.kotlinJUnitTest
 }
 
+//bundle javadocs with published aar
 task javadoc(type: Javadoc) {
     failOnError false
     source = android.sourceSets.main.java.sourceFiles
@@ -93,4 +104,13 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     executionData = fileTree(dir: project.buildDir, includes: [
             'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
     ])
+}
+
+//remove all non test related from kotlin source set, to make sure no kotlin files included in build
+afterEvaluate {
+    android.sourceSets.all { sourceSet ->
+        if (!sourceSet.name.contains("test")) {
+            sourceSet.kotlin.setSrcDirs([])
+        }
+    }
 }

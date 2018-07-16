@@ -3,7 +3,7 @@ package kin.core;
 
 final class IntegConsts {
 
-    static final String TEST_NETWORK_URL = "https://horizon-kik.kininfrastructure.com";
+    static final String TEST_NETWORK_URL = "http://10.0.2.2:8000";
     static final String TEST_NETWORK_ID = "private testnet";
-    static final String URL_CREATE_ACCOUNT = "http://friendbot-kik.kininfrastructure.com/?addr=";
+    static final String URL_CREATE_ACCOUNT = "http://10.0.2.2:8001/?addr=";
 }
