@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import kin.core.exception.CreateAccountException;
+import kin.core.exception.CryptoException;
 import kin.core.exception.DeleteAccountException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,9 +22,11 @@ class KeyStoreImpl implements KeyStore {
     private static final String JSON_KEY_ENCRYPTED_SEED = "seed";
 
     private final Store store;
+    private final BackupRestore backupRestore;
 
-    KeyStoreImpl(@NonNull Store store) {
+    KeyStoreImpl(@NonNull Store store, @NonNull BackupRestore backupRestore) {
         this.store = store;
+        this.backupRestore = backupRestore;
     }
 
     @NonNull
@@ -83,11 +86,14 @@ class KeyStoreImpl implements KeyStore {
 
     @Override
     public KeyPair newAccount() throws CreateAccountException {
+        return addKeyPairToStorage(KeyPair.random());
+    }
+
+    private KeyPair addKeyPairToStorage(KeyPair newKeyPair) throws CreateAccountException {
         try {
-            KeyPair newKeyPair = KeyPair.random();
             String encryptedSeed = String.valueOf(newKeyPair.getSecretSeed());
             String publicKey = newKeyPair.getAccountId();
-            JSONObject accountsJson = addKeyPairToAccounts(encryptedSeed, publicKey);
+            JSONObject accountsJson = addKeyPairToAccountsJson(encryptedSeed, publicKey);
             store.saveString(STORE_KEY_ACCOUNTS, accountsJson.toString());
             return newKeyPair;
         } catch (JSONException e) {
@@ -95,7 +101,14 @@ class KeyStoreImpl implements KeyStore {
         }
     }
 
-    private JSONObject addKeyPairToAccounts(@NonNull String encryptedSeed, @NonNull String accountId)
+    @Override
+    public KeyPair importAccount(@NonNull String json, @NonNull String passphrase)
+        throws CryptoException, CreateAccountException {
+        KeyPair keyPair = backupRestore.importWallet(json, passphrase);
+        return addKeyPairToStorage(keyPair);
+    }
+
+    private JSONObject addKeyPairToAccountsJson(@NonNull String encryptedSeed, @NonNull String accountId)
         throws JSONException {
         JSONArray jsonArray = loadJsonArray();
         if (jsonArray == null) {

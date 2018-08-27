@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.CryptoException;
 import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;
@@ -39,7 +40,8 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
+     * record.
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
     @NonNull
@@ -69,7 +71,8 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
+     * record.
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
@@ -144,4 +147,12 @@ public interface KinAccount {
      * Returns {@link BlockchainEvents} object, allows registering to various events on the blockchain network.
      */
     BlockchainEvents blockchainEvents();
+
+    /**
+     * Export the account data as a JSON string. The seed is encrypted.
+     *
+     * @param passphrase The passphrase with which to encrypt the seed
+     * @return A JSON representation of the data as a string
+     */
+    String export(@NonNull String passphrase) throws CryptoException;
 }

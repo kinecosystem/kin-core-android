@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kin.sdk.core.sample">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="kin.sdk.core.sample"
+    >
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -11,7 +13,8 @@
         android:name="kin.core.sample.KinClientSampleApplication"
         android:roundIcon="@mipmap/ic_launcher_rounded"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
         <activity
             android:name="kin.core.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait">

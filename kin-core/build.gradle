@@ -47,6 +47,7 @@ dependencies {
         implementation project(':android-stellar-sdk')
     }
     implementation supportDependencies.supportAnnotations
+    implementation 'com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.1'
 
     testImplementation testingDependencies.junit
     testImplementation testingDependencies.mockito

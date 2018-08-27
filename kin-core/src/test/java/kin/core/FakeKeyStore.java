@@ -4,6 +4,8 @@ package kin.core;
 import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
+import kin.core.exception.CreateAccountException;
+import kin.core.exception.CryptoException;
 import org.stellar.sdk.KeyPair;
 
 /**
@@ -37,6 +39,12 @@ class FakeKeyStore implements KeyStore {
         KeyPair account = KeyPair.random();
         accounts.add(account);
         return account;
+    }
+
+    @Override
+    public KeyPair importAccount(@NonNull String json, @NonNull String passphrase)
+        throws CryptoException, CreateAccountException {
+        return null;
     }
 
     @Override

@@ -296,7 +296,7 @@ public class KinClientTest {
         String url = "My awesome Horizon server";
         ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
         kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockAccountInfoRetriever, mockBlockchainEventsCreator);
+            mockAccountInfoRetriever, mockBlockchainEventsCreator, new FakeBackupRestore());
         ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
@@ -307,7 +307,8 @@ public class KinClientTest {
 
     @NonNull
     private KinClient createNewKinClient() {
-        return new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
-            mockAccountInfoRetriever, mockBlockchainEventsCreator);
+        return new KinClient(fakeServiceProvider, fakeKeyStore,
+            mockTransactionSender, mockAccountActivator,
+            mockAccountInfoRetriever, mockBlockchainEventsCreator, new FakeBackupRestore());
     }
 }
