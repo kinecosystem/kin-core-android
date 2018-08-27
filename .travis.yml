@@ -40,9 +40,9 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
   - git clone https://github.com/kinecosystem/stellar-ops.git
-  - cd stellar-ops/image
   # use specific working version to ensure it will not break in the future
   - git checkout c26afdc168ad378363c63fb44de5a93b3cf24ddf
+  - cd stellar-ops/image
   - ./init.sh
 
 script:
