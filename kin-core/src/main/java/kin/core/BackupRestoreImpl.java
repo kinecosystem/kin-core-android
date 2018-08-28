@@ -16,6 +16,7 @@ class BackupRestoreImpl implements BackupRestore {
     private static final String JSON_KEY_SALT = "salt";
     private static final int SALT_LENGTH_BYTES = 16;
     private static final int HASH_LENGTH_BYTES = 32;
+    private static final int OUPUT_JSON_INDENT_SPACES = 2;
 
     BackupRestoreImpl() {
         //init sodium
@@ -92,10 +93,10 @@ class BackupRestoreImpl implements BackupRestore {
             json.put(JSON_KEY_PUBLIC_KEY, publicAddress);
             json.put(JSON_KEY_SEED, seed);
             json.put(JSON_KEY_SALT, salt);
+            return json.toString(OUPUT_JSON_INDENT_SPACES);
         } catch (JSONException e) {
             throw new CryptoException("Json exception", e);
         }
-        return json.toString();
     }
 
     private AccountJson stringify(String exportedJson) throws CryptoException {

@@ -47,6 +47,11 @@
             android:parentActivityName="kin.core.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
+        <activity
+            android:name="kin.core.sample.ExportKeystoreActivity"
+            android:parentActivityName="kin.core.sample.WalletActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
 
     </application>
 
