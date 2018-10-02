@@ -4,7 +4,7 @@ package kin.core;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import java.math.BigDecimal;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;

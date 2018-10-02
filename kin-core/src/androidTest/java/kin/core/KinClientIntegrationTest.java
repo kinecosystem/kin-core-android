@@ -27,7 +27,7 @@ public class KinClientIntegrationTest {
 
     private static final String STORE_KEY_TEST = "test";
     private static final String STORE_KEY_TEST2 = "test2";
-    private ServiceProvider serviceProvider;
+    private Environment serviceProvider;
     private KinClient kinClient;
     private KinClient kinClient2;
 
@@ -36,7 +36,11 @@ public class KinClientIntegrationTest {
 
     @Before
     public void setup() {
-        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, TEST_NETWORK_ID);
+        serviceProvider = new Environment.Builder()
+            .networkUrl(TEST_NETWORK_URL)
+            .networkPassphrase(TEST_NETWORK_ID)
+            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         kinClient = createNewKinClient(STORE_KEY_TEST);
         kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         kinClient.clearAllAccounts();
@@ -263,14 +267,18 @@ public class KinClientIntegrationTest {
     @Test
     public void getServiceProvider() throws Exception {
         String url = "https://www.myawesomeserver.com";
-        ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
+        Environment serviceProvider = new Environment.Builder()
+            .networkUrl(url)
+            .networkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
-        ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
+        Environment actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
         assertFalse(actualServiceProvider.isMainNet());
-        assertEquals(url, actualServiceProvider.getProviderUrl());
-        assertEquals(ServiceProvider.NETWORK_ID_TEST, actualServiceProvider.getNetworkId());
+        assertEquals(url, actualServiceProvider.getNetworkUrl());
+        assertEquals(Environment.TEST.getNetworkPassphrase(), actualServiceProvider.getNetworkPassphrase());
     }
 
     @Test

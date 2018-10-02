@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;

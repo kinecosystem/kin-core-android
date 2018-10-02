@@ -19,7 +19,7 @@ public class KinClient {
 
     private static final String STORE_NAME_PREFIX = "KinKeyStore_";
     private static final int TRANSACTIONS_TIMEOUT = 30;
-    private final ServiceProvider serviceProvider;
+    private final Environment serviceProvider;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
@@ -35,7 +35,7 @@ public class KinClient {
      * @param provider the service provider - provides blockchain network parameters
      * @param storeKey the key for storing this client data, different keys will store a different accounts
      */
-    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider, @NonNull String storeKey) {
+    public KinClient(@NonNull Context context, @NonNull Environment provider, @NonNull String storeKey) {
         Utils.checkNotNull(storeKey, "storeKey");
         this.serviceProvider = provider;
         Server server = initServer();
@@ -53,12 +53,12 @@ public class KinClient {
      * @param context the android application context
      * @param provider the service provider - provides blockchain network parameters
      */
-    public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
+    public KinClient(@NonNull Context context, @NonNull Environment provider) {
         this(context, provider, "");
     }
 
     @VisibleForTesting
-    KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
+    KinClient(Environment serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
         AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
         BlockchainEventsCreator blockchainEventsCreator) {
         this.serviceProvider = serviceProvider;
@@ -72,7 +72,7 @@ public class KinClient {
 
     private Server initServer() {
         Network.use(serviceProvider.getNetwork());
-        return new Server(serviceProvider.getProviderUrl(), TRANSACTIONS_TIMEOUT, TimeUnit.SECONDS);
+        return new Server(serviceProvider.getNetworkUrl(), TRANSACTIONS_TIMEOUT, TimeUnit.SECONDS);
     }
 
     private KeyStore initKeyStore(Context context, String id) {
@@ -160,7 +160,7 @@ public class KinClient {
         kinAccounts.clear();
     }
 
-    public ServiceProvider getServiceProvider() {
+    public Environment getServiceProvider() {
         return serviceProvider;
     }
 

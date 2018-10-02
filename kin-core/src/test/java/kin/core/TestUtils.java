@@ -4,7 +4,7 @@ package kin.core;
 import android.support.annotation.NonNull;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 

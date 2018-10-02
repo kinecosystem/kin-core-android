@@ -2,7 +2,6 @@ package kin.core
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
-import kin.core.IntegConsts.TEST_NETWORK_ID
 import kin.core.IntegConsts.TEST_NETWORK_URL
 import kin.core.exception.AccountNotActivatedException
 import kin.core.exception.AccountNotFoundException
@@ -29,18 +28,16 @@ class KinAccountIntegrationTest {
     @JvmField
     val expectedEx: ExpectedException = ExpectedException.none()
 
-    private inner class TestServiceProvider internal constructor() : ServiceProvider(TEST_NETWORK_URL, TEST_NETWORK_ID) {
-
-        override fun getIssuerAccountId(): String {
-            return fakeKinIssuer.accountId
-        }
-    }
+    private val environment: Environment = Environment.Builder()
+            .networkUrl(IntegConsts.TEST_NETWORK_URL)
+            .networkPassphrase(IntegConsts.TEST_NETWORK_ID)
+            .issuerAccountId(fakeKinIssuer.accountId)
+            .build()
 
     @Before
     @Throws(IOException::class)
     fun setup() {
-        val serviceProvider = TestServiceProvider()
-        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider)
+        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), environment)
         kinClient.clearAllAccounts()
     }
 

@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.LedgerEntryChange;
 import org.stellar.sdk.LedgerEntryChanges;

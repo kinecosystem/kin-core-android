@@ -36,12 +36,16 @@ public class KinClientTest {
     private BlockchainEventsCreator mockBlockchainEventsCreator;
     private KinClient kinClient;
     private KeyStore fakeKeyStore;
-    private ServiceProvider fakeServiceProvider;
+    private Environment fakeServiceProvider;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        fakeServiceProvider = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST);
+        fakeServiceProvider = new Environment.Builder()
+            .networkUrl("empty")
+            .networkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         fakeKeyStore = new FakeKeyStore();
         kinClient = createNewKinClient();
     }
@@ -294,15 +298,19 @@ public class KinClientTest {
     @Test
     public void getServiceProvider() throws Exception {
         String url = "My awesome Horizon server";
-        ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
+        Environment serviceProvider = new Environment.Builder()
+            .networkUrl(url)
+            .networkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
-        ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
+        Environment actualServiceProvider = kinClient.getServiceProvider();
 
         assertNotNull(actualServiceProvider);
         assertFalse(actualServiceProvider.isMainNet());
-        assertEquals(url, actualServiceProvider.getProviderUrl());
-        assertEquals(ServiceProvider.NETWORK_ID_TEST, actualServiceProvider.getNetworkId());
+        assertEquals(url, actualServiceProvider.getNetworkUrl());
+        assertEquals(Environment.TEST.getNetworkPassphrase(), actualServiceProvider.getNetworkPassphrase());
     }
 
     @NonNull
