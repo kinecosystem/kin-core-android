@@ -29,15 +29,17 @@ class KinAccountIntegrationTest {
     val expectedEx: ExpectedException = ExpectedException.none()
 
     private val environment: Environment = Environment.Builder()
-            .networkUrl(IntegConsts.TEST_NETWORK_URL)
-            .networkPassphrase(IntegConsts.TEST_NETWORK_ID)
-            .issuerAccountId(fakeKinIssuer.accountId)
+            .setNetworkUrl(IntegConsts.TEST_NETWORK_URL)
+            .setNetworkPassphrase(IntegConsts.TEST_NETWORK_ID)
+            .setIssuerAccountId(fakeKinIssuer.accountId)
             .build()
 
     @Before
     @Throws(IOException::class)
     fun setup() {
-        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), environment)
+        kinClient = KinClient.Builder(InstrumentationRegistry.getTargetContext())
+                .setEnvironment(environment)
+                .build()
         kinClient.clearAllAccounts()
     }
 

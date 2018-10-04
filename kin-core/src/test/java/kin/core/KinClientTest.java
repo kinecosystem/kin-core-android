@@ -42,9 +42,9 @@ public class KinClientTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         fakeServiceProvider = new Environment.Builder()
-            .networkUrl("empty")
-            .networkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .setNetworkUrl("empty")
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
             .build();
         fakeKeyStore = new FakeKeyStore();
         kinClient = createNewKinClient();
@@ -299,9 +299,9 @@ public class KinClientTest {
     public void getServiceProvider() throws Exception {
         String url = "My awesome Horizon server";
         Environment serviceProvider = new Environment.Builder()
-            .networkUrl(url)
-            .networkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .issuerAccountId(Environment.TEST.getIssuerAccountId())
+            .setNetworkUrl(url)
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
             .build();
         kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);

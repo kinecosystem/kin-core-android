@@ -35,7 +35,7 @@ public class KinClient {
      * @param provider the service provider - provides blockchain network parameters
      * @param storeKey the key for storing this client data, different keys will store a different accounts
      */
-    public KinClient(@NonNull Context context, @NonNull Environment provider, @NonNull String storeKey) {
+    private KinClient(@NonNull Context context, @NonNull Environment provider, @NonNull String storeKey) {
         Utils.checkNotNull(storeKey, "storeKey");
         this.serviceProvider = provider;
         Server server = initServer();
@@ -45,16 +45,6 @@ public class KinClient {
         accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
         loadAccounts();
-    }
-
-    /**
-     * KinClient is an account manager for a {@link KinAccount}.
-     *
-     * @param context the android application context
-     * @param provider the service provider - provides blockchain network parameters
-     */
-    public KinClient(@NonNull Context context, @NonNull Environment provider) {
-        this(context, provider, "");
     }
 
     @VisibleForTesting
@@ -170,4 +160,38 @@ public class KinClient {
             blockchainEventsCreator);
     }
 
+    public static class Builder {
+
+        private final Context context;
+        private Environment environment;
+        private String storeKey = "";
+
+        public Builder(Context context) {
+            this.context = context;
+        }
+
+        /**
+         * Sets the blockchain network details.
+         */
+        public Builder setEnvironment(Environment environment) {
+            this.environment = environment;
+            return this;
+        }
+
+        /**
+         * Sets the key for storing this KinClient data, different keys will store a different accounts.
+         */
+        public Builder setStoreKey(String storeKey) {
+            this.storeKey = storeKey;
+            return this;
+        }
+
+        /**
+         * Builds a KinClient.
+         */
+        public KinClient build() {
+            Utils.checkNotNull(environment, "environment");
+            return new KinClient(context, environment, storeKey);
+        }
+    }
 }

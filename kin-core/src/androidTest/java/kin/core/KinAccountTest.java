@@ -23,7 +23,9 @@ public class KinAccountTest {
 
     @Before
     public void setup() throws IOException {
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), Environment.TEST);
+        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
+            .setEnvironment(Environment.TEST)
+            .build();
         kinClient.clearAllAccounts();
     }
 
