@@ -3,11 +3,15 @@
 [![Build Status](https://travis-ci.org/kinecosystem/kin-core-android.svg?branch=dev)](https://travis-ci.org/kinecosystem/kin-core-android)
 [![codecov](https://codecov.io/gh/kinecosystem/kin-core-android/branch/dev/graph/badge.svg)](https://codecov.io/gh/kinecosystem/kin-core-android)
 
-Android library responsible for creating a new Stellar account and managing KIN balance and transactions.
+Android library responsible for creating and managing KIN accounts.
 
-## Build
+
+# Android
+
+## Add Kin Core SDK to your project
 
 Add this to your module's `build.gradle` file.
+
 ```gradle
 repositories {
     ...
@@ -22,30 +26,36 @@ dependencies {
     compile "com.github.kinecosystem:kin-core-android:<latest release>"
 }
 ```
-For latest release version go to https://github.com/kinecosystem/kin-core-android/releases
 
-## Usage
+For latest release version go to [https://github.com/kinecosystem/kin-core-android/releases](https://github.com/kinecosystem/kin-core-android/releases).
+
+The main repository is at [github.com/kinecosystem/kin-core-android](https://github.com/kinecosystem/kin-core-android).
+
+## Get Started
+
 ### Connecting to a service provider
-Create a new `KinClient` with two arguments: an android `Context` and a `ServiceProvider`. 
 
-A `ServiceProvider` provides details of how to access the Stellar horizon end point.
-The example below creates a `ServiceProvider` that will be used to connect to the main (production) Stellar 
-network
+Create a new `KinClient` using a builder, set an `Environment` object that provides details of how to access the kin blockchain end point, Environment provides the predefined 
+`Environment.TEST` and `Environment.PRODUCTION`.  
+An optional parameter is `storeKey` which can be used to create a multiple accounts data set,
+ each different `storeKey` will have a separate data, an example use-case - store multiple users accounts separately.
+
+
+The example below creates a `KinClient` that will be used to connect to the kin test network:
+
 ```java
-ServiceProvider horizonProvider =  
-    new ServiceProvider("https://horizon.stellar.org", ServiceProvider.NETWORK_ID_MAIN);
-KinClient kinClient = new KinClient(context, horizonProvider);
+kinClient = new KinClient.Builder(context)
+            .setEnvironment(Environment.TEST)
+            .setStoreKey("user1")
+            .build();
 ```
 
-To connect to a test Stellar network use the following ServiceProvider:
-```java
-new ServiceProvider("https://horizon-testnet.stellar.org", ServiceProvider.NETWORK_ID_TEST)
-``` 
-
 ### Creating and retrieving a KIN account
+
 The first time you use `KinClient` you need to create a new account, 
 the details of the created account will be securely stored on the device.
 Multiple accounts can be created using `addAccount`.
+
 ```java
 KinAccount account;
 try {
@@ -57,48 +67,27 @@ try {
 }
 ```
 
-
 Calling `getAccount` with the existing account index, will retrieve the account stored on the device.
+
 ```java
 if (kinClient.hasAccount()) {
     account = kinClient.getAccount(0);
 }
-``` 
+```
 
 You can delete your account from the device using `deleteAccount`, 
 but beware! you will lose all your existing KIN if you do this.
+
 ```java
 kinClient.deleteAccount(int index);
-``` 
-
-### Onboarding
-A first step before an account can be used, is to create the account on Stellar blockchain and fund it with native Stellar
-asset for fees purposes, this funding should be done by the digital service servers.  
-When working against KIN test network, the Fee Faucet Service can be used for this purpose:
-
-```java
-Request request = new Request.Builder()
-            .url("http://friendbot-kik.kininfrastructure.com/?addr=" + account.getPublicAddress())
-            .get()
-            .build();
-okHttpClient.newCall(request)
-    .enqueue(new Callback() {
-        @Override
-        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-            e.printStackTrace();
-        }
-
-        @Override
-        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-            if (response.code() == 200) {
-                //account was created successfully, continue to the second phase - account activation
-            }
-        }
-    });
 ```
 
-The second step is to activate this account on the client side, using `activate` method. The account will not be able to receive or send KIN before activation.
+## Onboarding
 
+Before an account can be used on the configured network, it must be funded with the native network asset,
+This step must be performed by a service, see [Fee token faucet service](fee-faucet.md).
+
+The second step is to activate this account on the client side, using `activate` method. The account will not be able to receive or send KIN before activation.
 
 ```java
 Request<Void> activationRequest = account.activate()
@@ -114,38 +103,25 @@ activationRequest.run(new ResultCallback<Void>() {
     }
 });
 ```
- 
-Third, optional step is to fund the created account with KIN.  
-When working against KIN test network, the KIN Faucet Service can be used for this purpose:
-```java
-Request request = new Request.Builder()
-            .url("http://159.65.84.173:5000/fund?account=" + account.getPublicAddress() + "&amount=" + FUND_KIN_AMOUNT)
-            .get()
-            .build();
-okHttpClient.newCall(request)
-    .enqueue(new Callback() {
-        @Override
-        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-            e.printStackTrace();
-        }
 
-        @Override
-        public void onResponse(@NonNull Call call, @NonNull Response response)
-            throws IOException {
-            if (response.code() == 200) {
-              //Account was funded with KIN succesfully
-            }
-        }
-    });
+For more details see [Onboarding](onboarding.md), also take a look at Sample App [OnBoarding](https://github.com/kinecosystem/kin-core-android/blob/dev/sample/src/main/java/kin/core/sample/OnBoarding.java) class for a complete example.
+
+## Account Information
+
+### Public Address
+
+Your account can be identified via it's public address. To retrieve the account public address use:
+
+```java
+account.getPublicAddress();
 ```
 
-For a complete example of this process, take a look at Sample App `OnBoarding` class.
+### Query Account Status
 
-#### Query Account Status
-
-Current account status on the blockchain can be queried using `getStatus` method,  
+Current account status on the blockchain can be queried using `getStatus` method,
 status will be one of the following 3 options:
-* `AccountStatus.NOT_CREATED` - Account is not created yet on the blockchain network.
+
+* `AccountStatus.NOT_CREATED` - Account is not created (funded with native asset) on the network.
 * `AccountStatus.NOT_ACTIVATED` - Account was created but not activated yet, the account cannot send or receive KIN yet.
 * `AccountStatus.ACTIVATED` - Account was created and activated, account can send and receive KIN.
 
@@ -174,15 +150,10 @@ statusRequest.run(new ResultCallback<Integer>() {
 });
 ```
 
-### Public Address
-Your account can be identified via it's public address. To retrieve the account public address use:
-```java
-account.getPublicAddress();
-```
-
-
 ### Retrieving Balance
+
 To retrieve the balance of your account in KIN call the `getBalance` method: 
+
 ```java
 Request<Balance> balanceRequest = account.getBalance();
 balanceRequest.run(new ResultCallback<Balance>() {
@@ -199,15 +170,17 @@ balanceRequest.run(new ResultCallback<Balance>() {
 });
 ```
 
-### Transfering KIN to another account
-To transfer KIN to another account, you need the public address of the account you want 
-to transfer the KIN to. 
+## Transactions
 
-The following code will transfer 20 KIN to account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO". 
+### Transferring KIN to another account
+
+To transfer KIN to another account, you need the public address of the account you want to transfer the KIN to.
+
+The following code will transfer 20 KIN to account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO".
+
 ```java
 String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
 BigDecimal amountInKin = new BigDecimal("20");
-
 
 transactionRequest = account.sendTransaction(toAddress, amountInKin);
 transactionRequest.run(new ResultCallback<TransactionId>() {
@@ -225,8 +198,9 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
 ```
 
 #### Memo
+
 Arbitrary data can be added to a transfer operation using the memo parameter,
-the memo is a `String` of up to 28 characters.
+the memo can contain a utf-8 string up to 28 bytes in length. A typical usage is to include an order number that a service can use to verify payment.
 
 ```java
 String memo = "arbitrary data";
@@ -244,12 +218,16 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
         }
 });
 ```
+
+## Account Listeners
+
 ### Listening to payments
 
 Ongoing payments in KIN, from or to an account, can be observed,
 by adding payment listener using `BlockchainEvents`:
+
 ```java
-ListenerRegistration listenerRegistration = account.blockchainEvents()
+ListenerRegistration listenerRegistration = account
             .addPaymentListener(new EventListener<PaymentInfo>() {
                 @Override
                 public void onEvent(PaymentInfo payment) {
@@ -259,30 +237,41 @@ ListenerRegistration listenerRegistration = account.blockchainEvents()
                 }
             });
 ```
-For unregister the listener use `listenerRegistration.remove()` method.
+
+### Listening to balance changes
+
+Account balance changes, can be observed by adding balance listener using `BlockchainEvents`:
+
+```java
+ListenerRegistration listenerRegistration = account.addBalanceListener(new EventListener<Balance>() {
+            @Override
+            public void onEvent(Balance balance) {
+                Log.d("example", "balance event, new balance is = " + balance.value().toPlainString());
+            }
+        });
+```
 
 ### Listening to account creation
+
 Account creation on the blockchain network, can be observed, by adding create account listener using `BlockchainEvents`:
 
 ```java
-ListenerRegistration listenerRegistration = account.blockchainEvents()
-            .addAccountCreationListener(new EventListener<Void>() {
-                @Override
-                public void onEvent(Void result) {
-                    Log.d("example", "Account has created.);                     
-                }
-            });
+ListenerRegistration listenerRegistration = account.addAccountCreationListener(new EventListener<Void>() {
+            @Override
+            public void onEvent(Void result) {
+                Log.d("example", "Account has created.");
+            }
+        });
 ```
-For unregister the listener use `listenerRegistration.remove()` method.
 
-### Sync vs Async
+For unregister any listener use `listenerRegistration.remove()` method.
 
-Asynchronous requests are supported by our `Request` object. The `request.run()` method will perform the request on a serial 
-background thread and notify success/failure using `ResultCallback` on the android main thread. 
+## Sync vs Async
+
+Asynchronous requests are supported by our `Request` object. The `request.run()` method will perform the requests sequentially on a single background thread and notify success/failure using `ResultCallback` on the android main thread.
 In addition, `cancel(boolean)` method can be used to safely cancel requests and detach callbacks.
 
-
-A synchronous version of these methods is also provided. Make sure you call them in a background thread.
+A synchronous version (with the 'Sync' suffix) of these methods is also provided, as SDK requests performs network IO operations, make sure you call them in a background thread.
 
 ```java
 try {
@@ -295,16 +284,61 @@ try {
     TransactionId transactionId = account.sendTransactionSync(toAddress, amountInKin);
 } catch (OperationFailedException e){
     // something else went wrong - check the exception message
-} 
+}
 ```
 
-### Sample Application 
-For a more detailed example on how to use the library please take a look at our [Sample App](sample/).
+## Error Handling
 
-## Testing
+`kin-core` wraps errors with exceptions, synchronous methods can throw exceptions and asynchronous requests has `onError(Exception e)` callback.
 
-Both Unit tests and Android tests are provided, Android tests include integration tests that run on the Stellar test network, 
-these tests are marked as `@LargeTest`, because they are time consuming, and depends on the network.
+### Common Errors
+
+`AccountNotFoundException` - Account is not created (funded with native asset) on the network.  
+`AccountNotActivatedException` - Account was created but not activated yet, the account cannot send or receive KIN yet.  
+`InsufficientKinException` - Account has not enough kin funds to perform the transaction.
+
+## Sample Application
+
+![Sample App](../.github/android_sample_app_screenshot.png)
+
+Sample app covers the entire functionality of `kin-core`, and serves as a detailed example on how to use the library.  
+Sample app source code can be found [here](https://github.com/kinecosystem/kin-core-android/tree/dev/sample/).
+
+## Building from Source
+
+Clone the repo:
+
+```bash
+$ git clone https://github.com/kinecosystem/kin-core-android.git
+```
+
+Next, initialize and update git submodules:
+
+```bash
+$ git submodule init && git submodule update
+```
+
+Now you can build the library using gradle, or open the project using Android Studio.
+
+### Tests
+
+Both Unit tests and instrumentation tests are provided, Android tests include integration tests that run on a remote test network, these tests are marked as `@LargeTest`, because they are time consuming, and depends on the network.
+
+### Running Tests
+
+For running both unit tests and instrumentation tests and generating a code coverage report using Jacoco, use this script
+```bash
+$ ./run_integ_test.sh
+```
+
+Running tests without integration tests
+
+```bash
+$ ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest
+```
+
+Generated report can be found at:  
+`kin-core/build/reports/jacoco/jacocoTestReport/html/index.html`.
 
 
 ## Contributing
