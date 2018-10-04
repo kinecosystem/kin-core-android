@@ -120,15 +120,6 @@ public class KinAccountImplTest {
         verify(mockAccountActivator).activate(expectedRandomAccount);
     }
 
-    @Test
-    public void createBlockchainEvents() throws Exception {
-        initWithRandomAccount();
-
-        kinAccount.blockchainEvents();
-
-        verify(mockBlockchainEventsCreator).create(expectedRandomAccount.getAccountId());
-    }
-
     @Test(expected = AccountDeletedException.class)
     public void sendTransactionSync_DeletedAccount_Exception() throws Exception {
         initWithRandomAccount();

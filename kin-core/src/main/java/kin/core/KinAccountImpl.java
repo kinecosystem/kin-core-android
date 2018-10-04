@@ -70,8 +70,18 @@ final class KinAccountImpl extends AbstractKinAccount {
     }
 
     @Override
-    public BlockchainEvents blockchainEvents() {
-        return blockchainEvents;
+    public ListenerRegistration addBalanceListener(@NonNull EventListener<Balance> listener) {
+        return blockchainEvents.addBalanceListener(listener);
+    }
+
+    @Override
+    public ListenerRegistration addPaymentListener(@NonNull EventListener<PaymentInfo> listener) {
+        return blockchainEvents.addPaymentListener(listener);
+    }
+
+    @Override
+    public ListenerRegistration addAccountCreationListener(EventListener<Void> listener) {
+        return blockchainEvents.addAccountCreationListener(listener);
     }
 
     void markAsDeleted() {

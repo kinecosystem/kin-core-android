@@ -99,9 +99,8 @@ public class WalletActivity extends BaseActivity {
     private void handleAutoBalanceSwitchChanges(View refresh, boolean isChecked) {
         refresh.setEnabled(!isChecked);
         if (isChecked) {
-            balanceListenerRegistration = account.blockchainEvents()
-                .addBalanceListener(
-                    updatedBalance -> runOnUiThread(() -> balance.setText(updatedBalance.value().toPlainString())));
+            balanceListenerRegistration = account.addBalanceListener(
+                updatedBalance -> runOnUiThread(() -> balance.setText(updatedBalance.value().toPlainString())));
         } else {
             balanceListenerRegistration.remove();
         }

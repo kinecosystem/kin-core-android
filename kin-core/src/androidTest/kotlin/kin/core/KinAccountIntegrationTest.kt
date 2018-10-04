@@ -138,8 +138,7 @@ class KinAccountIntegrationTest {
         val expectedMemo = "fake memo"
 
         val latch = CountDownLatch(1)
-        val listenerRegistration = kinAccountReceiver.blockchainEvents()
-                .addPaymentListener { _ -> latch.countDown() }
+        val listenerRegistration = kinAccountReceiver.addPaymentListener { _ -> latch.countDown() }
 
         val transactionId = kinAccountSender
                 .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"),
@@ -246,11 +245,11 @@ class KinAccountIntegrationTest {
         val eventsCount = if (sender) 4 else 2 ///in case of observing the sender we'll get 2 events (1 for funding 1 for the
         //transaction) in case of receiver - only 1 event. multiply by 2, as we 2 listeners (balance and payment)
         val latch = CountDownLatch(eventsCount)
-        val paymentListener = accountToListen.blockchainEvents().addPaymentListener { data ->
+        val paymentListener = accountToListen.addPaymentListener { data ->
             actualPaymentsResults.add(data)
             latch.countDown()
         }
-        val balanceListener = accountToListen.blockchainEvents().addBalanceListener { data ->
+        val balanceListener = accountToListen.addBalanceListener { data ->
             actualBalanceResults.add(data)
             latch.countDown()
         }
@@ -286,11 +285,9 @@ class KinAccountIntegrationTest {
         val (kinAccountSender, kinAccountReceiver) = onboardAccounts(senderFundAmount = 100)
 
         val latch = CountDownLatch(1)
-        val blockchainEvents = kinAccountReceiver.blockchainEvents()
-        val listenerRegistration = blockchainEvents
-                .addPaymentListener {
-                    fail("should not get eny event!")
-                }
+        val listenerRegistration = kinAccountReceiver.addPaymentListener {
+            fail("should not get eny event!")
+        }
         listenerRegistration.remove()
 
         kinAccountSender
