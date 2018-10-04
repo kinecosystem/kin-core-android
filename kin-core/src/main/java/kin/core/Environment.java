@@ -1,5 +1,7 @@
 package kin.core;
 
+import static kin.core.Utils.checkNotEmpty;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import org.stellar.sdk.Asset;
@@ -154,6 +156,7 @@ public class Environment {
          * Sets the asset code, optional, the default is "KIN".
          * <p><b>Warning!</b> use for testing only, for testing against custom asset.</p>
          */
+        @SuppressWarnings("WeakerAccess")
         public Builder setAssetCode(String assetCode) {
             this.assetCode = assetCode;
             return this;
@@ -163,10 +166,10 @@ public class Environment {
          * Build an Environment object.
          */
         public Environment build() {
-            Utils.checkNotEmpty(networkUrl, "setNetworkUrl");
-            Utils.checkNotEmpty(networkPassphrase, "setNetworkPassphrase");
-            Utils.checkNotEmpty(issuerAccountId, "setIssuerAccountId");
-            Utils.checkNotEmpty(assetCode, "setAssetCode");
+            checkNotEmpty(networkUrl, "networkUrl");
+            checkNotEmpty(networkPassphrase, "networkPassphrase");
+            checkNotEmpty(issuerAccountId, "issuerAccountId");
+            checkNotEmpty(assetCode, "assetCode");
 
             return new Environment(networkUrl, networkPassphrase, issuerAccountId, assetCode);
         }

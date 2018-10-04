@@ -275,7 +275,7 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void getServiceProvider() throws Exception {
+    public void getEnvironment() throws Exception {
         String url = "https://www.myawesomeserver.com";
         kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
             .setEnvironment(
@@ -287,12 +287,12 @@ public class KinClientIntegrationTest {
             )
             .setStoreKey(STORE_KEY_TEST)
             .build();
-        Environment actualServiceProvider = kinClient.getServiceProvider();
+        Environment actualEnvironment = kinClient.getEnvironment();
 
-        assertNotNull(actualServiceProvider);
-        assertFalse(actualServiceProvider.isMainNet());
-        assertEquals(url, actualServiceProvider.getNetworkUrl());
-        assertEquals(Environment.TEST.getNetworkPassphrase(), actualServiceProvider.getNetworkPassphrase());
+        assertNotNull(actualEnvironment);
+        assertFalse(actualEnvironment.isMainNet());
+        assertEquals(url, actualEnvironment.getNetworkUrl());
+        assertEquals(Environment.TEST.getNetworkPassphrase(), actualEnvironment.getNetworkPassphrase());
     }
 
     @Test
