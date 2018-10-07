@@ -21,7 +21,7 @@ public class KinClient {
 
     private static final String STORE_NAME_PREFIX = "KinKeyStore_";
     private static final int TRANSACTIONS_TIMEOUT = 30;
-    private final Environment Environment;
+    private final Environment environment;
     private final KeyStore keyStore;
     private final TransactionSender transactionSender;
     private final AccountActivator accountActivator;
@@ -30,30 +30,23 @@ public class KinClient {
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
-    /**
-     * KinClient is an account manager for a {@link KinAccount}.
-     *
-     * @param context the android application context
-     * @param provider the service provider - provides blockchain network parameters
-     * @param storeKey the key for storing this client data, different keys will store a different accounts
-     */
-    private KinClient(@NonNull Context context, @NonNull Environment provider, @NonNull String storeKey) {
+    private KinClient(@NonNull Context context, @NonNull Environment environment, @NonNull String storeKey) {
         checkNotNull(storeKey, "storeKey");
-        this.Environment = provider;
+        this.environment = environment;
         Server server = initServer();
         keyStore = initKeyStore(context.getApplicationContext(), storeKey);
-        transactionSender = new TransactionSender(server, provider.getKinAsset());
-        accountActivator = new AccountActivator(server, provider.getKinAsset());
-        accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
-        blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
+        transactionSender = new TransactionSender(server, environment.getKinAsset());
+        accountActivator = new AccountActivator(server, environment.getKinAsset());
+        accountInfoRetriever = new AccountInfoRetriever(server, environment.getKinAsset());
+        blockchainEventsCreator = new BlockchainEventsCreator(server, environment.getKinAsset());
         loadAccounts();
     }
 
     @VisibleForTesting
-    KinClient(Environment Environment, KeyStore keyStore, TransactionSender transactionSender,
+    KinClient(Environment environment, KeyStore keyStore, TransactionSender transactionSender,
         AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
         BlockchainEventsCreator blockchainEventsCreator) {
-        this.Environment = Environment;
+        this.environment = environment;
         this.keyStore = keyStore;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
@@ -63,8 +56,8 @@ public class KinClient {
     }
 
     private Server initServer() {
-        Network.use(Environment.getNetwork());
-        return new Server(Environment.getNetworkUrl(), TRANSACTIONS_TIMEOUT, TimeUnit.SECONDS);
+        Network.use(environment.getNetwork());
+        return new Server(environment.getNetworkUrl(), TRANSACTIONS_TIMEOUT, TimeUnit.SECONDS);
     }
 
     private KeyStore initKeyStore(Context context, String id) {
@@ -153,7 +146,7 @@ public class KinClient {
     }
 
     public Environment getEnvironment() {
-        return Environment;
+        return environment;
     }
 
     @NonNull

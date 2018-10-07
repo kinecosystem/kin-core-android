@@ -176,7 +176,7 @@ balanceRequest.run(new ResultCallback<Balance>() {
 
 To transfer KIN to another account, you need the public address of the account you want to transfer the KIN to.
 
-The following code will transfer 20 KIN to account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO".
+The following code will transfer 20 KIN to the recipient account "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO".
 
 ```java
 String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
