@@ -2,6 +2,7 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import java.io.UnsupportedEncodingException;
+import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CryptoException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +43,8 @@ class BackupRestoreImpl implements BackupRestore {
 
     @Override
     @NonNull
-    public KeyPair importWallet(@NonNull String exportedJson, @NonNull String passphrase) throws CryptoException {
+    public KeyPair importWallet(@NonNull String exportedJson, @NonNull String passphrase)
+        throws CryptoException, CorruptedDataException {
         AccountJson accountJson = stringify(exportedJson);
 
         byte[] passphraseBytes = stringToUTF8ByteArray(passphrase);
@@ -99,14 +101,14 @@ class BackupRestoreImpl implements BackupRestore {
         }
     }
 
-    private AccountJson stringify(String exportedJson) throws CryptoException {
+    private AccountJson stringify(String exportedJson) throws CryptoException, CorruptedDataException {
         try {
             JSONObject json = new JSONObject(exportedJson);
             String seedHex = json.getString(JSON_KEY_SEED);
             String saltHex = json.getString(JSON_KEY_SALT);
             return new AccountJson(seedHex, saltHex);
         } catch (JSONException e) {
-            throw new CryptoException(e);
+            throw new CorruptedDataException("Unexpected json format", e);
         }
     }
 

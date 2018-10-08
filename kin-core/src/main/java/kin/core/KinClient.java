@@ -6,6 +6,7 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.CryptoException;
 import kin.core.exception.DeleteAccountException;
@@ -122,7 +123,7 @@ public class KinClient {
      */
     public @NonNull
     KinAccount importAccount(@NonNull String exportedJson, @NonNull String passphrase)
-        throws CryptoException, CreateAccountException {
+        throws CryptoException, CreateAccountException, CorruptedDataException {
         KeyPair account = keyStore.importAccount(exportedJson, passphrase);
         return addKeyPair(account);
     }

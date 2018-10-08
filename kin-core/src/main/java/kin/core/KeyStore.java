@@ -2,6 +2,7 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import java.util.List;
+import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.CryptoException;
 import kin.core.exception.DeleteAccountException;
@@ -17,7 +18,7 @@ interface KeyStore {
     KeyPair newAccount() throws CreateAccountException;
 
     KeyPair importAccount(@NonNull String json, @NonNull String passphrase)
-        throws CryptoException, CreateAccountException;
+        throws CryptoException, CreateAccountException, CorruptedDataException;
 
     void clearAllAccounts();
 }

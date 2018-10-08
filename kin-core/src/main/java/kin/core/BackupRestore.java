@@ -2,6 +2,7 @@ package kin.core;
 
 
 import android.support.annotation.NonNull;
+import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CryptoException;
 import org.stellar.sdk.KeyPair;
 
@@ -12,5 +13,6 @@ interface BackupRestore {
         throws CryptoException;
 
     @NonNull
-    KeyPair importWallet(@NonNull String exportedJson, @NonNull String passphrase) throws CryptoException;
+    KeyPair importWallet(@NonNull String exportedJson, @NonNull String passphrase)
+        throws CryptoException, CorruptedDataException;
 }
