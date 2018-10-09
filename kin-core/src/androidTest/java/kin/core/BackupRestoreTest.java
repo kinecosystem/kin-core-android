@@ -44,7 +44,7 @@ public class BackupRestoreTest {
 
     @Test
     public void import_BadJson_CryptoException() throws CryptoException, CorruptedDataException {
-        expectedEx.expect(CryptoException.class);
+        expectedEx.expect(CorruptedDataException.class);
         expectedEx.expectCause(isA(JSONException.class));
 
         backupRestore.importWallet("not a real json!!", "123456");
