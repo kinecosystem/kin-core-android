@@ -81,7 +81,7 @@ class AccountInfoRetriever {
      * @throws OperationFailedException or one of its subclasses
      */
     List<PaymentInfo> getTransactionsPaymentsHistory(@NonNull String accountId) throws OperationFailedException {
-        List<PaymentInfo> payments = new ArrayList<>(); // TODO: 12/10/2018 can make it null and if no payment then we return null.
+        List<PaymentInfo> payments = new ArrayList<>(); // TODO: 12/10/2018 can make it null and if no payment then we return null instead of empty list
         if (blockchainEvents != null) {
             payments = getPaymentsHistory(server.transactions(), accountId);
         }
@@ -138,7 +138,6 @@ class AccountInfoRetriever {
                 throw new OperationFailedException(httpError);
             }
         } catch (IOException e) {
-            // TODO: 12/10/2018 maybe add some logs
             e.printStackTrace();
         }
 

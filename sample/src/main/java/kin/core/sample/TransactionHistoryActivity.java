@@ -12,7 +12,7 @@ import kin.sdk.core.sample.R;
 
 public class TransactionHistoryActivity extends BaseActivity {
 
-    public static final String TAG = TransactionHistoryActivity.class.getSimpleName(); // TODO: 12/10/2018  should i log some methods?
+    public static final String TAG = TransactionHistoryActivity.class.getSimpleName();
     public static final String EXTRA_TRANSACTION_HISTORY_PARAMS = "extraTransactionHistoryParams";
 
     private TextInputLayout accountId;

@@ -17,7 +17,7 @@ import kin.sdk.core.sample.R;
 
 public class ShowTransactionHistoryActivity extends BaseActivity {
 
-    public static final String TAG = ShowTransactionHistoryActivity.class.getSimpleName(); // TODO: 12/10/2018  should i log some methods? do we log stuff
+    public static final String TAG = ShowTransactionHistoryActivity.class.getSimpleName();
 
     private RecyclerView recyclerView;
     private View progressBar;
@@ -58,9 +58,9 @@ public class ShowTransactionHistoryActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
     }
 
+
     private void getTransactionHistory(TransactionHistoryRequestParams params) {
         if (account != null) {
-//          .order(TransactionHistoryRequestParams.Order.DESC); // TODO: 12/10/2018 why can't we add dependency on stellar sdk as well?
             Request<List<PaymentInfo>> request = account.getTransactionsPaymentsHistory(params);
             request.run(new DisplayCallback<List<PaymentInfo>>(progressBar) {
                 @Override

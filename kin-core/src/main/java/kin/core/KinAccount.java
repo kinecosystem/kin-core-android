@@ -142,7 +142,7 @@ public interface KinAccount {
      * @throws OperationFailedException operation fail error
      */
     @NonNull
-    List<PaymentInfo> getTransactionsPaymentsHistorySync() throws  OperationFailedException; // TODO: 11/10/2018 add more exceptions to javadoc
+    List<PaymentInfo> getTransactionsPaymentsHistorySync() throws  OperationFailedException;
 
     /**
      * * For method description see {@link KinAccount#getTransactionsPaymentsHistorySync()}

@@ -137,7 +137,7 @@ class BlockchainEvents {
     private void extractPaymentsFromTransaction(TransactionResponse transactionResponse,
                                                 EventListener<PaymentInfo> listener) {
         PaymentInfo paymentInfo = getPaymentInfo(transactionResponse);
-        if (paymentInfo != null) { // TODO: 11/10/2018 did it in this way so i could extract to method the other parts
+        if (paymentInfo != null) {
             listener.onEvent(paymentInfo);
         }
     }
@@ -149,14 +149,6 @@ class BlockchainEvents {
             for (Operation operation : operations) {
                 if (operation instanceof PaymentOperation) {
                     PaymentOperation paymentOperation = (PaymentOperation) operation;
-
-                    // TODO: 11/10/2018 after looking on Ron code i saw that he looked at more conditions than only this
-//                  # A transaction will not be simplified if:
-//                  # 1. It contains a memo that is not a text memo
-//                  # 2. It contains multiple operations
-//                  # 3. It contains a payment that is not of KIN/XLM
-//                  # 4. It contains activation to anything other than KIN
-//                  # 5. Its operation type is not one of 'Payment'/'Activation'/'Create account'.
                     if (isPaymentInKin(paymentOperation)) {
                         paymentInfo = new PaymentInfoImpl(
                                 transactionResponse.getCreatedAt(),

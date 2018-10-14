@@ -28,7 +28,7 @@ final class KinAccountImpl extends AbstractKinAccount {
         this.accountActivator = accountActivator;
         this.blockchainEvents = blockchainEventsCreator.create(account.getAccountId());
         this.accountInfoRetriever = accountInfoRetriever;
-        this.accountInfoRetriever.setBlockChainEvents(this.blockchainEvents); // TODO: 12/10/2018 this is the simplest way to do it as discussed with Yossi
+        this.accountInfoRetriever.setBlockChainEvents(this.blockchainEvents);
     }
 
     @Override
