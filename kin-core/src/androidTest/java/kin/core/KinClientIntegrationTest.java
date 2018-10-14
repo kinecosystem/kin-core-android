@@ -27,7 +27,7 @@ public class KinClientIntegrationTest {
 
     private static final String STORE_KEY_TEST = "test";
     private static final String STORE_KEY_TEST2 = "test2";
-    private ServiceProvider serviceProvider;
+    private Environment environment;
     private KinClient kinClient;
     private KinClient kinClient2;
 
@@ -36,7 +36,11 @@ public class KinClientIntegrationTest {
 
     @Before
     public void setup() {
-        serviceProvider = new ServiceProvider(TEST_NETWORK_URL, TEST_NETWORK_ID);
+        environment = new Environment.Builder()
+            .setNetworkUrl(TEST_NETWORK_URL)
+            .setNetworkPassphrase(TEST_NETWORK_ID)
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         kinClient = createNewKinClient(STORE_KEY_TEST);
         kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         kinClient.clearAllAccounts();
@@ -44,7 +48,10 @@ public class KinClientIntegrationTest {
     }
 
     private KinClient createNewKinClient(String storeKey) {
-        return new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, storeKey);
+        return new KinClient.Builder(InstrumentationRegistry.getTargetContext())
+            .setEnvironment(environment)
+            .setStoreKey(storeKey)
+            .build();
     }
 
     @After
@@ -94,7 +101,7 @@ public class KinClientIntegrationTest {
     @Test
     public void getAccount_ExistingAccount_AddMultipleAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
         KinAccount kinAccount2 = kinClient.addAccount();
         KinAccount kinAccount3 = kinClient.addAccount();
 
@@ -114,7 +121,7 @@ public class KinClientIntegrationTest {
     public void getAccount_ExistingMultipleAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
         KinAccount kinAccount2 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
         KinAccount expectedAccount2 = kinClient.getAccount(1);
         KinAccount expectedAccount1 = kinClient.getAccount(0);
 
@@ -142,7 +149,7 @@ public class KinClientIntegrationTest {
     @Test
     public void getAccount_ExistingAccount_SameAccount() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         KinAccount kinAccount = kinClient.getAccount(0);
 
@@ -157,7 +164,7 @@ public class KinClientIntegrationTest {
     @Test
     public void hasAccount_ExistingAccount_True() throws Exception {
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         assertTrue(kinClient.hasAccount());
     }
@@ -166,7 +173,7 @@ public class KinClientIntegrationTest {
     public void hasAccount_ExistingMultipleAccounts_True() throws Exception {
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         assertTrue(kinClient.hasAccount());
     }
@@ -174,18 +181,25 @@ public class KinClientIntegrationTest {
     @Test
     public void deleteAccount() throws Exception {
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         assertTrue(kinClient.hasAccount());
         kinClient.deleteAccount(0);
         assertFalse(kinClient.hasAccount());
     }
 
+    private void buildKinClient() {
+        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
+            .setEnvironment(environment)
+            .setStoreKey(STORE_KEY_TEST)
+            .build();
+    }
+
     @Test
     public void deleteAccount_MultipleAccounts() throws Exception {
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         kinClient.deleteAccount(0);
 
@@ -198,7 +212,7 @@ public class KinClientIntegrationTest {
     public void deleteAccount_AtIndex() throws Exception {
         KinAccount kinAccount1 = kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         kinClient.deleteAccount(1);
 
@@ -235,7 +249,7 @@ public class KinClientIntegrationTest {
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         assertThat(kinClient.getAccountCount(), equalTo(3));
         kinClient.deleteAccount(2);
@@ -253,7 +267,7 @@ public class KinClientIntegrationTest {
         kinClient.addAccount();
         kinClient.addAccount();
         kinClient.addAccount();
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
+        buildKinClient();
 
         kinClient.clearAllAccounts();
 
@@ -261,16 +275,24 @@ public class KinClientIntegrationTest {
     }
 
     @Test
-    public void getServiceProvider() throws Exception {
+    public void getEnvironment() throws Exception {
         String url = "https://www.myawesomeserver.com";
-        ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider, STORE_KEY_TEST);
-        ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
+        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
+            .setEnvironment(
+                new Environment.Builder()
+                    .setNetworkUrl(url)
+                    .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+                    .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+                    .build()
+            )
+            .setStoreKey(STORE_KEY_TEST)
+            .build();
+        Environment actualEnvironment = kinClient.getEnvironment();
 
-        assertNotNull(actualServiceProvider);
-        assertFalse(actualServiceProvider.isMainNet());
-        assertEquals(url, actualServiceProvider.getProviderUrl());
-        assertEquals(ServiceProvider.NETWORK_ID_TEST, actualServiceProvider.getNetworkId());
+        assertNotNull(actualEnvironment);
+        assertFalse(actualEnvironment.isMainNet());
+        assertEquals(url, actualEnvironment.getNetworkUrl());
+        assertEquals(Environment.TEST.getNetworkPassphrase(), actualEnvironment.getNetworkPassphrase());
     }
 
     @Test

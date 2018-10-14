@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.LedgerEntryChange;
 import org.stellar.sdk.LedgerEntryChanges;
@@ -22,7 +22,7 @@ import org.stellar.sdk.responses.TransactionResponse;
 /**
  * Provides listeners, for various events happens on the blockchain.
  */
-public class BlockchainEvents {
+class BlockchainEvents {
 
     private static final String CURSOR_FUTURE_ONLY = "now";
     private final Server server;
@@ -41,7 +41,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener) {
+    ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server
             .transactions()
@@ -93,7 +93,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener) {
+    ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server
             .transactions()
@@ -114,7 +114,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addAccountCreationListener(final EventListener<Void> listener) {
+    ListenerRegistration addAccountCreationListener(final EventListener<Void> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server.transactions()
             .forAccount(accountKeyPair)

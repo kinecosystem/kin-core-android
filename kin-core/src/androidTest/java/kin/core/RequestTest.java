@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -86,6 +87,7 @@ public class RequestTest {
         runRequest(new Callable<Object>() {
                        @Override
                        public Object call() throws Exception {
+                           Log.d("debug", "Result Thread = " + Thread.currentThread());
                            threadIds.set(0, Thread.currentThread().getId());
                            return null;
                        }
@@ -93,6 +95,7 @@ public class RequestTest {
             new Consumer<Object>() {
                 @Override
                 public void accept(Object result) {
+                    Log.d("debug", "Error Thread = " + Thread.currentThread());
                     threadIds.set(1, Thread.currentThread().getId());
                 }
             },

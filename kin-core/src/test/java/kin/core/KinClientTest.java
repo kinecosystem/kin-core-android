@@ -9,7 +9,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.mockito.Mockito.mock;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +38,54 @@ public class KinClientTest {
     private BlockchainEventsCreator mockBlockchainEventsCreator;
     private KinClient kinClient;
     private KeyStore fakeKeyStore;
-    private ServiceProvider fakeServiceProvider;
+    private Environment fakeEnvironment;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        fakeServiceProvider = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST);
+        fakeEnvironment = new Environment.Builder()
+            .setNetworkUrl("empty")
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
         fakeKeyStore = new FakeKeyStore();
         kinClient = createNewKinClient();
+    }
+
+    @Test
+    public void kinClientBuilder_missingContext_IllegalArgumentException() {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("environment");
+
+        Context ctx = mock(Context.class);
+
+        new KinClient.Builder(ctx)
+            .setStoreKey("test")
+            .build();
+    }
+
+    @Test
+    public void kinClientBuilder_missingStoreKey_IllegalArgumentException() {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("storeKey");
+
+        Context ctx = mock(Context.class);
+
+        new KinClient.Builder(ctx)
+            .setEnvironment(fakeEnvironment)
+            .setStoreKey(null)
+            .build();
+    }
+
+    @Test
+    public void kinClientBuilder_missingEnvironment_IllegalArgumentException() {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("context");
+
+        new KinClient.Builder(null)
+            .setEnvironment(null)
+            .setStoreKey("test")
+            .build();
     }
 
     @Test
@@ -292,22 +334,122 @@ public class KinClientTest {
     }
 
     @Test
-    public void getServiceProvider() throws Exception {
+    public void getEnvironment() throws Exception {
         String url = "My awesome Horizon server";
-        ServiceProvider serviceProvider = new ServiceProvider(url, ServiceProvider.NETWORK_ID_TEST);
-        kinClient = new KinClient(serviceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
+        Environment environment = new Environment.Builder()
+            .setNetworkUrl(url)
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
+        kinClient = new KinClient(environment, fakeKeyStore, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
-        ServiceProvider actualServiceProvider = kinClient.getServiceProvider();
+        Environment actualEnvironment = kinClient.getEnvironment();
 
-        assertNotNull(actualServiceProvider);
-        assertFalse(actualServiceProvider.isMainNet());
-        assertEquals(url, actualServiceProvider.getProviderUrl());
-        assertEquals(ServiceProvider.NETWORK_ID_TEST, actualServiceProvider.getNetworkId());
+        assertNotNull(actualEnvironment);
+        assertFalse(actualEnvironment.isMainNet());
+        assertEquals(url, actualEnvironment.getNetworkUrl());
+        assertEquals(Environment.TEST.getNetworkPassphrase(), actualEnvironment.getNetworkPassphrase());
+    }
+
+    @Test
+    public void environment_MissingNetworkUrl_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("networkUrl");
+
+        new Environment.Builder()
+            .setNetworkUrl(null)
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
+    }
+
+    @Test
+    public void environment_MissingNetworkPassphrase_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("networkPassphrase");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
+    }
+
+    @Test
+    public void environment_MissingIssuerAccountId_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("issuerAccountId");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .build();
+    }
+
+    @Test
+    public void environment_MissingAssetCode_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("assetCode");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .setAssetCode(null)
+            .build();
+    }
+
+    @Test
+    public void environment_EmptyNetworkUrl_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("networkUrl");
+
+        new Environment.Builder()
+            .setNetworkUrl("")
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
+    }
+
+    @Test
+    public void environment_EmptyNetworkPassphrase_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("networkPassphrase");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setNetworkPassphrase("")
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .build();
+    }
+
+    @Test
+    public void environment_EmptyIssuerAccountId_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("issuerAccountId");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId("")
+            .build();
+    }
+
+    @Test
+    public void environment_EmptyAssetCode_IllegalArgumentException() throws Exception {
+        expectedEx.expect(IllegalArgumentException.class);
+        expectedEx.expectMessage("assetCode");
+
+        new Environment.Builder()
+            .setNetworkUrl(Environment.TEST.getNetworkUrl())
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
+            .setAssetCode("")
+            .build();
     }
 
     @NonNull
     private KinClient createNewKinClient() {
-        return new KinClient(fakeServiceProvider, fakeKeyStore, mockTransactionSender, mockAccountActivator,
+        return new KinClient(fakeEnvironment, fakeKeyStore, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
     }
 }

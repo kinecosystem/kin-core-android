@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;

@@ -39,7 +39,8 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
+     * record.
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
     @NonNull
@@ -69,7 +70,8 @@ public interface KinAccount {
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
+     * record.
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
@@ -141,7 +143,26 @@ public interface KinAccount {
     Request<Integer> getStatus();
 
     /**
-     * Returns {@link BlockchainEvents} object, allows registering to various events on the blockchain network.
+     * Creates and adds listener for balance changes of this account, use returned {@link ListenerRegistration} to
+     * stop listening. <p><b>Note:</b> Events will be fired on background thread.</p>
+     *
+     * @param listener listener object for payment events
      */
-    BlockchainEvents blockchainEvents();
+    ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener);
+
+    /**
+     * Creates and adds listener for payments concerning this account, use returned {@link ListenerRegistration} to
+     * stop listening. <p><b>Note:</b> Events will be fired on background thread.</p>
+     *
+     * @param listener listener object for payment events
+     */
+    ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener);
+
+    /**
+     * Creates and adds listener for account creation event, use returned {@link ListenerRegistration} to stop
+     * listening. <p><b>Note:</b> Events will be fired on background thread.</p>
+     *
+     * @param listener listener object for payment events
+     */
+    ListenerRegistration addAccountCreationListener(final EventListener<Void> listener);
 }

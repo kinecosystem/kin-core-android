@@ -30,4 +30,10 @@ final class Utils {
             throw new IllegalArgumentException(paramName + " == null");
         }
     }
+
+    static void checkNotEmpty(String string, String paramName) {
+        if (string == null || string.isEmpty()) {
+            throw new IllegalArgumentException(paramName + " cannot be null or empty.");
+        }
+    }
 }

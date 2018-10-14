@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;

@@ -19,8 +19,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     abstract int getActionBarTitleRes();
 
     public boolean isMainNet() {
-        if (getKinClient() != null && getKinClient().getServiceProvider() != null) {
-            return getKinClient().getServiceProvider().isMainNet();
+        if (getKinClient() != null && getKinClient().getEnvironment() != null) {
+            return getKinClient().getEnvironment().isMainNet();
         }
         return false;
     }
