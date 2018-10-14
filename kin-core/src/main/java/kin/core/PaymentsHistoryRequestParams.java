@@ -7,7 +7,7 @@ import android.os.Parcelable;
 /**
  * Class which build optional params for the transaction payment history request.
  */
-public class TransactionHistoryRequestParams implements Parcelable {
+public class PaymentsHistoryRequestParams implements Parcelable {
 
     private String accountId;
     private final String token;
@@ -17,7 +17,7 @@ public class TransactionHistoryRequestParams implements Parcelable {
     /**
      * Represents possible <code>order</code> parameter values.
      */
-    public enum Order { // TODO: 12/10/2018 add it only because I am not sure we can use the stellar sdk Order Enum
+    public enum Order {
         ASC("asc"),
         DESC("desc");
 
@@ -32,14 +32,14 @@ public class TransactionHistoryRequestParams implements Parcelable {
         }
     }
 
-    private TransactionHistoryRequestParams(TransactionHistoryRequestParamsBuilder builder) {
+    private PaymentsHistoryRequestParams(PaymentsHistoryRequestParamsBuilder builder) {
         this.accountId = builder.accountId;
         this.token = builder.token;
         this.limit = builder.limit;
         this.order = builder.order;
     }
 
-    protected TransactionHistoryRequestParams(Parcel in) {
+    protected PaymentsHistoryRequestParams(Parcel in) {
         accountId = in.readString();
         token = in.readString();
         limit = in.readInt();
@@ -60,15 +60,15 @@ public class TransactionHistoryRequestParams implements Parcelable {
         return 0;
     }
 
-    public static final Creator<TransactionHistoryRequestParams> CREATOR = new Creator<TransactionHistoryRequestParams>() {
+    public static final Creator<PaymentsHistoryRequestParams> CREATOR = new Creator<PaymentsHistoryRequestParams>() {
         @Override
-        public TransactionHistoryRequestParams createFromParcel(Parcel in) {
-            return new TransactionHistoryRequestParams(in);
+        public PaymentsHistoryRequestParams createFromParcel(Parcel in) {
+            return new PaymentsHistoryRequestParams(in);
         }
 
         @Override
-        public TransactionHistoryRequestParams[] newArray(int size) {
-            return new TransactionHistoryRequestParams[size];
+        public PaymentsHistoryRequestParams[] newArray(int size) {
+            return new PaymentsHistoryRequestParams[size];
         }
     };
 
@@ -93,35 +93,35 @@ public class TransactionHistoryRequestParams implements Parcelable {
     }
 
 
-    public static class TransactionHistoryRequestParamsBuilder {
+    public static class PaymentsHistoryRequestParamsBuilder {
 
         private String accountId;           //optional
         private String token;               //optional
         private int limit;                  //optional
         private Order order;                //optional
 
-        public TransactionHistoryRequestParamsBuilder account(String accountId) {
+        public PaymentsHistoryRequestParamsBuilder account(String accountId) {
             this.accountId = accountId;
             return this;
         }
 
-        public TransactionHistoryRequestParamsBuilder cursor(String token) {
+        public PaymentsHistoryRequestParamsBuilder cursor(String token) {
             this.token = token;
             return this;
         }
 
-        public TransactionHistoryRequestParamsBuilder limit(int limit) {
+        public PaymentsHistoryRequestParamsBuilder limit(int limit) {
             this.limit = limit;
             return this;
         }
 
-        public TransactionHistoryRequestParamsBuilder order(Order order) {
+        public PaymentsHistoryRequestParamsBuilder order(Order order) {
             this.order = order;
             return this;
         }
 
-        public TransactionHistoryRequestParams build() {
-            return new TransactionHistoryRequestParams(this);
+        public PaymentsHistoryRequestParams build() {
+            return new PaymentsHistoryRequestParams(this);
         }
 
     }

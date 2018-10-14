@@ -65,7 +65,7 @@ public class WalletActivity extends BaseActivity {
         statusProgress = findViewById(R.id.status_progress);
 
         final View transaction = findViewById(R.id.send_transaction_btn);
-        final View transactionHistory = findViewById(R.id.transaction_history_btn);
+        final View paymentsHistory = findViewById(R.id.transaction_history_btn);
         final View refresh = findViewById(R.id.refresh_btn);
         onboardBtn = findViewById(R.id.onboard_btn);
         final View deleteAccount = findViewById(R.id.delete_account_btn);
@@ -73,7 +73,6 @@ public class WalletActivity extends BaseActivity {
 
         if (isMainNet()) {
             transaction.setBackgroundResource(R.drawable.button_main_network_bg);
-            // TODO: 10/10/2018 should i do it also for get transaction history
             refresh.setBackgroundResource(R.drawable.button_main_network_bg);
             onboardBtn.setVisibility(View.GONE);
         } else {
@@ -87,7 +86,7 @@ public class WalletActivity extends BaseActivity {
         deleteAccount.setOnClickListener(view -> showDeleteAlert());
 
         transaction.setOnClickListener(view -> startActivity(TransactionActivity.getIntent(WalletActivity.this)));
-        transactionHistory.setOnClickListener(view -> startActivity(TransactionHistoryActivity.getIntent(WalletActivity.this)));
+        paymentsHistory.setOnClickListener(view -> startActivity(PaymentsHistoryActivity.getIntent(WalletActivity.this)));
         watchPayments.setOnClickListener(view -> startActivity(PaymentListenerActivity.getIntent(WalletActivity.this)));
         refresh.setOnClickListener(view -> updateAccountInfo(true));
         balanceListenSwitch

@@ -7,12 +7,12 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.widget.Button;
 
-import kin.core.TransactionHistoryRequestParams;
+import kin.core.PaymentsHistoryRequestParams;
 import kin.sdk.core.sample.R;
 
-public class TransactionHistoryActivity extends BaseActivity {
+public class PaymentsHistoryActivity extends BaseActivity {
 
-    public static final String TAG = TransactionHistoryActivity.class.getSimpleName();
+    public static final String TAG = PaymentsHistoryActivity.class.getSimpleName();
     public static final String EXTRA_TRANSACTION_HISTORY_PARAMS = "extraTransactionHistoryParams";
 
     private TextInputLayout accountId;
@@ -22,7 +22,7 @@ public class TransactionHistoryActivity extends BaseActivity {
     private Button descButton;
 
     public static Intent getIntent(Context context) {
-        return new Intent(context, TransactionHistoryActivity.class);
+        return new Intent(context, PaymentsHistoryActivity.class);
     }
 
     @Override
@@ -60,15 +60,15 @@ public class TransactionHistoryActivity extends BaseActivity {
         });
 
         findViewById(R.id.get_transaction_history_btn).setOnClickListener(v -> {
-            TransactionHistoryRequestParams transactionHistoryRequestParams = buildTransactionParams();
-            Intent intent = ShowTransactionHistoryActivity.getIntent(TransactionHistoryActivity.this);
-            intent.putExtra(EXTRA_TRANSACTION_HISTORY_PARAMS, transactionHistoryRequestParams);
+            PaymentsHistoryRequestParams paymentsHistoryRequestParams = buildTransactionParams();
+            Intent intent = ShowPaymentsHistoryActivity.getIntent(PaymentsHistoryActivity.this);
+            intent.putExtra(EXTRA_TRANSACTION_HISTORY_PARAMS, paymentsHistoryRequestParams);
             startActivity(intent);
         });
     }
 
-    private TransactionHistoryRequestParams buildTransactionParams() {
-        TransactionHistoryRequestParams.TransactionHistoryRequestParamsBuilder builder = new TransactionHistoryRequestParams.TransactionHistoryRequestParamsBuilder();
+    private PaymentsHistoryRequestParams buildTransactionParams() {
+        PaymentsHistoryRequestParams.PaymentsHistoryRequestParamsBuilder builder = new PaymentsHistoryRequestParams.PaymentsHistoryRequestParamsBuilder();
         String publicAddress = accountId.getEditText().getText().toString();
         if (!TextUtils.isEmpty(publicAddress)) {
             builder.account(publicAddress);
@@ -83,9 +83,9 @@ public class TransactionHistoryActivity extends BaseActivity {
         }
 
         if (ascButton.isSelected()) {
-            builder.order(TransactionHistoryRequestParams.Order.ASC);
+            builder.order(PaymentsHistoryRequestParams.Order.ASC);
         } else if (descButton.isSelected()) {
-            builder.order(TransactionHistoryRequestParams.Order.DESC);
+            builder.order(PaymentsHistoryRequestParams.Order.DESC);
         }
         return builder.build();
     }

@@ -2,6 +2,7 @@ package kin.core.sample;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,11 @@ import java.util.List;
 import kin.core.PaymentInfo;
 import kin.sdk.core.sample.R;
 
-// TODO: 11/10/2018 name is too long so maybe change it to Tx?
-class TransactionHistoryRecyclerViewAdapter extends RecyclerView.Adapter<TransactionHistoryRecyclerViewAdapter.TransactionHistoryViewHolder> {
+class PaymentsHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PaymentsHistoryRecyclerViewAdapter.TransactionHistoryViewHolder> {
 
     private List<PaymentInfo> payments;
 
-    TransactionHistoryRecyclerViewAdapter(List<PaymentInfo> payments) {
+    PaymentsHistoryRecyclerViewAdapter(List<PaymentInfo> payments) {
         this.payments = payments;
     }
 
@@ -44,7 +44,12 @@ class TransactionHistoryRecyclerViewAdapter extends RecyclerView.Adapter<Transac
         holder.hashText.setText(paymentInfo.hash().id());
         holder.amountText.setText(paymentInfo.amount().toPlainString());
         holder.createdAtText.setText(paymentInfo.createdAt());
-        holder.memoText.setText(paymentInfo.memo()); // TODO: 12/10/2018 if no memo then this supposed to be not valid like Ron did? and anyway if no memo maybe hide the text
+        if (TextUtils.isEmpty(holder.memoText.getText())) {
+            holder.memoText.setVisibility(View.GONE);
+        } else {
+            holder.memoText.setText(paymentInfo.memo());
+            holder.memoText.setVisibility(View.VISIBLE);
+        }
     }
 
 //    public void addAll(List<PaymentInfo> payments) {

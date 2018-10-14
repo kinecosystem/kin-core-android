@@ -39,12 +39,12 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name="kin.core.sample.TransactionHistoryActivity"
+            android:name="kin.core.sample.PaymentsHistoryActivity"
             android:parentActivityName="kin.core.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity android:name="kin.core.sample.ShowTransactionHistoryActivity"
-            android:parentActivityName="kin.core.sample.TransactionHistoryActivity"
+        <activity android:name="kin.core.sample.ShowPaymentsHistoryActivity"
+            android:parentActivityName="kin.core.sample.PaymentsHistoryActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity

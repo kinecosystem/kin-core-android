@@ -80,13 +80,12 @@ class AccountInfoRetriever {
      * @return the list of payments {@link PaymentInfo}
      * @throws OperationFailedException or one of its subclasses
      */
-    List<PaymentInfo> getTransactionsPaymentsHistory(@NonNull String accountId) throws OperationFailedException {
-        List<PaymentInfo> payments = new ArrayList<>(); // TODO: 12/10/2018 can make it null and if no payment then we return null instead of empty list
+    List<PaymentInfo> getPaymentsHistory(@NonNull String accountId) throws OperationFailedException {
+        List<PaymentInfo> payments = new ArrayList<>();
         if (blockchainEvents != null) {
             payments = getPaymentsHistory(server.transactions(), accountId);
         }
 
-        // TODO: 11/10/2018 maybe handle the possible errors according to https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-account.html
         return payments;
     }
 
@@ -96,7 +95,7 @@ class AccountInfoRetriever {
      * @return the list of payments {@link PaymentInfo}
      * @throws OperationFailedException or one of its subclasses
      */
-    List<PaymentInfo> getTransactionsPaymentsHistory(TransactionHistoryRequestParams requestParams) throws OperationFailedException {
+    List<PaymentInfo> getPaymentsHistory(PaymentsHistoryRequestParams requestParams) throws OperationFailedException {
         List<PaymentInfo> payments = new ArrayList<>();
         TransactionsRequestBuilder transactionBuilder = server.transactions();
         // Add all the optional parameters that the client supplied (if any supplied) to the request

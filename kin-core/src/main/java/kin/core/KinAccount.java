@@ -108,19 +108,19 @@ public interface KinAccount {
 
     /**
      * Create {@link Request} for getting all the transactions payments history for the current account.
-     * <p> See {@link KinAccount#getTransactionsPaymentsHistorySync()} for possibles errors</p>
+     * <p> See {@link KinAccount#getPaymentsHistorySync()} for possibles errors</p>
      *
      * @return {@code Request<List<PaymentInfo>> } PaymentInfo - the payment information for a specific payment operation in a transaction
      */
     @NonNull
-    Request<List<PaymentInfo>> getTransactionsPaymentsHistory();
+    Request<List<PaymentInfo>> getPaymentsHistory();
 
     /**
-     * For method description see {@link KinAccount#getTransactionsPaymentsHistory()}
+     * For method description see {@link KinAccount#getPaymentsHistory()}
      * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
      * Create {@link Request} for getting all the transactions payments history for a given account.
      *                        If no account has been given to the requestParams then it will be for the current account.
-     * <p> See {@link KinAccount#getTransactionsPaymentsHistorySync()} for possibles errors</p>
+     * <p> See {@link KinAccount#getPaymentsHistorySync()} for possibles errors</p>
      *
      * <p><b>Note:</b>     requestParams can have the next members:</p>
      * <p><b>accountId</b> is optional, a string, if not given then using the current account if exist. It is represents the ID of an account.</p>
@@ -131,7 +131,7 @@ public interface KinAccount {
      * @return {@code Request<List<PaymentInfo>> } PaymentInfo - the payment information for a specific payment operation in a transaction
      */
     @NonNull
-    Request<List<PaymentInfo>> getTransactionsPaymentsHistory(TransactionHistoryRequestParams requestParams);
+    Request<List<PaymentInfo>> getPaymentsHistory(PaymentsHistoryRequestParams requestParams);
 
     /**
      * Get the list of the transactions payments history for the current account.
@@ -142,10 +142,10 @@ public interface KinAccount {
      * @throws OperationFailedException operation fail error
      */
     @NonNull
-    List<PaymentInfo> getTransactionsPaymentsHistorySync() throws  OperationFailedException;
+    List<PaymentInfo> getPaymentsHistorySync() throws  OperationFailedException;
 
     /**
-     * * For method description see {@link KinAccount#getTransactionsPaymentsHistorySync()}
+     * * For method description see {@link KinAccount#getPaymentsHistorySync()}
      * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
      * Get the list of all the transactions payments history for a given account.
      * If no account has been given to the requestParams then it will be for the current account.
@@ -161,7 +161,7 @@ public interface KinAccount {
      * @throws OperationFailedException operation fail error
      */
     @NonNull
-    List<PaymentInfo> getTransactionsPaymentsHistorySync(TransactionHistoryRequestParams requestParams) throws  OperationFailedException; // TODO: 11/10/2018 add more exceptions to javadoc and maybe make the note more readable
+    List<PaymentInfo> getPaymentsHistorySync(PaymentsHistoryRequestParams requestParams) throws  OperationFailedException;
 
     /**
      * Create {@link Request} for allowing an account to receive kin.

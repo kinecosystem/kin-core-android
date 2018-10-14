@@ -64,21 +64,21 @@ final class KinAccountImpl extends AbstractKinAccount {
 
     @NonNull
     @Override
-    public List<PaymentInfo> getTransactionsPaymentsHistorySync() throws OperationFailedException {
+    public List<PaymentInfo> getPaymentsHistorySync() throws OperationFailedException {
         checkValidAccount();
-        return accountInfoRetriever.getTransactionsPaymentsHistory(account.getAccountId());
+        return accountInfoRetriever.getPaymentsHistory(account.getAccountId());
     }
 
     @NonNull
     @Override
-    public List<PaymentInfo> getTransactionsPaymentsHistorySync(TransactionHistoryRequestParams requestParams) throws OperationFailedException {
+    public List<PaymentInfo> getPaymentsHistorySync(PaymentsHistoryRequestParams requestParams) throws OperationFailedException {
         String accountId = requestParams.getAccountId();
         // check only if there is no accountId in the params which is optional for the client to add. If non was found then get use the current account.
         if (TextUtils.isEmpty(accountId)) {
             requestParams.setAccountId(account.getAccountId()); // because no accountId was given then set the current account to be the "given" one.
             checkValidAccount();
         }
-        return accountInfoRetriever.getTransactionsPaymentsHistory(requestParams);
+        return accountInfoRetriever.getPaymentsHistory(requestParams);
     }
 
     @Override

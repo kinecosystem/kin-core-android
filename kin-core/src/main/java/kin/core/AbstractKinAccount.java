@@ -45,22 +45,22 @@ abstract class AbstractKinAccount implements KinAccount {
 
     @NonNull
     @Override
-    public Request<List<PaymentInfo>> getTransactionsPaymentsHistory() {
+    public Request<List<PaymentInfo>> getPaymentsHistory() {
         return new Request<>(new Callable<List<PaymentInfo>>() {
             @Override
             public List<PaymentInfo> call() throws Exception {
-                return getTransactionsPaymentsHistorySync();
+                return getPaymentsHistorySync();
             }
         });
     }
 
     @NonNull
     @Override
-    public Request<List<PaymentInfo>> getTransactionsPaymentsHistory(final TransactionHistoryRequestParams requestParams) {
+    public Request<List<PaymentInfo>> getPaymentsHistory(final PaymentsHistoryRequestParams requestParams) {
         return new Request<>(new Callable<List<PaymentInfo>>() {
             @Override
             public List<PaymentInfo> call() throws Exception {
-                return getTransactionsPaymentsHistorySync(requestParams);
+                return getPaymentsHistorySync(requestParams);
             }
         });
     }

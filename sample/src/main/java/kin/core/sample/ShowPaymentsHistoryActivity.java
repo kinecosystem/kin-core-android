@@ -12,19 +12,19 @@ import java.util.List;
 import kin.core.KinAccount;
 import kin.core.PaymentInfo;
 import kin.core.Request;
-import kin.core.TransactionHistoryRequestParams;
+import kin.core.PaymentsHistoryRequestParams;
 import kin.sdk.core.sample.R;
 
-public class ShowTransactionHistoryActivity extends BaseActivity {
+public class ShowPaymentsHistoryActivity extends BaseActivity {
 
-    public static final String TAG = ShowTransactionHistoryActivity.class.getSimpleName();
+    public static final String TAG = ShowPaymentsHistoryActivity.class.getSimpleName();
 
     private RecyclerView recyclerView;
     private View progressBar;
     private KinAccount account;
 
     public static Intent getIntent(Context context) {
-        return new Intent(context, ShowTransactionHistoryActivity.class);
+        return new Intent(context, ShowPaymentsHistoryActivity.class);
     }
 
     @Override
@@ -36,13 +36,13 @@ public class ShowTransactionHistoryActivity extends BaseActivity {
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recyclerview);
 
-        TransactionHistoryRequestParams params = getIntent().getParcelableExtra(TransactionHistoryActivity.EXTRA_TRANSACTION_HISTORY_PARAMS);
+        PaymentsHistoryRequestParams params = getIntent().getParcelableExtra(PaymentsHistoryActivity.EXTRA_TRANSACTION_HISTORY_PARAMS);
         getTransactionHistory(params);
     }
 
     @Override
     Intent getBackIntent() {
-        return TransactionHistoryActivity.getIntent(this);
+        return PaymentsHistoryActivity.getIntent(this);
     }
 
     @Override
@@ -52,16 +52,16 @@ public class ShowTransactionHistoryActivity extends BaseActivity {
 
     private void initRecyclerView(List<PaymentInfo> payments) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        TransactionHistoryRecyclerViewAdapter adapter = new TransactionHistoryRecyclerViewAdapter(payments);
+        PaymentsHistoryRecyclerViewAdapter adapter = new PaymentsHistoryRecyclerViewAdapter(payments);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
 
 
-    private void getTransactionHistory(TransactionHistoryRequestParams params) {
+    private void getTransactionHistory(PaymentsHistoryRequestParams params) {
         if (account != null) {
-            Request<List<PaymentInfo>> request = account.getTransactionsPaymentsHistory(params);
+            Request<List<PaymentInfo>> request = account.getPaymentsHistory(params);
             request.run(new DisplayCallback<List<PaymentInfo>>(progressBar) {
                 @Override
                 public void displayResult(Context context, View displayView, List<PaymentInfo> result) {
