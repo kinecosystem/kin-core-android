@@ -2,22 +2,12 @@ package kin.core;
 
 
 import static kin.core.Utils.checkNotNull;
-import static org.stellar.sdk.xdr.OperationType.PAYMENT;
 
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-
 import com.here.oksse.ServerSentEvent;
-
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-
-import kin.core.ServiceProvider.KinAsset;
-
-import org.stellar.sdk.Asset;
+import kin.core.Environment.KinAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.LedgerEntryChange;
 import org.stellar.sdk.LedgerEntryChanges;
@@ -27,13 +17,12 @@ import org.stellar.sdk.Operation;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.TrustLineLedgerEntryChange;
-import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.TransactionResponse;
 
 /**
  * Provides listeners, for various events happens on the blockchain.
  */
-public class BlockchainEvents {
+class BlockchainEvents {
 
     private static final String CURSOR_FUTURE_ONLY = "now";
     private final Server server;
@@ -52,7 +41,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener) {
+    ListenerRegistration addBalanceListener(@NonNull final EventListener<Balance> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server
             .transactions()
@@ -104,7 +93,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener) {
+    ListenerRegistration addPaymentListener(@NonNull final EventListener<PaymentInfo> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server
             .transactions()
@@ -125,7 +114,7 @@ public class BlockchainEvents {
      *
      * @param listener listener object for payment events
      */
-    public ListenerRegistration addAccountCreationListener(final EventListener<Void> listener) {
+    ListenerRegistration addAccountCreationListener(final EventListener<Void> listener) {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server.transactions()
             .forAccount(accountKeyPair)
@@ -185,7 +174,7 @@ public class BlockchainEvents {
         return paymentInfo;
     }
 
-    private String extractSourceAccountId(TransactionResponse transactionResponse, org.stellar.sdk.Operation operation) {
+    private String extractSourceAccountId(TransactionResponse transactionResponse, Operation operation) {
         //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
         //is the transaction source account
         return operation.getSourceAccount() != null ? operation.getSourceAccount()
@@ -204,5 +193,4 @@ public class BlockchainEvents {
         }
         return memoString;
     }
-
 }

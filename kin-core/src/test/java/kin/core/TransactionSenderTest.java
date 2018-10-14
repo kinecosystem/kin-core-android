@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;

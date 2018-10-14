@@ -2,7 +2,7 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import java.io.IOException;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;
 import org.stellar.sdk.ChangeTrustOperation;

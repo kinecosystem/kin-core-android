@@ -46,7 +46,7 @@ public class TransactionActivity extends BaseActivity {
         amountInput = findViewById(R.id.amount_input);
         memoInput = findViewById(R.id.memo_input);
 
-        if (getKinClient().getServiceProvider().isMainNet()) {
+        if (getKinClient().getEnvironment().isMainNet()) {
             sendTransaction.setBackgroundResource(R.drawable.button_main_network_bg);
         }
         toAddressInput.addTextChangedListener(new TextWatcher() {

@@ -1,5 +1,6 @@
 package kin.core.sample;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,12 +49,13 @@ public class PaymentListenerActivity extends BaseActivity {
     private void startListener() {
         startBtn.setEnabled(false);
         stopBtn.setEnabled(true);
-        listenerRegistration = account.blockchainEvents()
+        listenerRegistration = account
             .addPaymentListener(paymentInfo -> runOnUiThread(() -> addPaymentToUi(paymentInfo)));
     }
 
     private void addPaymentToUi(PaymentInfo paymentInfo) {
-        View paymentView = LayoutInflater.from(this).inflate(R.layout.payment_info, null);
+        @SuppressLint("InflateParams") View paymentView = LayoutInflater.from(this)
+            .inflate(R.layout.payment_info, null);
         TextView destinationText = paymentView.findViewById(R.id.to_public_id);
         TextView sourceText = paymentView.findViewById(R.id.from_public_id);
         TextView amountText = paymentView.findViewById(R.id.amount);

@@ -16,7 +16,6 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings({"deprecation", "ConstantConditions"})
 public class KinAccountTest {
 
-    private static final String TEST_NETWORK_URL = "https://horizon-testnet.stellar.org";
     private KinClient kinClient;
 
     @Rule
@@ -24,8 +23,9 @@ public class KinAccountTest {
 
     @Before
     public void setup() throws IOException {
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(),
-            new ServiceProvider(TEST_NETWORK_URL, ServiceProvider.NETWORK_ID_TEST));
+        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
+            .setEnvironment(Environment.TEST)
+            .build();
         kinClient.clearAllAccounts();
     }
 

@@ -2,7 +2,6 @@ package kin.core
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
-import kin.core.IntegConsts.TEST_NETWORK_ID
 import kin.core.IntegConsts.TEST_NETWORK_URL
 import kin.core.exception.AccountNotActivatedException
 import kin.core.exception.AccountNotFoundException
@@ -29,18 +28,18 @@ class KinAccountIntegrationTest {
     @JvmField
     val expectedEx: ExpectedException = ExpectedException.none()
 
-    private inner class TestServiceProvider internal constructor() : ServiceProvider(TEST_NETWORK_URL, TEST_NETWORK_ID) {
-
-        override fun getIssuerAccountId(): String {
-            return fakeKinIssuer.accountId
-        }
-    }
+    private val environment: Environment = Environment.Builder()
+            .setNetworkUrl(IntegConsts.TEST_NETWORK_URL)
+            .setNetworkPassphrase(IntegConsts.TEST_NETWORK_ID)
+            .setIssuerAccountId(fakeKinIssuer.accountId)
+            .build()
 
     @Before
     @Throws(IOException::class)
     fun setup() {
-        val serviceProvider = TestServiceProvider()
-        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), serviceProvider)
+        kinClient = KinClient.Builder(InstrumentationRegistry.getTargetContext())
+                .setEnvironment(environment)
+                .build()
         kinClient.clearAllAccounts()
     }
 
@@ -139,8 +138,7 @@ class KinAccountIntegrationTest {
         val expectedMemo = "fake memo"
 
         val latch = CountDownLatch(1)
-        val listenerRegistration = kinAccountReceiver.blockchainEvents()
-                .addPaymentListener { _ -> latch.countDown() }
+        val listenerRegistration = kinAccountReceiver.addPaymentListener { _ -> latch.countDown() }
 
         val transactionId = kinAccountSender
                 .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"),
@@ -247,11 +245,11 @@ class KinAccountIntegrationTest {
         val eventsCount = if (sender) 4 else 2 ///in case of observing the sender we'll get 2 events (1 for funding 1 for the
         //transaction) in case of receiver - only 1 event. multiply by 2, as we 2 listeners (balance and payment)
         val latch = CountDownLatch(eventsCount)
-        val paymentListener = accountToListen.blockchainEvents().addPaymentListener { data ->
+        val paymentListener = accountToListen.addPaymentListener { data ->
             actualPaymentsResults.add(data)
             latch.countDown()
         }
-        val balanceListener = accountToListen.blockchainEvents().addBalanceListener { data ->
+        val balanceListener = accountToListen.addBalanceListener { data ->
             actualBalanceResults.add(data)
             latch.countDown()
         }
@@ -287,11 +285,9 @@ class KinAccountIntegrationTest {
         val (kinAccountSender, kinAccountReceiver) = onboardAccounts(senderFundAmount = 100)
 
         val latch = CountDownLatch(1)
-        val blockchainEvents = kinAccountReceiver.blockchainEvents()
-        val listenerRegistration = blockchainEvents
-                .addPaymentListener {
-                    fail("should not get eny event!")
-                }
+        val listenerRegistration = kinAccountReceiver.addPaymentListener {
+            fail("should not get eny event!")
+        }
         listenerRegistration.remove()
 
         kinAccountSender

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import kin.core.ServiceProvider.KinAsset;
+import kin.core.Environment.KinAsset;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,12 +57,12 @@ public class BlockchainEventsTest {
         Network.useTestNetwork();
 
         //use custom issuer that fake responses are use, to prevent testnet issuer address changes affect the tests
-        KinAsset kinAsset = new ServiceProvider("", ServiceProvider.NETWORK_ID_TEST) {
-            @Override
-            protected String getIssuerAccountId() {
-                return "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V";
-            }
-        }.getKinAsset();
+        KinAsset kinAsset = new Environment.Builder()
+            .setNetworkUrl("empty")
+            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
+            .setIssuerAccountId("GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V")
+            .build()
+            .getKinAsset();
         blockchainEvents = new BlockchainEvents(server, ACCOUNT_ID, kinAsset);
         createResponsesQueue();
     }
