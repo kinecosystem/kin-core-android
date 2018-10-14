@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:state_selected="true"
+        android:drawable="@drawable/order_by_button_selected_shape"/>
+    <item
+        android:drawable="@drawable/order_by_button_not_selected_shape"/>
+
+</selector>

@@ -3,6 +3,7 @@ package kin.core;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 abstract class AbstractKinAccount implements KinAccount {
@@ -38,6 +39,28 @@ abstract class AbstractKinAccount implements KinAccount {
             @Override
             public Balance call() throws Exception {
                 return getBalanceSync();
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public Request<List<PaymentInfo>> getTransactionsPaymentsHistory() {
+        return new Request<>(new Callable<List<PaymentInfo>>() {
+            @Override
+            public List<PaymentInfo> call() throws Exception {
+                return getTransactionsPaymentsHistorySync();
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public Request<List<PaymentInfo>> getTransactionsPaymentsHistory(final TransactionHistoryRequestParams requestParams) {
+        return new Request<>(new Callable<List<PaymentInfo>>() {
+            @Override
+            public List<PaymentInfo> call() throws Exception {
+                return getTransactionsPaymentsHistorySync(requestParams);
             }
         });
     }

@@ -2,13 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
@@ -29,6 +31,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
@@ -49,6 +53,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
@@ -69,6 +75,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
@@ -89,6 +97,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
@@ -109,13 +119,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingLeft="@dimen/payment_info_padding"
+        android:paddingRight="@dimen/payment_info_padding"
         android:orientation="horizontal">
 
         <TextView
             style="@style/KinText.Title.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/memo"/>
+            android:text="@string/payment_memo"/>
         <TextView
             android:id="@+id/memo"
             style="@style/KinText.Title"
@@ -128,7 +140,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:background="@color/grey"/>
 
 </LinearLayout>

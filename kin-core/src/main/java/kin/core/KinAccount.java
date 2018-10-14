@@ -3,6 +3,8 @@ package kin.core;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.List;
+
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;
@@ -101,6 +103,63 @@ public interface KinAccount {
      */
     @NonNull
     Balance getBalanceSync() throws OperationFailedException;
+
+    /**
+     * Create {@link Request} for getting all the transactions payments history for the current account.
+     * <p> See {@link KinAccount#getTransactionsPaymentsHistorySync()} for possibles errors</p>
+     *
+     * @return {@code Request<List<PaymentInfo>> } PaymentInfo - the payment information for a specific payment operation in a transaction
+     */
+    @NonNull
+    Request<List<PaymentInfo>> getTransactionsPaymentsHistory();
+
+    /**
+     * For method description see {@link KinAccount#getTransactionsPaymentsHistory()}
+     * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
+     * Create {@link Request} for getting all the transactions payments history for a given account.
+     *                        If no account has been given to the requestParams then it will be for the current account.
+     * <p> See {@link KinAccount#getTransactionsPaymentsHistorySync()} for possibles errors</p>
+     *
+     * <p><b>Note:</b>     requestParams can have the next members:</p>
+     * <p><b>accountId</b> is optional, a string, if not given then using the current account if exist. It is represents the ID of an account.</p>
+     * <p><b>cursor:</b>   is optional, a paging token, specifying where to start returning records from. for example 12884905984.</p>
+     * <p><b>order:</b>    is optional, an Order, currently the default is "asc".	It is represents the order in which to return rows, “asc” or “desc”.</p>
+     * <p><b>limit:</b>    is optional, a number, currently the default is 10. It is represents the maximum number of records to return.</p>
+     *
+     * @return {@code Request<List<PaymentInfo>> } PaymentInfo - the payment information for a specific payment operation in a transaction
+     */
+    @NonNull
+    Request<List<PaymentInfo>> getTransactionsPaymentsHistory(TransactionHistoryRequestParams requestParams);
+
+    /**
+     * Get the list of the transactions payments history for the current account.
+     * If using this method then the default is currently the last 10.
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @return a list of payments for a given account
+     * @throws OperationFailedException operation fail error
+     */
+    @NonNull
+    List<PaymentInfo> getTransactionsPaymentsHistorySync() throws  OperationFailedException; // TODO: 11/10/2018 add more exceptions to javadoc
+
+    /**
+     * * For method description see {@link KinAccount#getTransactionsPaymentsHistorySync()}
+     * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
+     * Get the list of all the transactions payments history for a given account.
+     * If no account has been given to the requestParams then it will be for the current account.
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * <p><b>Note:</b>     requestParams can have the next members:</p>
+     * <p><b>accountId</b> is optional, a string, if not given then using the current account if exist. It is represents the ID of an account.</p>
+     * <p><b>cursor:</b>   is optional, a paging token, specifying where to start returning records from. for example 12884905984.</p>
+     * <p><b>order:</b>    is optional, an Order, currently the default is "asc".	It is represents the order in which to return rows, “asc” or “desc”.</p>
+     * <p><b>limit:</b>    is optional, a number, currently the default is 10. It is represents the maximum number of records to return.</p>
+     *
+     * @return a list of payments for a given account
+     * @throws OperationFailedException operation fail error
+     */
+    @NonNull
+    List<PaymentInfo> getTransactionsPaymentsHistorySync(TransactionHistoryRequestParams requestParams) throws  OperationFailedException; // TODO: 11/10/2018 add more exceptions to javadoc and maybe make the note more readable
 
     /**
      * Create {@link Request} for allowing an account to receive kin.

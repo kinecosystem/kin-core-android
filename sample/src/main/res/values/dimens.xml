@@ -3,6 +3,8 @@
     <dimen name="font_small">16sp</dimen>
     <dimen name="sub_text_margin">10dp</dimen>
     <dimen name="progress_size">20dp</dimen>
+    <dimen name="progress_bar_big">50dp</dimen>
     <dimen name="progress_margin">10dp</dimen>
     <dimen name="delim_margin">10dp</dimen>
+    <dimen name="payment_info_padding">10dp</dimen>
 </resources>

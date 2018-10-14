@@ -2,12 +2,22 @@ package kin.core;
 
 
 import static kin.core.Utils.checkNotNull;
+import static org.stellar.sdk.xdr.OperationType.PAYMENT;
 
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+
 import com.here.oksse.ServerSentEvent;
+
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
 import kin.core.ServiceProvider.KinAsset;
+
+import org.stellar.sdk.Asset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.LedgerEntryChange;
 import org.stellar.sdk.LedgerEntryChanges;
@@ -17,6 +27,7 @@ import org.stellar.sdk.Operation;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.TrustLineLedgerEntryChange;
+import org.stellar.sdk.responses.Page;
 import org.stellar.sdk.responses.TransactionResponse;
 
 /**
@@ -135,30 +146,46 @@ public class BlockchainEvents {
     }
 
     private void extractPaymentsFromTransaction(TransactionResponse transactionResponse,
-        EventListener<PaymentInfo> listener) {
+                                                EventListener<PaymentInfo> listener) {
+        PaymentInfo paymentInfo = getPaymentInfo(transactionResponse);
+        if (paymentInfo != null) { // TODO: 11/10/2018 did it in this way so i could extract to method the other parts
+            listener.onEvent(paymentInfo);
+        }
+    }
+
+    PaymentInfo getPaymentInfo(TransactionResponse transactionResponse) {
+        PaymentInfo paymentInfo = null;
         List<Operation> operations = transactionResponse.getOperations();
         if (operations != null) {
             for (Operation operation : operations) {
                 if (operation instanceof PaymentOperation) {
                     PaymentOperation paymentOperation = (PaymentOperation) operation;
+
+                    // TODO: 11/10/2018 after looking on Ron code i saw that he looked at more conditions than only this
+//                  # A transaction will not be simplified if:
+//                  # 1. It contains a memo that is not a text memo
+//                  # 2. It contains multiple operations
+//                  # 3. It contains a payment that is not of KIN/XLM
+//                  # 4. It contains activation to anything other than KIN
+//                  # 5. Its operation type is not one of 'Payment'/'Activation'/'Create account'.
                     if (isPaymentInKin(paymentOperation)) {
-                        PaymentInfo paymentInfo = new PaymentInfoImpl(
-                            transactionResponse.getCreatedAt(),
-                            paymentOperation.getDestination().getAccountId(),
-                            extractSourceAccountId(transactionResponse, paymentOperation),
-                            new BigDecimal(paymentOperation.getAmount()),
-                            new TransactionIdImpl(transactionResponse.getHash()),
-                            extractHashTextIfAny(transactionResponse)
+                        paymentInfo = new PaymentInfoImpl(
+                                transactionResponse.getCreatedAt(),
+                                paymentOperation.getDestination().getAccountId(),
+                                extractSourceAccountId(transactionResponse, paymentOperation),
+                                new BigDecimal(paymentOperation.getAmount()),
+                                new TransactionIdImpl(transactionResponse.getHash()),
+                                extractHashTextIfAny(transactionResponse)
                         );
-                        listener.onEvent(paymentInfo);
                     }
                 }
             }
-
         }
+        // return a new payment info object if possible, otherwise return null.
+        return paymentInfo;
     }
 
-    private String extractSourceAccountId(TransactionResponse transactionResponse, Operation operation) {
+    private String extractSourceAccountId(TransactionResponse transactionResponse, org.stellar.sdk.Operation operation) {
         //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
         //is the transaction source account
         return operation.getSourceAccount() != null ? operation.getSourceAccount()
@@ -177,4 +204,5 @@ public class BlockchainEvents {
         }
         return memoString;
     }
+
 }

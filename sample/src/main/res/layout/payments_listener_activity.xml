@@ -36,10 +36,11 @@
         android:background="@color/white"
         android:fillViewport="true"
         tools:context="kin.core.sample.PaymentListenerActivity">
+
         <LinearLayout
             android:id="@+id/payments_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
         </LinearLayout>

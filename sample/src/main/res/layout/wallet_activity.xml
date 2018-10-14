@@ -11,7 +11,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/activity_padding"
+        android:paddingTop="@dimen/activity_padding"
+        android:paddingBottom="@dimen/activity_padding"
+        android:paddingStart="@dimen/activity_padding"
+        android:paddingEnd="@dimen/activity_padding"
         android:orientation="vertical"
         >
 
@@ -136,6 +139,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/send_transaction"/>
+
+        <Button
+            android:id="@+id/transaction_history_btn"
+            style="@style/KinButtonStyle.TestNet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/button_margin"
+            android:text="@string/transaction_history"/>
 
         <Button
             android:id="@+id/watch_payments_btn"

@@ -2,25 +2,39 @@ package kin.core;
 
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.OperationFailedException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Server;
+import org.stellar.sdk.requests.RequestBuilder;
+import org.stellar.sdk.requests.TransactionsRequestBuilder;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
+import org.stellar.sdk.responses.Page;
+import org.stellar.sdk.responses.TransactionResponse;
 
 class AccountInfoRetriever {
 
     private final Server server;
     private final KinAsset kinAsset;
+    private BlockchainEvents blockchainEvents;
 
     AccountInfoRetriever(Server server, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
+    }
+
+    void setBlockChainEvents(BlockchainEvents blockchainEvents) {
+        this.blockchainEvents = blockchainEvents;
     }
 
     /**
@@ -62,6 +76,76 @@ class AccountInfoRetriever {
         return balance;
     }
 
+    /**
+     * @param accountId the account ID to get all its transaction history
+     * @return the list of payments {@link PaymentInfo}
+     * @throws OperationFailedException or one of its subclasses
+     */
+    List<PaymentInfo> getTransactionsPaymentsHistory(@NonNull String accountId) throws OperationFailedException {
+        List<PaymentInfo> payments = new ArrayList<>(); // TODO: 12/10/2018 can make it null and if no payment then we return null.
+        if (blockchainEvents != null) {
+            payments = getPaymentsHistory(server.transactions(), accountId);
+        }
+
+        // TODO: 11/10/2018 maybe handle the possible errors according to https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-account.html
+        return payments;
+    }
+
+    /**
+     * @param requestParams is an optional parameters to the request, such as accountId, cursor, limit, and order.
+     *                      If no account is given then using the current account if exist.
+     * @return the list of payments {@link PaymentInfo}
+     * @throws OperationFailedException or one of its subclasses
+     */
+    List<PaymentInfo> getTransactionsPaymentsHistory(TransactionHistoryRequestParams requestParams) throws OperationFailedException {
+        List<PaymentInfo> payments = new ArrayList<>();
+        TransactionsRequestBuilder transactionBuilder = server.transactions();
+        // Add all the optional parameters that the client supplied (if any supplied) to the request
+        if (requestParams.getLimit() > 0) {
+            transactionBuilder.limit(requestParams.getLimit());
+        }
+        if (!TextUtils.isEmpty(requestParams.getToken())) {
+            transactionBuilder.cursor(requestParams.getToken());
+        }
+        if (requestParams.getOrder() != null) {
+            transactionBuilder.order(RequestBuilder.Order.valueOf(requestParams.getOrder().name()));
+        }
+        if (blockchainEvents != null) {
+            payments = getPaymentsHistory(transactionBuilder, requestParams.getAccountId());
+        }
+        return payments;
+    }
+
+    private List<PaymentInfo> getPaymentsHistory(TransactionsRequestBuilder transactions, @NonNull String accountId) throws OperationFailedException {
+        List<PaymentInfo> payments = new ArrayList<>();
+        try {
+            Page<TransactionResponse> execute = transactions
+                    .forAccount(KeyPair.fromAccountId(accountId))
+                    .execute();
+            if (execute == null || execute.getRecords() == null) {
+                throw new AccountNotActivatedException(accountId);
+            } else {
+                for (TransactionResponse transactionResponse : execute.getRecords()) {
+                    PaymentInfo paymentInfo = blockchainEvents.getPaymentInfo(transactionResponse);
+                    if (paymentInfo != null) {
+                        payments.add(paymentInfo);
+                    }
+                }
+            }
+        } catch (HttpResponseException httpError) {
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(accountId);
+            } else {
+                throw new OperationFailedException(httpError);
+            }
+        } catch (IOException e) {
+            // TODO: 12/10/2018 maybe add some logs
+            e.printStackTrace();
+        }
+
+        return payments;
+    }
+
     @AccountStatus
     int getStatus(@NonNull String accountId) throws OperationFailedException {
         try {
@@ -73,4 +157,5 @@ class AccountInfoRetriever {
             return AccountStatus.NOT_ACTIVATED;
         }
     }
+
 }

@@ -2,7 +2,11 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
 import java.math.BigDecimal;
+import java.util.List;
+
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
 import org.stellar.sdk.KeyPair;
@@ -22,8 +26,9 @@ final class KinAccountImpl extends AbstractKinAccount {
         this.account = account;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
-        this.accountInfoRetriever = accountInfoRetriever;
         this.blockchainEvents = blockchainEventsCreator.create(account.getAccountId());
+        this.accountInfoRetriever = accountInfoRetriever;
+        this.accountInfoRetriever.setBlockChainEvents(this.blockchainEvents); // TODO: 12/10/2018 this is the simplest way to do it as discussed with Yossi
     }
 
     @Override
@@ -55,6 +60,25 @@ final class KinAccountImpl extends AbstractKinAccount {
     public Balance getBalanceSync() throws OperationFailedException {
         checkValidAccount();
         return accountInfoRetriever.getBalance(account.getAccountId());
+    }
+
+    @NonNull
+    @Override
+    public List<PaymentInfo> getTransactionsPaymentsHistorySync() throws OperationFailedException {
+        checkValidAccount();
+        return accountInfoRetriever.getTransactionsPaymentsHistory(account.getAccountId());
+    }
+
+    @NonNull
+    @Override
+    public List<PaymentInfo> getTransactionsPaymentsHistorySync(TransactionHistoryRequestParams requestParams) throws OperationFailedException {
+        String accountId = requestParams.getAccountId();
+        // check only if there is no accountId in the params which is optional for the client to add. If non was found then get use the current account.
+        if (TextUtils.isEmpty(accountId)) {
+            requestParams.setAccountId(account.getAccountId()); // because no accountId was given then set the current account to be the "given" one.
+            checkValidAccount();
+        }
+        return accountInfoRetriever.getTransactionsPaymentsHistory(requestParams);
     }
 
     @Override
