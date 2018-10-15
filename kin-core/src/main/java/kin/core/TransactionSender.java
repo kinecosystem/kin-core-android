@@ -3,7 +3,10 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.List;
 import kin.core.Environment.KinAsset;
@@ -24,14 +27,18 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
-    private static final int MEMO_LENGTH_LIMIT = 28; //Stellar text memo length limitation
+    private static final int MEMO_BYTES_LENGTH_LIMIT = 21; //Stellar text memo length limitation(in bytes) is 28 but we add 7 more bytes which includes the appId and some characters.
+    private static String APP_ID_VERSION_PREFIX = "1";
     private static final String INSUFFICIENT_KIN_RESULT_CODE = "op_underfunded";
+
     private final Server server; //horizon server
     private final KinAsset kinAsset;
+    private final String appId;
 
-    TransactionSender(Server server, KinAsset kinAsset) {
+    TransactionSender(Server server, KinAsset kinAsset, String appId) {
         this.server = server;
         this.kinAsset = kinAsset;
+        this.appId = appId;
     }
 
     @NonNull
@@ -47,11 +54,29 @@ class TransactionSender {
         throws OperationFailedException {
 
         checkParams(from, publicAddress, amount, memo);
+        memo = addAppIdToMemo(memo);
+
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         verifyAddresseeAccount(addressee);
         AccountResponse sourceAccount = loadSourceAccount(from);
         Transaction transaction = buildTransaction(from, amount, addressee, sourceAccount, memo);
         return sendTransaction(transaction);
+    }
+
+    @NonNull
+    private String addAppIdToMemo(@Nullable String memo) {
+        if (memo == null) {
+            memo = "";
+        } else {
+            memo = memo.trim(); // remove leading and trailing whitespaces
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(APP_ID_VERSION_PREFIX)
+          .append("-")
+          .append(appId)
+          .append("-")
+          .append(memo);
+        return sb.toString();
     }
 
     private void checkParams(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
@@ -77,8 +102,14 @@ class TransactionSender {
     }
 
     private void checkMemo(String memo) {
-        if (memo != null && memo.length() > MEMO_LENGTH_LIMIT) {
-            throw new IllegalArgumentException("Memo cannot be longer that 28 characters");
+        try {
+            Log.d("TEST", "memo length = " + memo.length() + ", memo byte length = " + memo.getBytes().length + ", memo byte in utf-8 length = " + memo.getBytes("UTF-8").length);
+            if (memo != null && memo.getBytes("UTF-8").length > MEMO_BYTES_LENGTH_LIMIT) {
+                throw new IllegalArgumentException("Memo cannot be longer that 21 bytes(UTF-8 characters)");
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Memo text have unsupported characters encoding");
         }
     }
 
