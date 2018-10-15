@@ -28,7 +28,6 @@ final class KinAccountImpl extends AbstractKinAccount {
         this.accountActivator = accountActivator;
         this.blockchainEvents = blockchainEventsCreator.create(account.getAccountId());
         this.accountInfoRetriever = accountInfoRetriever;
-        this.accountInfoRetriever.setBlockChainEvents(this.blockchainEvents);
     }
 
     @Override
@@ -72,13 +71,8 @@ final class KinAccountImpl extends AbstractKinAccount {
     @NonNull
     @Override
     public List<PaymentInfo> getPaymentsHistorySync(PaymentsHistoryRequestParams requestParams) throws OperationFailedException {
-        String accountId = requestParams.getAccountId();
-        // check only if there is no accountId in the params which is optional for the client to add. If non was found then get use the current account.
-        if (TextUtils.isEmpty(accountId)) {
-            requestParams.setAccountId(account.getAccountId()); // because no accountId was given then set the current account to be the "given" one.
-            checkValidAccount();
-        }
-        return accountInfoRetriever.getPaymentsHistory(requestParams);
+        checkValidAccount();
+        return accountInfoRetriever.getPaymentsHistory(requestParams, account.getAccountId());
     }
 
     @Override

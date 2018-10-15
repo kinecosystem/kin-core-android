@@ -52,15 +52,6 @@ class PaymentsHistoryRecyclerViewAdapter extends RecyclerView.Adapter<PaymentsHi
         }
     }
 
-//    public void addAll(List<PaymentInfo> payments) {
-//        if (payments != null) {
-//            // Could also use DiffUtil in order to replace only the changed items in case we will do a refresh or something like that.
-//            this.payments.clear();
-//            this.payments.addAll(payments);
-//            notifyDataSetChanged();
-//        }
-//    }
-
     class TransactionHistoryViewHolder extends RecyclerView.ViewHolder {
 
         TextView destinationText;

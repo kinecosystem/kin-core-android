@@ -2,8 +2,6 @@ package kin.core;
 
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,15 +23,10 @@ class AccountInfoRetriever {
 
     private final Server server;
     private final KinAsset kinAsset;
-    private BlockchainEvents blockchainEvents;
 
     AccountInfoRetriever(Server server, KinAsset kinAsset) {
         this.server = server;
         this.kinAsset = kinAsset;
-    }
-
-    void setBlockChainEvents(BlockchainEvents blockchainEvents) {
-        this.blockchainEvents = blockchainEvents;
     }
 
     /**
@@ -81,10 +74,8 @@ class AccountInfoRetriever {
      * @throws OperationFailedException or one of its subclasses
      */
     List<PaymentInfo> getPaymentsHistory(@NonNull String accountId) throws OperationFailedException {
-        List<PaymentInfo> payments = new ArrayList<>();
-        if (blockchainEvents != null) {
-            payments = getPaymentsHistory(server.transactions(), accountId);
-        }
+        List<PaymentInfo> payments;
+        payments = getPaymentsHistory(server.transactions(), accountId);
 
         return payments;
     }
@@ -95,36 +86,34 @@ class AccountInfoRetriever {
      * @return the list of payments {@link PaymentInfo}
      * @throws OperationFailedException or one of its subclasses
      */
-    List<PaymentInfo> getPaymentsHistory(PaymentsHistoryRequestParams requestParams) throws OperationFailedException {
-        List<PaymentInfo> payments = new ArrayList<>();
+    List<PaymentInfo> getPaymentsHistory(PaymentsHistoryRequestParams requestParams, String accountId) throws OperationFailedException {
+        List<PaymentInfo> payments;
         TransactionsRequestBuilder transactionBuilder = server.transactions();
         // Add all the optional parameters that the client supplied (if any supplied) to the request
         if (requestParams.getLimit() > 0) {
             transactionBuilder.limit(requestParams.getLimit());
         }
-        if (!TextUtils.isEmpty(requestParams.getToken())) {
-            transactionBuilder.cursor(requestParams.getToken());
-        }
         if (requestParams.getOrder() != null) {
             transactionBuilder.order(RequestBuilder.Order.valueOf(requestParams.getOrder().name()));
         }
-        if (blockchainEvents != null) {
-            payments = getPaymentsHistory(transactionBuilder, requestParams.getAccountId());
-        }
+
+        payments = getPaymentsHistory(transactionBuilder, accountId);
+
+
         return payments;
     }
 
     private List<PaymentInfo> getPaymentsHistory(TransactionsRequestBuilder transactions, @NonNull String accountId) throws OperationFailedException {
         List<PaymentInfo> payments = new ArrayList<>();
         try {
-            Page<TransactionResponse> execute = transactions
+            Page<TransactionResponse> response = transactions
                     .forAccount(KeyPair.fromAccountId(accountId))
                     .execute();
-            if (execute == null || execute.getRecords() == null) {
-                throw new AccountNotActivatedException(accountId);
+            if (response == null || response.getRecords() == null) {
+                throw new OperationFailedException("can't retrieve data for account " + accountId);
             } else {
-                for (TransactionResponse transactionResponse : execute.getRecords()) {
-                    PaymentInfo paymentInfo = blockchainEvents.getPaymentInfo(transactionResponse);
+                for (TransactionResponse transactionResponse : response.getRecords()) {
+                    PaymentInfo paymentInfo = PaymentInfoHelper.extractPaymentInfo(transactionResponse, kinAsset);
                     if (paymentInfo != null) {
                         payments.add(paymentInfo);
                     }
@@ -137,7 +126,7 @@ class AccountInfoRetriever {
                 throw new OperationFailedException(httpError);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new OperationFailedException(e);
         }
 
         return payments;

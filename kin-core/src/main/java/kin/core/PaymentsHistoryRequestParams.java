@@ -1,21 +1,18 @@
 package kin.core;
 
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
- * Class which build optional params for the transaction payment history request.
+ * Class which build optional params for the payments history request.
+ * @see KinAccount#getPaymentsHistory(PaymentsHistoryRequestParams requestParams)
  */
-public class PaymentsHistoryRequestParams implements Parcelable {
+public class PaymentsHistoryRequestParams{
 
-    private String accountId;
-    private final String token;
+//    private final String cursor;
     private final int limit;
     private final Order order;
 
     /**
-     * Represents possible <code>order</code> parameter values.
+     * Represents possible order by values.
      */
     public enum Order {
         ASC("asc"),
@@ -32,56 +29,9 @@ public class PaymentsHistoryRequestParams implements Parcelable {
         }
     }
 
-    private PaymentsHistoryRequestParams(PaymentsHistoryRequestParamsBuilder builder) {
-        this.accountId = builder.accountId;
-        this.token = builder.token;
+    private PaymentsHistoryRequestParams(Builder builder) {
         this.limit = builder.limit;
         this.order = builder.order;
-    }
-
-    protected PaymentsHistoryRequestParams(Parcel in) {
-        accountId = in.readString();
-        token = in.readString();
-        limit = in.readInt();
-        String orderName = in.readString();
-        order = orderName != null ? Order.valueOf(orderName) : null;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(accountId);
-        dest.writeString(token);
-        dest.writeInt(limit);
-        dest.writeString(order != null ? order.name() : null);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<PaymentsHistoryRequestParams> CREATOR = new Creator<PaymentsHistoryRequestParams>() {
-        @Override
-        public PaymentsHistoryRequestParams createFromParcel(Parcel in) {
-            return new PaymentsHistoryRequestParams(in);
-        }
-
-        @Override
-        public PaymentsHistoryRequestParams[] newArray(int size) {
-            return new PaymentsHistoryRequestParams[size];
-        }
-    };
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public String getToken() {
-        return token;
     }
 
     public int getLimit() {
@@ -93,29 +43,34 @@ public class PaymentsHistoryRequestParams implements Parcelable {
     }
 
 
-    public static class PaymentsHistoryRequestParamsBuilder {
+    public static class Builder {
 
-        private String accountId;           //optional
-        private String token;               //optional
         private int limit;                  //optional
         private Order order;                //optional
 
-        public PaymentsHistoryRequestParamsBuilder account(String accountId) {
-            this.accountId = accountId;
-            return this;
-        }
+//        /**
+//         * @param token: is optional, a paging token(cursor), specifying where to start returning records from. for example 12884905984
+//         * @return
+//         */
+//        public PaymentsHistoryRequestParamsBuilder cursor(String token) {
+//            this.cursor = token;
+//            return this;
+//        }
 
-        public PaymentsHistoryRequestParamsBuilder cursor(String token) {
-            this.token = token;
-            return this;
-        }
-
-        public PaymentsHistoryRequestParamsBuilder limit(int limit) {
+        /**
+         * @param limit is optional, a number, currently the default is 10. It is represents the maximum number of records to return.
+         * @return
+         */
+        public Builder limit(int limit) {
             this.limit = limit;
             return this;
         }
 
-        public PaymentsHistoryRequestParamsBuilder order(Order order) {
+        /**
+         * @param order is optional, an Order, currently the default is "asc".	It is represents the order in which to return rows, “asc” or “desc”.
+         * @return
+         */
+        public Builder order(Order order) {
             this.order = order;
             return this;
         }
@@ -125,5 +80,4 @@ public class PaymentsHistoryRequestParams implements Parcelable {
         }
 
     }
-
 }

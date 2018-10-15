@@ -13,10 +13,9 @@ import kin.sdk.core.sample.R;
 public class PaymentsHistoryActivity extends BaseActivity {
 
     public static final String TAG = PaymentsHistoryActivity.class.getSimpleName();
-    public static final String EXTRA_TRANSACTION_HISTORY_PARAMS = "extraTransactionHistoryParams";
+    static final String EXTRA_LIMIT = "extraLimit";
+    static final String EXTRA_ORDER_BY = "extraOrderBy";
 
-    private TextInputLayout accountId;
-    private TextInputLayout cursorText;
     private TextInputLayout limitText;
     private Button ascButton;
     private Button descButton;
@@ -43,8 +42,6 @@ public class PaymentsHistoryActivity extends BaseActivity {
     }
 
     private void initUiViews() {
-        accountId = findViewById(R.id.public_address);
-        cursorText = findViewById(R.id.cursor);
         limitText = findViewById(R.id.limit);
         ascButton = findViewById(R.id.asc);
         descButton = findViewById(R.id.desc);
@@ -60,23 +57,17 @@ public class PaymentsHistoryActivity extends BaseActivity {
         });
 
         findViewById(R.id.get_transaction_history_btn).setOnClickListener(v -> {
-            PaymentsHistoryRequestParams paymentsHistoryRequestParams = buildTransactionParams();
+            // This is just a simple example of how to do it with params.
+            // because PaymentsHistoryRequestParams is not Parcelable then we add each value to the intent as an extra.
             Intent intent = ShowPaymentsHistoryActivity.getIntent(PaymentsHistoryActivity.this);
-            intent.putExtra(EXTRA_TRANSACTION_HISTORY_PARAMS, paymentsHistoryRequestParams);
+            PaymentsHistoryRequestParams params = buildPaymentsParams();
+            intent = buildIntentWithPaymentsParams(intent, params);
             startActivity(intent);
         });
     }
 
-    private PaymentsHistoryRequestParams buildTransactionParams() {
-        PaymentsHistoryRequestParams.PaymentsHistoryRequestParamsBuilder builder = new PaymentsHistoryRequestParams.PaymentsHistoryRequestParamsBuilder();
-        String publicAddress = accountId.getEditText().getText().toString();
-        if (!TextUtils.isEmpty(publicAddress)) {
-            builder.account(publicAddress);
-        }
-        String cursor = cursorText.getEditText().getText().toString();
-        if (!TextUtils.isEmpty(cursor)) {
-            builder.cursor(cursor);
-        }
+    private PaymentsHistoryRequestParams buildPaymentsParams() {
+        PaymentsHistoryRequestParams.Builder builder = new PaymentsHistoryRequestParams.Builder();
         String limit = limitText.getEditText().getText().toString();
         if (!TextUtils.isEmpty(limit)) {
             builder.limit(Integer.valueOf(limit));
@@ -88,6 +79,16 @@ public class PaymentsHistoryActivity extends BaseActivity {
             builder.order(PaymentsHistoryRequestParams.Order.DESC);
         }
         return builder.build();
+    }
+
+    private Intent buildIntentWithPaymentsParams(Intent intent, PaymentsHistoryRequestParams params) {
+        if (params.getLimit() > 0) {
+            intent.putExtra(EXTRA_LIMIT, params.getLimit());
+        }
+        if (params.getOrder() != null) {
+            intent.putExtra(EXTRA_ORDER_BY, params.getOrder().name());
+        }
+        return intent;
     }
 
 

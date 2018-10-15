@@ -107,9 +107,9 @@ public interface KinAccount {
     Balance getBalanceSync() throws OperationFailedException;
 
     /**
-     * Create {@link Request} for getting all the transactions payments history for the current account.
+     * Create {@link Request} for getting list of payments history for the current account.
+     * The default is currently the last 10 payments, please use use {@link KinAccount#getPaymentsHistory((PaymentsHistoryRequestParams)} for providing a different limit.
      * <p> See {@link KinAccount#getPaymentsHistorySync()} for possibles errors</p>
-     *
      * @return {@code Request<List<PaymentInfo>> } PaymentInfo - the payment information for a specific payment operation in a transaction
      */
     @NonNull
@@ -117,14 +117,11 @@ public interface KinAccount {
 
     /**
      * For method description see {@link KinAccount#getPaymentsHistory()}
-     * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
-     * Create {@link Request} for getting all the transactions payments history for a given account.
-     *                        If no account has been given to the requestParams then it will be for the current account.
-     * <p> See {@link KinAccount#getPaymentsHistorySync()} for possibles errors</p>
+     * @param requestParams an optional parameters to the request, such as limit, and order.
+     * Create {@link Request} for getting list of payments history for the current account.
+     * <p> See {@link KinAccount#getPaymentsHistorySync()} for possibles errors.</p>
      *
-     * <p><b>Note:</b>     requestParams can have the next members:</p>
-     * <p><b>accountId</b> is optional, a string, if not given then using the current account if exist. It is represents the ID of an account.</p>
-     * <p><b>cursor:</b>   is optional, a paging token, specifying where to start returning records from. for example 12884905984.</p>
+     * <br>requestParams can have the next members:</br>
      * <p><b>order:</b>    is optional, an Order, currently the default is "asc".	It is represents the order in which to return rows, “asc” or “desc”.</p>
      * <p><b>limit:</b>    is optional, a number, currently the default is 10. It is represents the maximum number of records to return.</p>
      *
@@ -134,8 +131,8 @@ public interface KinAccount {
     Request<List<PaymentInfo>> getPaymentsHistory(PaymentsHistoryRequestParams requestParams);
 
     /**
-     * Get the list of the transactions payments history for the current account.
-     * If using this method then the default is currently the last 10.
+     * Get the list of the payments history for the current account.
+     * The default is currently the last 10 payments, please use use {@link KinAccount#getPaymentsHistorySync((PaymentsHistoryRequestParams)} for providing a different limit.
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @return a list of payments for a given account
@@ -146,14 +143,11 @@ public interface KinAccount {
 
     /**
      * * For method description see {@link KinAccount#getPaymentsHistorySync()}
-     * @param requestParams an optional parameters to the request, such as accountId, cursor, limit, and order.
-     * Get the list of all the transactions payments history for a given account.
-     * If no account has been given to the requestParams then it will be for the current account.
+     * @param requestParams an optional parameters to the request, such limit, and order.
+     * Get the list of payments history for a given account.
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
-     * <p><b>Note:</b>     requestParams can have the next members:</p>
-     * <p><b>accountId</b> is optional, a string, if not given then using the current account if exist. It is represents the ID of an account.</p>
-     * <p><b>cursor:</b>   is optional, a paging token, specifying where to start returning records from. for example 12884905984.</p>
+     * <br>requestParams can have the next members:</br>
      * <p><b>order:</b>    is optional, an Order, currently the default is "asc".	It is represents the order in which to return rows, “asc” or “desc”.</p>
      * <p><b>limit:</b>    is optional, a number, currently the default is 10. It is represents the maximum number of records to return.</p>
      *

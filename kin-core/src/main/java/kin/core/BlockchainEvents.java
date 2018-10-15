@@ -11,10 +11,6 @@ import kin.core.Environment.KinAsset;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.LedgerEntryChange;
 import org.stellar.sdk.LedgerEntryChanges;
-import org.stellar.sdk.Memo;
-import org.stellar.sdk.MemoText;
-import org.stellar.sdk.Operation;
-import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.TrustLineLedgerEntryChange;
 import org.stellar.sdk.responses.TransactionResponse;
@@ -136,53 +132,10 @@ class BlockchainEvents {
 
     private void extractPaymentsFromTransaction(TransactionResponse transactionResponse,
                                                 EventListener<PaymentInfo> listener) {
-        PaymentInfo paymentInfo = getPaymentInfo(transactionResponse);
-        if (paymentInfo != null) {
+        PaymentInfo paymentInfo = PaymentInfoHelper.extractPaymentInfo(transactionResponse, kinAsset);
+        if (paymentInfo != null && listener != null) {
             listener.onEvent(paymentInfo);
         }
     }
 
-    PaymentInfo getPaymentInfo(TransactionResponse transactionResponse) {
-        PaymentInfo paymentInfo = null;
-        List<Operation> operations = transactionResponse.getOperations();
-        if (operations != null) {
-            for (Operation operation : operations) {
-                if (operation instanceof PaymentOperation) {
-                    PaymentOperation paymentOperation = (PaymentOperation) operation;
-                    if (isPaymentInKin(paymentOperation)) {
-                        paymentInfo = new PaymentInfoImpl(
-                                transactionResponse.getCreatedAt(),
-                                paymentOperation.getDestination().getAccountId(),
-                                extractSourceAccountId(transactionResponse, paymentOperation),
-                                new BigDecimal(paymentOperation.getAmount()),
-                                new TransactionIdImpl(transactionResponse.getHash()),
-                                extractHashTextIfAny(transactionResponse)
-                        );
-                    }
-                }
-            }
-        }
-        // return a new payment info object if possible, otherwise return null.
-        return paymentInfo;
-    }
-
-    private String extractSourceAccountId(TransactionResponse transactionResponse, Operation operation) {
-        //if payment was sent on behalf of other account - paymentOperation will contains this account, o.w. the source
-        //is the transaction source account
-        return operation.getSourceAccount() != null ? operation.getSourceAccount()
-            .getAccountId() : transactionResponse.getSourceAccount().getAccountId();
-    }
-
-    private boolean isPaymentInKin(PaymentOperation paymentOperation) {
-        return kinAsset.isKinAsset(paymentOperation.getAsset());
-    }
-
-    private String extractHashTextIfAny(TransactionResponse transactionResponse) {
-        String memoString = null;
-        Memo memo = transactionResponse.getMemo();
-        if (memo instanceof MemoText) {
-            memoString = ((MemoText) memo).getText();
-        }
-        return memoString;
-    }
 }

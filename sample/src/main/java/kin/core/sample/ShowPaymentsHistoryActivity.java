@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.util.List;
@@ -36,8 +37,21 @@ public class ShowPaymentsHistoryActivity extends BaseActivity {
         progressBar = findViewById(R.id.progress_bar);
         recyclerView = findViewById(R.id.recyclerview);
 
-        PaymentsHistoryRequestParams params = getIntent().getParcelableExtra(PaymentsHistoryActivity.EXTRA_TRANSACTION_HISTORY_PARAMS);
+        PaymentsHistoryRequestParams params = buildPaymentsParamsFromIntent(getIntent());
         getTransactionHistory(params);
+    }
+
+    private PaymentsHistoryRequestParams buildPaymentsParamsFromIntent(Intent intent) {
+        PaymentsHistoryRequestParams.Builder builder = new PaymentsHistoryRequestParams.Builder();
+        int limit = intent.getIntExtra(PaymentsHistoryActivity.EXTRA_LIMIT, 0);
+        if (limit > 0) {
+            builder.limit(limit);
+        }
+        String orderBy = intent.getStringExtra(PaymentsHistoryActivity.EXTRA_ORDER_BY);
+        if (!TextUtils.isEmpty(orderBy)) {
+            builder.order(PaymentsHistoryRequestParams.Order.valueOf(orderBy));
+        }
+        return builder.build();
     }
 
     @Override
