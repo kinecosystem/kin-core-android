@@ -22,24 +22,22 @@ import kotlin.test.fail
 
 @Suppress("FunctionName")
 class KinAccountIntegrationTest {
+
+    private val appId = "1a2c"
+
+
     private lateinit var kinClient: KinClient
 
     @Rule
     @JvmField
     val expectedEx: ExpectedException = ExpectedException.none()
 
-    private val environment: Environment = Environment.Builder()
-            .setNetworkUrl(IntegConsts.TEST_NETWORK_URL)
-            .setNetworkPassphrase(IntegConsts.TEST_NETWORK_ID)
-            .setIssuerAccountId(fakeKinIssuer.accountId)
-            .build()
+    private val environment: Environment = Environment(IntegConsts.TEST_NETWORK_URL, IntegConsts.TEST_NETWORK_ID, fakeKinIssuer.accountId)
 
     @Before
     @Throws(IOException::class)
     fun setup() {
-        kinClient = KinClient.Builder(InstrumentationRegistry.getTargetContext())
-                .setEnvironment(environment)
-                .build()
+        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), environment, appId)
         kinClient.clearAllAccounts()
     }
 
