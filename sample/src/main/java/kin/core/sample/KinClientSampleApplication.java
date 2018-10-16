@@ -16,7 +16,8 @@ public class KinClientSampleApplication extends Application {
     private KinClient kinClient = null;
 
     public KinClient createKinClient(NetWorkType type, String appId) {
-        return new KinClient(this, type == NetWorkType.MAIN ? Environment.PRODUCTION : Environment.TEST, appId, "sample_app");
+        kinClient = new KinClient(this, type == NetWorkType.MAIN ? Environment.PRODUCTION : Environment.TEST, appId, "sample_app");
+        return kinClient;
     }
 
     @Override

@@ -57,7 +57,7 @@ public class KinClientTest {
 
         Context ctx = mock(Context.class);
 
-        new KinClient(ctx, null, APP_ID);
+        new KinClient(ctx, null, APP_ID, "test");
 
     }
 

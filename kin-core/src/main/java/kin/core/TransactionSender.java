@@ -52,7 +52,7 @@ class TransactionSender {
     TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
         @Nullable String memo)
         throws OperationFailedException {
-
+//        memo
         checkParams(from, publicAddress, amount, memo);
         memo = addAppIdToMemo(memo);
 
@@ -65,6 +65,7 @@ class TransactionSender {
 
     @NonNull
     private String addAppIdToMemo(@Nullable String memo) {
+        Log.d("TEST", "memo: " + memo + ", memo == null: " + (memo == null));
         if (memo == null) {
             memo = "";
         } else {
@@ -103,7 +104,6 @@ class TransactionSender {
 
     private void checkMemo(String memo) {
         try {
-            Log.d("TEST", "memo length = " + memo.length() + ", memo byte length = " + memo.getBytes().length + ", memo byte in utf-8 length = " + memo.getBytes("UTF-8").length);
             if (memo != null && memo.getBytes("UTF-8").length > MEMO_BYTES_LENGTH_LIMIT) {
                 throw new IllegalArgumentException("Memo cannot be longer that 21 bytes(UTF-8 characters)");
             }

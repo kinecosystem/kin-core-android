@@ -301,9 +301,9 @@ public class TransactionSenderTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void sendTransaction_TooLongMemo() throws Exception {
-        String tooLongMemo = "memo string can be only 28 characters";
+        String tooLongMemo = "memo string can be only 21 characters";
         expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("28 characters");
+        expectedEx.expectMessage("Memo cannot be longer that 21 bytes(UTF-8 characters)");
         transactionSender.sendTransaction(account, ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
         assertThat(mockWebServer.getRequestCount(), equalTo(0));
     }
