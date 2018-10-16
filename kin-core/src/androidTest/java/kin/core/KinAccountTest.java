@@ -16,6 +16,8 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings({"deprecation", "ConstantConditions"})
 public class KinAccountTest {
 
+    private static final String APP_ID = "1a2c";
+
     private KinClient kinClient;
 
     @Rule
@@ -23,9 +25,7 @@ public class KinAccountTest {
 
     @Before
     public void setup() throws IOException {
-        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
-            .setEnvironment(Environment.TEST)
-            .build();
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), Environment.TEST, APP_ID);
         kinClient.clearAllAccounts();
     }
 
