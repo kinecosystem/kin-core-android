@@ -57,12 +57,8 @@ public class BlockchainEventsTest {
         Network.useTestNetwork();
 
         //use custom issuer that fake responses are use, to prevent testnet issuer address changes affect the tests
-        KinAsset kinAsset = new Environment.Builder()
-            .setNetworkUrl("empty")
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId("GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V")
-            .build()
-            .getKinAsset();
+        KinAsset kinAsset = new Environment("empty", Environment.TEST.getNetworkPassphrase(),
+                "GCKG5WGBIJP74UDNRIRDFGENNIH5Y3KBI5IHREFAJKV4MQXLELT7EX6V").getKinAsset();
         blockchainEvents = new BlockchainEvents(server, ACCOUNT_ID, kinAsset);
         createResponsesQueue();
     }

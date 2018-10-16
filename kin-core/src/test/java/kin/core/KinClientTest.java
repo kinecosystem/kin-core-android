@@ -26,6 +26,8 @@ import org.stellar.sdk.KeyPair;
 @SuppressWarnings("deprecation")
 public class KinClientTest {
 
+    private static final String APP_ID = "1a2c";
+
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
     @Mock
@@ -43,25 +45,20 @@ public class KinClientTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        fakeEnvironment = new Environment.Builder()
-            .setNetworkUrl("empty")
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        fakeEnvironment = new Environment("empty", Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
         fakeKeyStore = new FakeKeyStore();
         kinClient = createNewKinClient();
     }
 
     @Test
-    public void kinClientBuilder_missingContext_IllegalArgumentException() {
+    public void kinClientBuilder_missingEnvironment_IllegalArgumentException() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("environment");
 
         Context ctx = mock(Context.class);
 
-        new KinClient.Builder(ctx)
-            .setStoreKey("test")
-            .build();
+        new KinClient(ctx, null, APP_ID);
+
     }
 
     @Test
@@ -71,21 +68,15 @@ public class KinClientTest {
 
         Context ctx = mock(Context.class);
 
-        new KinClient.Builder(ctx)
-            .setEnvironment(fakeEnvironment)
-            .setStoreKey(null)
-            .build();
+        new KinClient(ctx, fakeEnvironment, APP_ID, null);
     }
 
     @Test
-    public void kinClientBuilder_missingEnvironment_IllegalArgumentException() {
+    public void kinClientBuilder_missingContext_IllegalArgumentException() {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("context");
 
-        new KinClient.Builder(null)
-            .setEnvironment(null)
-            .setStoreKey("test")
-            .build();
+        new KinClient(null, fakeEnvironment, APP_ID, "test");
     }
 
     @Test
@@ -336,11 +327,7 @@ public class KinClientTest {
     @Test
     public void getEnvironment() throws Exception {
         String url = "My awesome Horizon server";
-        Environment environment = new Environment.Builder()
-            .setNetworkUrl(url)
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        Environment environment = new Environment(url, Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
         kinClient = new KinClient(environment, fakeKeyStore, mockTransactionSender, mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
         Environment actualEnvironment = kinClient.getEnvironment();
@@ -356,11 +343,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("networkUrl");
 
-        new Environment.Builder()
-            .setNetworkUrl(null)
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        new Environment(null, Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
     }
 
     @Test
@@ -368,10 +351,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("networkPassphrase");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), null, Environment.TEST.getIssuerAccountId());
     }
 
     @Test
@@ -379,10 +359,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("issuerAccountId");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), Environment.TEST.getNetworkPassphrase(), null);
     }
 
     @Test
@@ -390,12 +367,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("assetCode");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .setAssetCode(null)
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId(), null);
     }
 
     @Test
@@ -403,11 +375,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("networkUrl");
 
-        new Environment.Builder()
-            .setNetworkUrl("")
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        new Environment("", Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
     }
 
     @Test
@@ -415,11 +383,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("networkPassphrase");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setNetworkPassphrase("")
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), "", Environment.TEST.getIssuerAccountId());
     }
 
     @Test
@@ -427,11 +391,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("issuerAccountId");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId("")
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), Environment.TEST.getNetworkPassphrase(), "");
     }
 
     @Test
@@ -439,12 +399,7 @@ public class KinClientTest {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("assetCode");
 
-        new Environment.Builder()
-            .setNetworkUrl(Environment.TEST.getNetworkUrl())
-            .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .setAssetCode("")
-            .build();
+        new Environment(Environment.TEST.getNetworkUrl(), Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId(), "");
     }
 
     @NonNull

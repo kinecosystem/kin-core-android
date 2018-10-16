@@ -53,6 +53,7 @@ public class TransactionSenderTest {
     private static final String SECRET_SEED_TO = "SCJFLXKUY6VQT2LYSP6XDP23WNEP5OITSC3LZEJUJO7GFZM7QLDF2BCN";
     private static final String TX_BODY = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAA0uSmqLI9ir6I2%2B%2FAwELkoUzOOEAZXWAz9Cq%2B8gaFISIAAAABS0lOAAAAAABBq58xoA5F8Hm%2F7tPH51hBTD4tUsenooq1dLrUnnJnxgAAAAAA5OHAAAAAAAAAAAFtBVodAAAAQLLn6OJYeSG1KEki6SL%2FKYPX01Dzdid5aTNTMYTJ%2FO7cMQC1n%2FAWSmyVXJdm5zQCtn9vAzTVZpIbBmKKyHjtfw4%3D";
     private static final String TX_BODY_WITH_MEMO = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAEAAAAJRmFrZSBNZW1vAAAAAAAAAQAAAAAAAAABAAAAANLkpqiyPYq%2BiNvvwMBC5KFMzjhAGV1gM%2FQqvvIGhSEiAAAAAUtJTgAAAAAAQaufMaAORfB5v%2B7Tx%2BdYQUw%2BLVLHp6KKtXS61J5yZ8YAAAAAAOThwAAAAAAAAAABbQVaHQAAAEBg5FzUJmYLcqxR24yo8RI6CnvJ1vDNWAHALT4XEqIR4nzrh5fqQxVnNMCP2wawlYUw46Ff0Jb%2BS4mrnUg7vzwE";
+    private static final String APP_ID = "1a2c";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -72,7 +73,7 @@ public class TransactionSenderTest {
         Network.useTestNetwork();
 
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, kinAsset);
+        transactionSender = new TransactionSender(server, kinAsset, APP_ID);
         account = KeyPair.fromSecretSeed(SECRET_SEED_FROM);
     }
 
@@ -253,7 +254,7 @@ public class TransactionSenderTest {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, kinAsset);
+        transactionSender = new TransactionSender(server, kinAsset, APP_ID);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));

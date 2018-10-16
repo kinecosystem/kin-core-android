@@ -31,8 +31,15 @@ public class KinClient {
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
-    private KinClient(@NonNull Context context, @NonNull Environment environment, @NonNull String storeKey, String appId) {
+    public KinClient(@NonNull Context context, @NonNull Environment environment, String appId) {
+        this(context, environment, appId,"");
+    }
+
+    public KinClient(@NonNull Context context, @NonNull Environment environment, @NonNull String appId, @NonNull String storeKey) {
         checkNotNull(storeKey, "storeKey");
+        checkNotNull(context, "context");
+        checkNotNull(environment, "environment");
+        validateAppId(appId);
         this.environment = environment;
         Server server = initServer();
         keyStore = initKeyStore(context.getApplicationContext(), storeKey);
@@ -78,6 +85,14 @@ public class KinClient {
             for (KeyPair account : accounts) {
                 kinAccounts.add(createNewKinAccount(account));
             }
+        }
+    }
+
+    private void validateAppId(String appId) {
+        checkNotEmpty(appId, "appId");
+        if (!appId.matches("[a-zA-Z0-9]{4}")) {
+            throw new IllegalArgumentException("appId must contain only upper and/or lower case letters and/or digits and that the total string length is exactly 4.\n" +
+                    "for example 1234 or 2ab3 or bcda, etc.");
         }
     }
 
@@ -156,50 +171,4 @@ public class KinClient {
             blockchainEventsCreator);
     }
 
-    public static class Builder {
-
-        private final Context context;
-        private final String appId;
-        private Environment environment;
-        private String storeKey = "";
-
-        public Builder(Context context, String appId) {
-            this.context = context;
-            this.appId = appId;
-        }
-
-        /**
-         * Sets the blockchain network details.
-         */
-        public Builder setEnvironment(Environment environment) {
-            this.environment = environment;
-            return this;
-        }
-
-        /**
-         * Sets the key for storing this KinClient data, different keys will store a different accounts.
-         */
-        public Builder setStoreKey(String storeKey) {
-            this.storeKey = storeKey;
-            return this;
-        }
-
-        /**
-         * Builds a KinClient.
-         */
-        public KinClient build() {
-            checkNotNull(context, "context");
-            checkNotNull(environment, "environment");
-            validateAppId(appId);
-            return new KinClient(context, environment, storeKey, appId);
-        }
-
-        private void validateAppId(String appId) {
-            checkNotEmpty(appId, "appId");
-            if (!appId.matches("[a-zA-Z0-9]{4}")) {
-                throw new IllegalArgumentException("appId must contain only upper and/or lower case letters and/or digits and that the total string length is exactly 4.\n" +
-                        "for example 1234 or 2ab3 or bcda, etc.");
-            }
-        }
-    }
 }

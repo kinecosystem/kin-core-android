@@ -38,7 +38,15 @@ public class Environment {
     @Nullable
     private KinAsset kinAsset;
 
-    private Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode) {
+    public Environment(String networkUrl, String networkPassphrase, String issuerAccountId) {
+        this(networkUrl, networkPassphrase, issuerAccountId, KIN_ASSET_CODE);
+    }
+
+    public Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode) {
+        checkNotEmpty(networkUrl, "networkUrl");
+        checkNotEmpty(networkPassphrase, "networkPassphrase");
+        checkNotEmpty(issuerAccountId, "issuerAccountId");
+        checkNotEmpty(assetCode, "assetCode");
         this.networkUrl = networkUrl;
         this.network = new Network(networkPassphrase);
         this.issuerAccountId = issuerAccountId;
@@ -121,57 +129,4 @@ public class Environment {
         }
     }
 
-    public static class Builder {
-
-        private String networkUrl;
-        private String networkPassphrase;
-        private String issuerAccountId;
-        private String assetCode = KIN_ASSET_CODE;
-
-        /**
-         * Sets the URL of the blockchain node.
-         */
-        public Builder setNetworkUrl(String networkUrl) {
-            this.networkUrl = networkUrl;
-            return this;
-        }
-
-        /**
-         * Sets the network id to be used.
-         */
-        public Builder setNetworkPassphrase(String networkPassphrase) {
-            this.networkPassphrase = networkPassphrase;
-            return this;
-        }
-
-        /**
-         * Sets the asset issuer account ID.
-         */
-        public Builder setIssuerAccountId(String issuerAccountId) {
-            this.issuerAccountId = issuerAccountId;
-            return this;
-        }
-
-        /**
-         * Sets the asset code, optional, the default is "KIN".
-         * <p><b>Warning!</b> use for testing only, for testing against custom asset.</p>
-         */
-        @SuppressWarnings("WeakerAccess")
-        public Builder setAssetCode(String assetCode) {
-            this.assetCode = assetCode;
-            return this;
-        }
-
-        /**
-         * Build an Environment object.
-         */
-        public Environment build() {
-            checkNotEmpty(networkUrl, "networkUrl");
-            checkNotEmpty(networkPassphrase, "networkPassphrase");
-            checkNotEmpty(issuerAccountId, "issuerAccountId");
-            checkNotEmpty(assetCode, "assetCode");
-
-            return new Environment(networkUrl, networkPassphrase, issuerAccountId, assetCode);
-        }
-    }
 }
