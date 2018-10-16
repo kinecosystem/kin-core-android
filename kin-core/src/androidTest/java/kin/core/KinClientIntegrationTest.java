@@ -25,6 +25,7 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("deprecation")
 public class KinClientIntegrationTest {
 
+    private static final String APP_ID = "1a2c";
     private static final String STORE_KEY_TEST = "test";
     private static final String STORE_KEY_TEST2 = "test2";
     private Environment environment;
@@ -44,7 +45,7 @@ public class KinClientIntegrationTest {
     }
 
     private KinClient createNewKinClient(String storeKey) {
-        return new KinClient(InstrumentationRegistry.getTargetContext(), environment, storeKey);
+        return new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, storeKey);
     }
 
     @After
@@ -182,7 +183,7 @@ public class KinClientIntegrationTest {
     }
 
     private void buildKinClient() {
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), environment, STORE_KEY_TEST);
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, STORE_KEY_TEST);
     }
 
     @Test
@@ -267,9 +268,8 @@ public class KinClientIntegrationTest {
     @Test
     public void getEnvironment() throws Exception {
         String url = "https://www.myawesomeserver.com";
-        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(),
-                new Environment(url, Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId()),
-                        STORE_KEY_TEST);
+        Environment environment = new Environment(url, Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, STORE_KEY_TEST);
         Environment actualEnvironment = kinClient.getEnvironment();
 
         assertNotNull(actualEnvironment);

@@ -24,7 +24,7 @@ public class KinAccountTest {
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), Environment.TEST, APP_ID);
         kinClient.clearAllAccounts();
     }

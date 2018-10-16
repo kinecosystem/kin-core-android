@@ -24,7 +24,7 @@ import kotlin.test.fail
 class KinAccountIntegrationTest {
 
     private val appId = "1a2c"
-
+    private val appIdVersionPrefix = "1"
 
     private lateinit var kinClient: KinClient
 
@@ -133,7 +133,8 @@ class KinAccountIntegrationTest {
     fun sendTransaction_WithMemo() {
         val (kinAccountSender, kinAccountReceiver) = onboardAccounts(senderFundAmount = 100)
 
-        val expectedMemo = "fake memo"
+        val memo = "fake memo"
+        val expectedMemo = addAppIdToMemo(memo)
 
         val latch = CountDownLatch(1)
         val listenerRegistration = kinAccountReceiver.addPaymentListener { _ -> latch.countDown() }
@@ -254,9 +255,10 @@ class KinAccountIntegrationTest {
 
         //send the transaction we want to observe
         fakeKinIssuer.fundWithKin(kinAccountSender.publicAddress.orEmpty(), "100")
-        val expectedMemo = "memo"
+        val memo = "memo"
+        val expectedMemo = addAppIdToMemo(memo)
         val expectedTransactionId = kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), transactionAmount, expectedMemo)
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), transactionAmount, memo)
 
         //verify data notified by listeners
         val transactionIndex = if (sender) 1 else 0 //in case of observing the sender we'll get 2 events (1 for funding 1 for the
@@ -322,6 +324,10 @@ class KinAccountIntegrationTest {
         if (fundAmount > 0) {
             fakeKinIssuer.fundWithKin(account.publicAddress.orEmpty(), fundAmount.toString())
         }
+    }
+
+    private fun addAppIdToMemo(memo: String): String {
+        return appIdVersionPrefix.plus("-").plus(appId).plus("-").plus(memo);
     }
 
     companion object {
