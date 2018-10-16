@@ -141,7 +141,7 @@ class KinAccountIntegrationTest {
 
         val transactionId = kinAccountSender
                 .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"),
-                        expectedMemo)
+                        memo)
         assertThat(kinAccountSender.balanceSync.value(), equalTo(BigDecimal("78.8770000")))
         assertThat(kinAccountReceiver.balanceSync.value(), equalTo(BigDecimal("21.1230000")))
 
