@@ -67,7 +67,7 @@ class TransactionSender {
         if (memo == null) {
             memo = "";
         } else {
-            memo = memo.trim(); // remove leading and trailing whitespaces
+            memo = memo.trim(); // remove leading and trailing whitespaces.
         }
         StringBuilder sb = new StringBuilder();
         sb.append(APP_ID_VERSION_PREFIX)
