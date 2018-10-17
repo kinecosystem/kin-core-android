@@ -38,10 +38,21 @@ public class Environment {
     @Nullable
     private KinAsset kinAsset;
 
+    /**
+     * For more de at{@link Environment#Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode)}
+     */
     public Environment(String networkUrl, String networkPassphrase, String issuerAccountId) {
         this(networkUrl, networkPassphrase, issuerAccountId, KIN_ASSET_CODE);
     }
 
+    /**
+     * Build an Environment object.
+     * @param networkUrl the URL of the blockchain node.
+     * @param networkPassphrase the network id to be used.
+     * @param issuerAccountId the asset issuer account ID.
+     * @param assetCode the asset code, optional, the default is "KIN".
+     *                  <p><b>Warning!</b> use for testing only, for testing against custom asset.</p>
+     */
     public Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode) {
         checkNotEmpty(networkUrl, "networkUrl");
         checkNotEmpty(networkPassphrase, "networkPassphrase");

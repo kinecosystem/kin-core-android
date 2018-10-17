@@ -52,7 +52,6 @@ class TransactionSender {
     TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
         @Nullable String memo)
         throws OperationFailedException {
-//        memo
         checkParams(from, publicAddress, amount, memo);
         memo = addAppIdToMemo(memo);
 
@@ -65,7 +64,6 @@ class TransactionSender {
 
     @NonNull
     private String addAppIdToMemo(@Nullable String memo) {
-        Log.d("TEST", "memo: " + memo + ", memo == null: " + (memo == null));
         if (memo == null) {
             memo = "";
         } else {
@@ -105,10 +103,9 @@ class TransactionSender {
     private void checkMemo(String memo) {
         try {
             if (memo != null && memo.getBytes("UTF-8").length > MEMO_BYTES_LENGTH_LIMIT) {
-                throw new IllegalArgumentException("Memo cannot be longer that 21 bytes(UTF-8 characters)");
+                throw new IllegalArgumentException("Memo cannot be longer that " + MEMO_BYTES_LENGTH_LIMIT + " bytes(UTF-8 characters)");
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
             throw new IllegalArgumentException("Memo text have unsupported characters encoding");
         }
     }

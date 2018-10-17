@@ -110,7 +110,7 @@ public class TransactionActivity extends BaseActivity {
         sendTransaction.setOnClickListener(view -> {
             BigDecimal amount = new BigDecimal(amountInput.getText().toString());
             try {
-                sendTransaction(toAddressInput.getText().toString(), amount, null/*memoInput.getText().toString()*/);
+                sendTransaction(toAddressInput.getText().toString(), amount, memoInput.getText().toString());
             } catch (OperationFailedException e) {
                 Utils.logError(e, "sendTransaction");
                 KinAlertDialog.createErrorDialog(TransactionActivity.this, e.getMessage()).show();
