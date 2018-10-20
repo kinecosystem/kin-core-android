@@ -402,12 +402,6 @@ public class KinClientTest {
         new Environment(Environment.TEST.getNetworkUrl(), Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId(), "");
     }
 
-    @Test
-    public void moshe() throws Exception {
-        int x = 3;
-        assertEquals(x, 3);
-    }
-
     @NonNull
     private KinClient createNewKinClient() {
         return new KinClient(fakeEnvironment, fakeKeyStore, mockTransactionSender, mockAccountActivator,

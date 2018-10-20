@@ -39,7 +39,7 @@ public class Environment {
     private KinAsset kinAsset;
 
     /**
-     * For more de at{@link Environment#Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode)}
+     * For more details please look at{@link Environment#Environment(String networkUrl, String networkPassphrase, String issuerAccountId, String assetCode)}
      */
     public Environment(String networkUrl, String networkPassphrase, String issuerAccountId) {
         this(networkUrl, networkPassphrase, issuerAccountId, KIN_ASSET_CODE);
