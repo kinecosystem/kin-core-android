@@ -69,6 +69,7 @@ public class WalletActivity extends BaseActivity {
         onboardBtn = findViewById(R.id.onboard_btn);
         final View deleteAccount = findViewById(R.id.delete_account_btn);
         final View watchPayments = findViewById(R.id.watch_payments_btn);
+        final View exportKeyStore = findViewById(R.id.export_wallet);
 
         if (isMainNet()) {
             transaction.setBackgroundResource(R.drawable.button_main_network_bg);
@@ -89,6 +90,7 @@ public class WalletActivity extends BaseActivity {
         refresh.setOnClickListener(view -> updateAccountInfo(true));
         balanceListenSwitch
             .setOnCheckedChangeListener((buttonView, isChecked) -> handleAutoBalanceSwitchChanges(refresh, isChecked));
+        exportKeyStore.setOnClickListener(view -> startActivity(ExportKeystoreActivity.getIntent(this)));
     }
 
     private void updateAccountInfo(boolean showDialog) {

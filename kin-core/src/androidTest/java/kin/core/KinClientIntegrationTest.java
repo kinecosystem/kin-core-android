@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 
 import android.support.test.InstrumentationRegistry;
+import java.util.UUID;
 import kin.core.exception.CreateAccountException;
 import org.junit.After;
 import org.junit.Before;
@@ -301,6 +302,17 @@ public class KinClientIntegrationTest {
         kinClient2 = createNewKinClient(STORE_KEY_TEST2);
 
         assertThat(kinClient2.getAccount(0), equalTo(account));
+    }
+
+    @Test
+    public void backupRestore() throws Exception {
+        for (int i = 0; i < 50; i++) {
+            KinAccount kinAccount = kinClient.addAccount();
+            String uuid = UUID.randomUUID().toString();
+            String exported = kinAccount.export(uuid);
+            KinAccount kinAccount2 = kinClient2.importAccount(exported, uuid);
+            assertThat(kinAccount2.getPublicAddress(), equalTo(kinAccount.getPublicAddress()));
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
