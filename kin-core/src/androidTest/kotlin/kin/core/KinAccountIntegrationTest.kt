@@ -22,24 +22,22 @@ import kotlin.test.fail
 
 @Suppress("FunctionName")
 class KinAccountIntegrationTest {
+
+    private val appId = "1a2c"
+    private val appIdVersionPrefix = "1"
+
     private lateinit var kinClient: KinClient
 
     @Rule
     @JvmField
     val expectedEx: ExpectedException = ExpectedException.none()
 
-    private val environment: Environment = Environment.Builder()
-            .setNetworkUrl(IntegConsts.TEST_NETWORK_URL)
-            .setNetworkPassphrase(IntegConsts.TEST_NETWORK_ID)
-            .setIssuerAccountId(fakeKinIssuer.accountId)
-            .build()
+    private val environment: Environment = Environment(IntegConsts.TEST_NETWORK_URL, IntegConsts.TEST_NETWORK_ID, fakeKinIssuer.accountId)
 
     @Before
     @Throws(IOException::class)
     fun setup() {
-        kinClient = KinClient.Builder(InstrumentationRegistry.getTargetContext())
-                .setEnvironment(environment)
-                .build()
+        kinClient = KinClient(InstrumentationRegistry.getTargetContext(), environment, appId)
         kinClient.clearAllAccounts()
     }
 
@@ -135,14 +133,15 @@ class KinAccountIntegrationTest {
     fun sendTransaction_WithMemo() {
         val (kinAccountSender, kinAccountReceiver) = onboardAccounts(senderFundAmount = 100)
 
-        val expectedMemo = "fake memo"
+        val memo = "fake memo"
+        val expectedMemo = addAppIdToMemo(memo)
 
         val latch = CountDownLatch(1)
         val listenerRegistration = kinAccountReceiver.addPaymentListener { _ -> latch.countDown() }
 
         val transactionId = kinAccountSender
                 .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"),
-                        expectedMemo)
+                        memo)
         assertThat(kinAccountSender.balanceSync.value(), equalTo(BigDecimal("78.8770000")))
         assertThat(kinAccountReceiver.balanceSync.value(), equalTo(BigDecimal("21.1230000")))
 
@@ -256,9 +255,10 @@ class KinAccountIntegrationTest {
 
         //send the transaction we want to observe
         fakeKinIssuer.fundWithKin(kinAccountSender.publicAddress.orEmpty(), "100")
-        val expectedMemo = "memo"
+        val memo = "memo"
+        val expectedMemo = addAppIdToMemo(memo)
         val expectedTransactionId = kinAccountSender
-                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), transactionAmount, expectedMemo)
+                .sendTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), transactionAmount, memo)
 
         //verify data notified by listeners
         val transactionIndex = if (sender) 1 else 0 //in case of observing the sender we'll get 2 events (1 for funding 1 for the
@@ -324,6 +324,10 @@ class KinAccountIntegrationTest {
         if (fundAmount > 0) {
             fakeKinIssuer.fundWithKin(account.publicAddress.orEmpty(), fundAmount.toString())
         }
+    }
+
+    private fun addAppIdToMemo(memo: String): String {
+        return appIdVersionPrefix.plus("-").plus(appId).plus("-").plus(memo);
     }
 
     companion object {

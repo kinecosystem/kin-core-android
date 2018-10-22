@@ -48,7 +48,7 @@ public class ChooseNetworkActivity extends BaseActivity {
 
     private void createKinClient(KinClientSampleApplication.NetWorkType netWorkType) {
         KinClientSampleApplication application = (KinClientSampleApplication) getApplication();
-        KinClient kinClient = application.createKinClient(netWorkType);
+        KinClient kinClient = application.createKinClient(netWorkType,"test");
         if (kinClient.hasAccount()) {
             startActivity(WalletActivity.getIntent(this));
         } else {

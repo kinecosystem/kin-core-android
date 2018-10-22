@@ -25,6 +25,7 @@ import org.junit.rules.ExpectedException;
 @SuppressWarnings("deprecation")
 public class KinClientIntegrationTest {
 
+    private static final String APP_ID = "1a2c";
     private static final String STORE_KEY_TEST = "test";
     private static final String STORE_KEY_TEST2 = "test2";
     private Environment environment;
@@ -36,11 +37,7 @@ public class KinClientIntegrationTest {
 
     @Before
     public void setup() {
-        environment = new Environment.Builder()
-            .setNetworkUrl(TEST_NETWORK_URL)
-            .setNetworkPassphrase(TEST_NETWORK_ID)
-            .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-            .build();
+        environment = new Environment(TEST_NETWORK_URL, TEST_NETWORK_ID, Environment.TEST.getIssuerAccountId());
         kinClient = createNewKinClient(STORE_KEY_TEST);
         kinClient2 = createNewKinClient(STORE_KEY_TEST2);
         kinClient.clearAllAccounts();
@@ -48,10 +45,7 @@ public class KinClientIntegrationTest {
     }
 
     private KinClient createNewKinClient(String storeKey) {
-        return new KinClient.Builder(InstrumentationRegistry.getTargetContext())
-            .setEnvironment(environment)
-            .setStoreKey(storeKey)
-            .build();
+        return new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, storeKey);
     }
 
     @After
@@ -189,10 +183,7 @@ public class KinClientIntegrationTest {
     }
 
     private void buildKinClient() {
-        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
-            .setEnvironment(environment)
-            .setStoreKey(STORE_KEY_TEST)
-            .build();
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, STORE_KEY_TEST);
     }
 
     @Test
@@ -277,16 +268,8 @@ public class KinClientIntegrationTest {
     @Test
     public void getEnvironment() throws Exception {
         String url = "https://www.myawesomeserver.com";
-        kinClient = new KinClient.Builder(InstrumentationRegistry.getTargetContext())
-            .setEnvironment(
-                new Environment.Builder()
-                    .setNetworkUrl(url)
-                    .setNetworkPassphrase(Environment.TEST.getNetworkPassphrase())
-                    .setIssuerAccountId(Environment.TEST.getIssuerAccountId())
-                    .build()
-            )
-            .setStoreKey(STORE_KEY_TEST)
-            .build();
+        Environment environment = new Environment(url, Environment.TEST.getNetworkPassphrase(), Environment.TEST.getIssuerAccountId());
+        kinClient = new KinClient(InstrumentationRegistry.getTargetContext(), environment, APP_ID, STORE_KEY_TEST);
         Environment actualEnvironment = kinClient.getEnvironment();
 
         assertNotNull(actualEnvironment);

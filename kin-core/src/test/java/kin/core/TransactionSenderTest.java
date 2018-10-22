@@ -51,8 +51,9 @@ public class TransactionSenderTest {
     private static final String SECRET_SEED_FROM = "SB6PCLT2WUQF44HVOTEGCXIDYNX2U4BJUPWUX453ODRGD4CXGPJP3HUX";
     private static final String ACCOUNT_ID_TO = "GDJOJJVIWI6YVPUI3PX4BQCC4SQUZTRYIAMV2YBT6QVL54QGQUQSFKGM";
     private static final String SECRET_SEED_TO = "SCJFLXKUY6VQT2LYSP6XDP23WNEP5OITSC3LZEJUJO7GFZM7QLDF2BCN";
-    private static final String TX_BODY = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAA0uSmqLI9ir6I2%2B%2FAwELkoUzOOEAZXWAz9Cq%2B8gaFISIAAAABS0lOAAAAAABBq58xoA5F8Hm%2F7tPH51hBTD4tUsenooq1dLrUnnJnxgAAAAAA5OHAAAAAAAAAAAFtBVodAAAAQLLn6OJYeSG1KEki6SL%2FKYPX01Dzdid5aTNTMYTJ%2FO7cMQC1n%2FAWSmyVXJdm5zQCtn9vAzTVZpIbBmKKyHjtfw4%3D";
-    private static final String TX_BODY_WITH_MEMO = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAEAAAAJRmFrZSBNZW1vAAAAAAAAAQAAAAAAAAABAAAAANLkpqiyPYq%2BiNvvwMBC5KFMzjhAGV1gM%2FQqvvIGhSEiAAAAAUtJTgAAAAAAQaufMaAORfB5v%2B7Tx%2BdYQUw%2BLVLHp6KKtXS61J5yZ8YAAAAAAOThwAAAAAAAAAABbQVaHQAAAEBg5FzUJmYLcqxR24yo8RI6CnvJ1vDNWAHALT4XEqIR4nzrh5fqQxVnNMCP2wawlYUw46Ff0Jb%2BS4mrnUg7vzwE";
+    private static final String TX_BODY = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAEAAAAHMS0xYTJjLQAAAAABAAAAAAAAAAEAAAAA0uSmqLI9ir6I2%2B%2FAwELkoUzOOEAZXWAz9Cq%2B8gaFISIAAAABS0lOAAAAAABBq58xoA5F8Hm%2F7tPH51hBTD4tUsenooq1dLrUnnJnxgAAAAAA5OHAAAAAAAAAAAFtBVodAAAAQGq4eJS6%2FHD2wnSVQGx86mV04fJWKnRN07LIEkA9wMy215b6ZFILwGTDkOgaIdYbv%2FMG8UrnliR8%2BN1w3VJzzgQ%3D";
+    private static final String TX_BODY_WITH_MEMO = "tx=AAAAANSQMFM2TD8pn4hIhHoUwA8IUMSN1M2SRw31SjZtBVodAAAAZABpZ8AAAAAEAAAAAAAAAAEAAAAQMS0xYTJjLWZha2UgbWVtbwAAAAEAAAAAAAAAAQAAAADS5Kaosj2Kvojb78DAQuShTM44QBldYDP0Kr7yBoUhIgAAAAFLSU4AAAAAAEGrnzGgDkXweb%2Fu08fnWEFMPi1Sx6eiirV0utSecmfGAAAAAHc1lAAAAAAAAAAAAW0FWh0AAABAttpTT8oOcsieRGuli9IiiJvAc4ik9f9AQW5QythcAlNo9D27lSddp88w%2FG8aZctWEx3aPPd0STytC8Obe0UwBw%3D%3D";
+    private static final String APP_ID = "1a2c";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -72,7 +73,7 @@ public class TransactionSenderTest {
         Network.useTestNetwork();
 
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, kinAsset);
+        transactionSender = new TransactionSender(server, kinAsset, APP_ID);
         account = KeyPair.fromSecretSeed(SECRET_SEED_FROM);
     }
 
@@ -110,10 +111,10 @@ public class TransactionSenderTest {
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_success_res.json"));
-        String fakeMemo = "Fake Memo";
+        String fakeMemo = "fake memo";
 
         TransactionId transactionId = transactionSender
-            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"), fakeMemo);
+            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"), fakeMemo);
 
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
 
@@ -253,7 +254,7 @@ public class TransactionSenderTest {
         String url = mockWebServer.url("").toString();
         server = new Server(url, 100, TimeUnit.MILLISECONDS);
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
-        transactionSender = new TransactionSender(server, kinAsset);
+        transactionSender = new TransactionSender(server, kinAsset, APP_ID);
 
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
@@ -300,9 +301,9 @@ public class TransactionSenderTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void sendTransaction_TooLongMemo() throws Exception {
-        String tooLongMemo = "memo string can be only 28 characters";
+        String tooLongMemo = "memo string can be only 21 characters";
         expectedEx.expect(IllegalArgumentException.class);
-        expectedEx.expectMessage("28 characters");
+        expectedEx.expectMessage("Memo cannot be longer that 21 bytes(UTF-8 characters)");
         transactionSender.sendTransaction(account, ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
         assertThat(mockWebServer.getRequestCount(), equalTo(0));
     }

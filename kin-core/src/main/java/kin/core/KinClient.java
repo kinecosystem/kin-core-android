@@ -1,5 +1,6 @@
 package kin.core;
 
+import static kin.core.Utils.checkNotEmpty;
 import static kin.core.Utils.checkNotNull;
 
 import android.content.Context;
@@ -30,12 +31,31 @@ public class KinClient {
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
-    private KinClient(@NonNull Context context, @NonNull Environment environment, @NonNull String storeKey) {
+    /**
+     * For more details please look at {@link #KinClient(Context context,Environment environment,String appId, String storeKey)}
+     */
+    public KinClient(@NonNull Context context, @NonNull Environment environment, String appId) {
+        this(context, environment, appId,"");
+    }
+
+    /**
+     * Build KinClient object.
+     * @param context android context
+     * @param environment the blockchain network details.
+     * @param appId a 4 character string which represent the application id which will be added to each transaction.
+     *              <br><b>Note:</b> appId must contain only upper and/or lower case letters and/or digits and that the total string length is exactly 4.
+     *              For example 1234 or 2ab3 or bcda, etc.</br>
+     * @param storeKey an optional param which is the key for storing this KinClient data, different keys will store a different accounts.
+     */
+    public KinClient(@NonNull Context context, @NonNull Environment environment, @NonNull String appId, @NonNull String storeKey) {
         checkNotNull(storeKey, "storeKey");
+        checkNotNull(context, "context");
+        checkNotNull(environment, "environment");
+        validateAppId(appId);
         this.environment = environment;
         Server server = initServer();
         keyStore = initKeyStore(context.getApplicationContext(), storeKey);
-        transactionSender = new TransactionSender(server, environment.getKinAsset());
+        transactionSender = new TransactionSender(server, environment.getKinAsset(), appId);
         accountActivator = new AccountActivator(server, environment.getKinAsset());
         accountInfoRetriever = new AccountInfoRetriever(server, environment.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, environment.getKinAsset());
@@ -77,6 +97,14 @@ public class KinClient {
             for (KeyPair account : accounts) {
                 kinAccounts.add(createNewKinAccount(account));
             }
+        }
+    }
+
+    private void validateAppId(String appId) {
+        checkNotEmpty(appId, "appId");
+        if (!appId.matches("[a-zA-Z0-9]{4}")) {
+            throw new IllegalArgumentException("appId must contain only upper and/or lower case letters and/or digits and that the total string length is exactly 4.\n" +
+                    "for example 1234 or 2ab3 or bcda, etc.");
         }
     }
 
@@ -155,39 +183,4 @@ public class KinClient {
             blockchainEventsCreator);
     }
 
-    public static class Builder {
-
-        private final Context context;
-        private Environment environment;
-        private String storeKey = "";
-
-        public Builder(Context context) {
-            this.context = context;
-        }
-
-        /**
-         * Sets the blockchain network details.
-         */
-        public Builder setEnvironment(Environment environment) {
-            this.environment = environment;
-            return this;
-        }
-
-        /**
-         * Sets the key for storing this KinClient data, different keys will store a different accounts.
-         */
-        public Builder setStoreKey(String storeKey) {
-            this.storeKey = storeKey;
-            return this;
-        }
-
-        /**
-         * Builds a KinClient.
-         */
-        public KinClient build() {
-            checkNotNull(context, "context");
-            checkNotNull(environment, "environment");
-            return new KinClient(context, environment, storeKey);
-        }
-    }
 }

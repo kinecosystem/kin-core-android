@@ -15,11 +15,8 @@ public class KinClientSampleApplication extends Application {
 
     private KinClient kinClient = null;
 
-    public KinClient createKinClient(NetWorkType type) {
-        kinClient = new KinClient.Builder(this)
-            .setEnvironment(type == NetWorkType.MAIN ? Environment.PRODUCTION : Environment.TEST)
-            .setStoreKey("sample_app")
-            .build();
+    public KinClient createKinClient(NetWorkType type, String appId) {
+        kinClient = new KinClient(this, type == NetWorkType.MAIN ? Environment.PRODUCTION : Environment.TEST, appId, "sample_app");
         return kinClient;
     }
 
