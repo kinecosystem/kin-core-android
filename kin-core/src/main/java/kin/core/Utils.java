@@ -25,6 +25,13 @@ final class Utils {
         return new TransactionFailedException(transactionResultCode, operationsResultCodes);
     }
 
+    static String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for(byte b : a)
+            sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
+
     static void checkNotNull(Object obj, String paramName) {
         if (obj == null) {
             throw new IllegalArgumentException(paramName + " == null");

@@ -19,7 +19,6 @@ import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
-import org.stellar.sdk.Transaction;
 import org.stellar.sdk.Transaction.Builder;
 import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.HttpResponseException;
@@ -27,10 +26,9 @@ import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
-    private static final int MEMO_BYTES_LENGTH_LIMIT = 21; //Stellar text memo length limitation(in bytes) is 28 but we add 7 more bytes which includes the appId and some characters.
+    private static final int MEMO_BYTES_LENGTH_LIMIT = 21; //Memo length limitation(in bytes) is 28 but we add 7 more bytes which includes the appId and some characters.
     private static String APP_ID_VERSION_PREFIX = "1";
     private static final String INSUFFICIENT_KIN_RESULT_CODE = "op_underfunded";
-
     private final Server server; //horizon server
     private final KinAsset kinAsset;
     private final String appId;
@@ -41,25 +39,26 @@ class TransactionSender {
         this.appId = appId;
     }
 
-    @NonNull
-    TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress,
-        @NonNull BigDecimal amount)
-        throws OperationFailedException {
-        return sendTransaction(from, publicAddress, amount, null);
+    Transaction buildTransaction(@NonNull KeyPair from, @NonNull String publicAddress,
+                                                 @NonNull BigDecimal amount) throws OperationFailedException {
+        return buildTransaction(from, publicAddress, amount, null);
     }
 
-    @NonNull
-    TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
-        @Nullable String memo)
-        throws OperationFailedException {
+    Transaction buildTransaction(@NonNull KeyPair from, @NonNull String publicAddress,
+                                                 @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException {
         checkParams(from, publicAddress, amount, memo);
         memo = addAppIdToMemo(memo);
 
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
-        verifyAddresseeAccount(addressee);
         AccountResponse sourceAccount = loadSourceAccount(from);
-        Transaction transaction = buildTransaction(from, amount, addressee, sourceAccount, memo);
-        return sendTransaction(transaction);
+        org.stellar.sdk.Transaction stellarTransaction = buildStellarTransaction(from, amount, addressee, sourceAccount, memo);
+        return new Transaction(addressee, from, amount, memo,
+               Utils.byteArrayToHex(stellarTransaction.hash()), stellarTransaction); // TODO: 25/10/2018 maybe change it from stellarTransaction to something else?
+    }
+
+    TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
+        verifyAddresseeAccount(generateAddresseeKeyPair(transaction.getDestination().getAccountId()));
+        return sendTransaction(transaction.getStellarTransaction());
     }
 
     @NonNull
@@ -120,16 +119,15 @@ class TransactionSender {
     }
 
     @NonNull
-    private Transaction buildTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
-        AccountResponse sourceAccount, @Nullable String memo) {
-
+    private org.stellar.sdk.Transaction buildStellarTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
+                                                                AccountResponse sourceAccount, @Nullable String memo) {
         Builder transactionBuilder = new Builder(sourceAccount)
             .addOperation(
                 new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build());
         if (memo != null) {
             transactionBuilder.addMemo(Memo.text(memo));
         }
-        Transaction transaction = transactionBuilder.build();
+        org.stellar.sdk.Transaction transaction = transactionBuilder.build();
         transaction.sign(from);
         return transaction;
     }
@@ -173,8 +171,10 @@ class TransactionSender {
     }
 
     @NonNull
-    private TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
+    private TransactionId sendTransaction(org.stellar.sdk.Transaction transaction) throws OperationFailedException {
         try {
+            byte[] hash = transaction.hash();
+            Log.d("TEST", "sendTransaction: our hash = " + Utils.byteArrayToHex(hash)); // TODO: 22/10/2018 delete before push
             SubmitTransactionResponse response = server.submitTransaction(transaction);
             if (response == null) {
                 throw new OperationFailedException("can't get transaction response");
