@@ -155,19 +155,20 @@ class KinAccountIntegrationTest {
         assertThat((actualMemo as MemoText).text, equalTo(expectedMemo))
     }
 
-//    @Test
-//    @LargeTest
-//    @Throws(Exception::class)
-//    fun sendTransaction_ReceiverAccountNotCreated_AccountNotFoundException() {
-//        val kinAccountSender = kinClient.addAccount()
-//        val kinAccountReceiver = kinClient.addAccount()
-//        fakeKinIssuer.createAccount(kinAccountSender.publicAddress.orEmpty())
-//
-//        expectedEx.expect(AccountNotFoundException::class.java)
-//        expectedEx.expectMessage(kinAccountReceiver.publicAddress)
-//        val transaction = kinAccountSender.buildTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
-//        kinAccountSender.sendTransactionSync(transaction)
-//    }
+    @Test
+    @LargeTest
+    @Throws(Exception::class)
+    fun sendTransaction_ReceiverAccountNotCreated_AccountNotFoundException() {
+        val kinAccountSender = kinClient.addAccount()
+        val kinAccountReceiver = kinClient.addAccount()
+        fakeKinIssuer.createAccount(kinAccountSender.publicAddress.orEmpty())
+        kinAccountSender.activateSync()
+
+        expectedEx.expect(AccountNotFoundException::class.java)
+        expectedEx.expectMessage(kinAccountReceiver.publicAddress)
+        val transaction = kinAccountSender.buildTransactionSync(kinAccountReceiver.publicAddress.orEmpty(), BigDecimal("21.123"))
+        kinAccountSender.sendTransactionSync(transaction)
+    }
 
     @Test
     @LargeTest
@@ -176,7 +177,7 @@ class KinAccountIntegrationTest {
         val kinAccountSender = kinClient.addAccount()
         val kinAccountReceiver = kinClient.addAccount()
         fakeKinIssuer.createAccount(kinAccountReceiver.publicAddress.orEmpty())
-        kinAccountReceiver.activateSync()
+//        kinAccountReceiver.activateSync()
 
         expectedEx.expect(AccountNotFoundException::class.java)
         expectedEx.expectMessage(kinAccountSender.publicAddress)
