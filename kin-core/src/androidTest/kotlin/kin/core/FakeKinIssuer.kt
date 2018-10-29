@@ -49,7 +49,7 @@ constructor() {
         val issuerAccountResponse = server.accounts().account(issuerKeyPair)
         val paymentOperation = PaymentOperation.Builder(destinationKeyPair, kinAsset, amount)
                 .build()
-        val transaction = Transaction.Builder(issuerAccountResponse)
+        val transaction = org.stellar.sdk.Transaction.Builder(issuerAccountResponse)
                 .addOperation(paymentOperation)
                 .build()
         transaction.sign(issuerKeyPair)
