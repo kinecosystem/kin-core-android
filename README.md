@@ -181,8 +181,10 @@ The following code will transfer 20 KIN to the recipient account "GDIRGGTBE3H4CU
 String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
 BigDecimal amountInKin = new BigDecimal("20");
 
-// build the transaction
+// Build the transaction and get a Request<Transaction> object.
 buildTransactionRequest = account.buildTransaction(toAddress, amountInKin);
+// Actually run the build transaction code in a background thread and get 
+// notify of success/failure methods which runs on the main thread
 buildTransactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
@@ -194,9 +196,10 @@ buildTransactionRequest.run(new ResultCallback<TransactionId>() {
         // So when the network is back we can check what is the status of this transaction.
         Log.d("example", "The transaction id before sending: " + transaction.getId().id());
 
-        // Send the transaction
+        // Create the send transaction request
         sendTransactionRequest = account.sendTransaction(transaction);
-        transactionRequest.run(new ResultCallback<TransactionId>() {
+        // Actually send the transaction in a background thread.
+        sendTransactionRequest.run(new ResultCallback<TransactionId>() {
 
             @Override
             public void onResult(TransactionId id) {
@@ -226,21 +229,16 @@ the memo can contain a utf-8 string up to 21 bytes in length. A typical usage is
 
 ```java
 String memo = "arbitrary data";
-// build the transaction
+
 buildTransactionRequest = account.buildTransaction(toAddress, amountInKin, memo);
-buildTransactionRequest.run(new ResultCallback<TransactionId>()
-
-
-transactionRequest = account.sendTransaction(toAddress, amountInKin, memo);
-transactionRequest.run(new ResultCallback<TransactionId>() {
+buildTransactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
     public void onResult(Transaction transaction) {
         Log.d("example", "The transaction id before sending: " + transaction.getId.().id());
 
-        // Send the transaction
         sendTransactionRequest = account.sendTransaction(transaction);
-        transactionRequest.run(new ResultCallback<TransactionId>() {
+        sendTransactionRequest.run(new ResultCallback<TransactionId>() {
 
             @Override
             public void onResult(TransactionId id) {
@@ -252,7 +250,6 @@ transactionRequest.run(new ResultCallback<TransactionId>() {
                 e.printStackTrace();
             }
         });
-
     }
 
     @Override
