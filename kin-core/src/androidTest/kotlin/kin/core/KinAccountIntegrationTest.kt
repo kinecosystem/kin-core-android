@@ -177,7 +177,6 @@ class KinAccountIntegrationTest {
         val kinAccountSender = kinClient.addAccount()
         val kinAccountReceiver = kinClient.addAccount()
         fakeKinIssuer.createAccount(kinAccountReceiver.publicAddress.orEmpty())
-//        kinAccountReceiver.activateSync()
 
         expectedEx.expect(AccountNotFoundException::class.java)
         expectedEx.expectMessage(kinAccountSender.publicAddress)
