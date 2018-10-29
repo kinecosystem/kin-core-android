@@ -181,19 +181,42 @@ The following code will transfer 20 KIN to the recipient account "GDIRGGTBE3H4CU
 String toAddress = "GDIRGGTBE3H4CUIHNIFZGUECGFQ5MBGIZTPWGUHPIEVOOHFHSCAGMEHO";
 BigDecimal amountInKin = new BigDecimal("20");
 
-transactionRequest = account.sendTransaction(toAddress, amountInKin);
-transactionRequest.run(new ResultCallback<TransactionId>() {
+// build the transaction
+buildTransactionRequest = account.buildTransaction(toAddress, amountInKin);
+buildTransactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
-        public void onResult(TransactionId result) {
-            Log.d("example", "The transaction id: " + result.toString());
-        }
+    public void onResult(Transaction transaction) {
+        // Here we already got a Transaction object before sending the transaction. This means 
+        // that we can, for example, send the transaction id to our servers or save it locally  
+        // in order to use it later. For example if we lose network just after sending 
+        // the transaction then we will not know what happened with this transaction. 
+        // So when the network is back we can check what is the status of this transaction.
+        Log.d("example", "The transaction id before sending: " + transaction.getId().id());
 
-        @Override
-        public void onError(Exception e) {
-            e.printStackTrace();
-        }
+        // Send the transaction
+        sendTransactionRequest = account.sendTransaction(transaction);
+        transactionRequest.run(new ResultCallback<TransactionId>() {
+
+            @Override
+            public void onResult(TransactionId id) {
+                Log.d("example", "The transaction id: " + id);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    @Override
+    public void onError(Exception e) {
+        e.printStackTrace();
+    }
 });
+
 ```
 
 #### Memo
@@ -203,18 +226,40 @@ the memo can contain a utf-8 string up to 21 bytes in length. A typical usage is
 
 ```java
 String memo = "arbitrary data";
+// build the transaction
+buildTransactionRequest = account.buildTransaction(toAddress, amountInKin, memo);
+buildTransactionRequest.run(new ResultCallback<TransactionId>()
+
+
 transactionRequest = account.sendTransaction(toAddress, amountInKin, memo);
 transactionRequest.run(new ResultCallback<TransactionId>() {
 
     @Override
-        public void onResult(TransactionId result) {
-            Log.d("example", "The transaction id: " + result.toString());
-        }
+    public void onResult(Transaction transaction) {
+        Log.d("example", "The transaction id before sending: " + transaction.getId.().id());
 
-        @Override
-        public void onError(Exception e) {
-            e.printStackTrace();
-        }
+        // Send the transaction
+        sendTransactionRequest = account.sendTransaction(transaction);
+        transactionRequest.run(new ResultCallback<TransactionId>() {
+
+            @Override
+            public void onResult(TransactionId id) {
+                Log.d("example", "The transaction id: " + id);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    @Override
+    public void onError(Exception e) {
+        e.printStackTrace();
+    }
+    
 });
 ```
 
@@ -280,7 +325,10 @@ try {
 }
 
 try {
-    TransactionId transactionId = account.sendTransactionSync(toAddress, amountInKin);
+    // build the transaction
+    Transaction transaction = account.buildTransactionSync(toAddress, amountInKin)
+    // send the transaction
+    TransactionId transactionId = account.sendTransactionSync(transaction);
 } catch (OperationFailedException e){
     // something else went wrong - check the exception message
 }
