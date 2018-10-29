@@ -21,18 +21,18 @@ public class Transaction {
     /**
      * The transaction hash
      */
-    private final String id;
+    private final TransactionId id;
 
     private final org.stellar.sdk.Transaction stellarTransaction;
 
     public Transaction(KeyPair destination, KeyPair source, BigDecimal amount,
-                       String memo, String id, org.stellar.sdk.Transaction stellarTransaction) {
+                       String memo, TransactionId id, org.stellar.sdk.Transaction stellarTransaction) {
         this.destination = destination;
         this.source = source;
         this.amount = amount;
         this.memo = memo;
-        this.id = id; // TODO: 23/10/2018 maybe use TransactionId object here in order to keep it like today? or maybe delete TransactionId?
-        this.stellarTransaction = stellarTransaction;  // TODO: 23/10/2018 create a better name
+        this.id = id;
+        this.stellarTransaction = stellarTransaction;
     }
 
     public KeyPair getDestination() {
@@ -51,7 +51,7 @@ public class Transaction {
         return memo;
     }
 
-    public String getId() {
+    public TransactionId getId() {
         return id;
     }
 

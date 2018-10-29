@@ -151,7 +151,7 @@ public class TransactionActivity extends BaseActivity {
             buildTransactionRequest.run(new ResultCallback<Transaction>() {
                 @Override
                 public void onResult(Transaction transaction) {
-                    Log.d(TAG, "sendTransaction: build transaction " + transaction.getId() + " succeeded");
+                    Log.d(TAG, "sendTransaction: build transaction " + transaction.getId().id() + " succeeded");
                     sendTransactionRequest = account.sendTransaction(transaction);
                     sendTransactionRequest.run(callback);
                 }

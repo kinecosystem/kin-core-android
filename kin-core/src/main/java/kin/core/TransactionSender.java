@@ -52,8 +52,8 @@ class TransactionSender {
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         AccountResponse sourceAccount = loadSourceAccount(from);
         org.stellar.sdk.Transaction stellarTransaction = buildStellarTransaction(from, amount, addressee, sourceAccount, memo);
-        return new Transaction(addressee, from, amount, memo,
-               Utils.byteArrayToHex(stellarTransaction.hash()), stellarTransaction); // TODO: 25/10/2018 maybe change it from stellarTransaction to something else?
+        TransactionId id = new TransactionIdImpl(Utils.byteArrayToHex(stellarTransaction.hash()));
+        return new Transaction(addressee, from, amount, memo, id, stellarTransaction);
     }
 
     TransactionId sendTransaction(Transaction transaction) throws OperationFailedException {
@@ -174,7 +174,6 @@ class TransactionSender {
     private TransactionId sendTransaction(org.stellar.sdk.Transaction transaction) throws OperationFailedException {
         try {
             byte[] hash = transaction.hash();
-            Log.d("TEST", "sendTransaction: our hash = " + Utils.byteArrayToHex(hash)); // TODO: 22/10/2018 delete before push
             SubmitTransactionResponse response = server.submitTransaction(transaction);
             if (response == null) {
                 throw new OperationFailedException("can't get transaction response");
