@@ -21,38 +21,65 @@ public interface KinAccount {
     String getPublicAddress();
 
     /**
-     * Create {@link Request} for signing and sending a transaction of the given amount in kin, to the specified public
-     * address
-     * <p> See {@link KinAccount#sendTransactionSync(String, BigDecimal)} for possibles errors</p>
-     *
+     * Build a Transaction object of the given amount in kin, to the specified public address.
+     * <p> See {@link KinAccount#buildTransactionSync(String, BigDecimal)} for possibles errors</p>
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
-    @NonNull
-    Request<TransactionId> sendTransaction(@NonNull String publicAddress, @NonNull BigDecimal amount);
+    Request<Transaction> buildTransaction(@NonNull String publicAddress, @NonNull BigDecimal amount);
 
     /**
-     * Create {@link Request} for signing and sending a transaction of the given amount in kin, to the specified public
-     * address
-     * <p> See {@link KinAccount#sendTransactionSync(String, BigDecimal)} for possibles errors</p>
-     *
+     * Build a Transaction object of the given amount in kin, to the specified public address and with a memo(that can be empty or null).
+     * <p> See {@link KinAccount#buildTransaction(String, BigDecimal, String)} for possibles errors</p>
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
-     * record.
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
      * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier
      */
-    @NonNull
-    Request<TransactionId> sendTransaction(@NonNull String publicAddress, @NonNull BigDecimal amount,
-        @Nullable String memo);
+    Request<Transaction> buildTransaction(@NonNull String publicAddress, @NonNull BigDecimal amount, @Nullable String memo);
 
     /**
-     * Create, sign and send a transaction of the given amount in kin to the specified public address
+     * Create {@link Request} for signing and sending a transaction
+     * <p> See {@link KinAccount#sendTransactionSync(Transaction)} for possibles errors</p>
+     * @param transaction is the transaction object to send.
+     * @return {@code Request<TransactionId>}, TransactionId - the transaction identifier.
+     */
+    @NonNull
+    Request<TransactionId> sendTransaction(Transaction transaction);
+
+    /**
+     * Build a Transaction object of the given amount in kin, to the specified public address.
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @param publicAddress the account address to send the specified kin amount
      * @param amount the amount of kin to transfer
+     * @return a Transaction object which also includes the transaction id.
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws OperationFailedException other error occurred
+     */
+    Transaction buildTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount) throws OperationFailedException;
+
+    /**
+     * Build a Transaction object of the given amount in kin, to the specified public address and with a memo(that can be empty or null).
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @param amount the amount of kin to transfer
+     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction record.
+     * @return a Transaction object which also includes the transaction id.
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws OperationFailedException other error occurred
+     */
+    Transaction buildTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException;
+
+    /**
+     * send a transaction.
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param transaction is the transaction object to send.
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
@@ -61,27 +88,7 @@ public interface KinAccount {
      * @throws OperationFailedException other error occurred
      */
     @NonNull
-    TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount)
-        throws OperationFailedException;
-
-    /**
-     * Create, sign and send a transaction of the given amount in kin to the specified public address
-     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
-     *
-     * @param publicAddress the account address to send the specified kin amount
-     * @param amount the amount of kin to transfer
-     * @param memo An optional string, can contain a utf-8 string up to 28 bytes in length, included on the transaction
-     * record.
-     * @return TransactionId the transaction identifier
-     * @throws AccountNotFoundException if the sender or destination account was not created
-     * @throws AccountNotActivatedException if the sender or destination account is not activated
-     * @throws InsufficientKinException if account balance has not enough kin
-     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
-     * @throws OperationFailedException other error occurred
-     */
-    @NonNull
-    TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount, @Nullable String memo)
-        throws OperationFailedException;
+    TransactionId sendTransactionSync(Transaction transaction) throws OperationFailedException;
 
     /**
      * Create {@link Request} for getting the current confirmed balance in kin

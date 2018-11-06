@@ -89,18 +89,18 @@ public class TransactionSenderTest {
     public void sendTransaction_success() throws Exception {
         //send transaction fetch first to account details, then from account details, and finally perform tx,
         //here we mock all 3 responses from server to achieve success operation
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_success_res.json"));
 
-        TransactionId transactionId = transactionSender
-            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        TransactionId transactionId = transactionSender.sendTransaction(transaction);
 
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
 
         //verify sent requests data
-        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
         assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY));
     }
 
@@ -108,55 +108,55 @@ public class TransactionSenderTest {
     public void sendTransaction_WithMemo_success() throws Exception {
         //send transaction fetch first to account details, then from account details, and finally perform tx,
         //here we mock all 3 responses from server to achieve success operation
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_success_res.json"));
         String fakeMemo = "fake memo";
 
-        TransactionId transactionId = transactionSender
-            .sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"), fakeMemo);
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"), fakeMemo);
+        TransactionId transactionId = transactionSender.sendTransaction(transaction);
 
         assertEquals("8f1e0cd1d922f4c57cc1898ececcf47375e52ec4abf77a7e32d0d9bb4edecb69", transactionId.id());
 
         //verify sent requests data
-        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
         assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_FROM));
+        assertThat(mockWebServer.takeRequest().getRequestUrl().toString(), containsString(ACCOUNT_ID_TO));
         assertThat(mockWebServer.takeRequest().getBody().readUtf8(), equalTo(TX_BODY_WITH_MEMO));
     }
 
     @Test
     public void sendTransaction_ToAccountNotExist() throws Exception {
-
-        mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(404));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_TO)));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_NoKinTrustToAccount() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to_no_kin.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
 
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_TO)));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_FromAccountNotExist() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
-        mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(404));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
 
         expectedEx.expect(AccountNotFoundException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -167,7 +167,8 @@ public class TransactionSenderTest {
         expectedEx.expect(AccountNotActivatedException.class);
         expectedEx.expect(new HasPropertyWithValue<>("accountId", equalTo(ACCOUNT_ID_FROM)));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("1.5"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -184,8 +185,10 @@ public class TransactionSenderTest {
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", contains("op_malformed")));
         expectedEx.expect(new HasPropertyWithValue<>("operationsResultCodes", hasSize(1)));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
+
 
     @Test
     public void sendTransaction_Underfunded_InsufficientKinException() throws Exception {
@@ -198,7 +201,8 @@ public class TransactionSenderTest {
 
         expectedEx.expect(InsufficientKinException.class);
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -225,7 +229,8 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(IOException.class));
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -235,18 +240,20 @@ public class TransactionSenderTest {
 
         expectedEx.expect(OperationFailedException.class);
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_ThirdQuery_ConnectionException() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
         expectedEx.expect(OperationFailedException.class);
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test(timeout = 500)
@@ -256,13 +263,14 @@ public class TransactionSenderTest {
         KinAsset kinAsset = createKinAsset(ACCOUNT_ID_KIN_ISSUER);
         transactionSender = new TransactionSender(server, kinAsset, APP_ID);
 
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE));
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(SocketTimeoutException.class));
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -270,32 +278,35 @@ public class TransactionSenderTest {
         TestUtils.enqueueEmptyResponse(mockWebServer);
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectMessage(ACCOUNT_ID_TO);
+        expectedEx.expectMessage(ACCOUNT_ID_FROM);
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_SecondQuery_NullResponse() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
         TestUtils.enqueueEmptyResponse(mockWebServer);
 
         expectedEx.expect(OperationFailedException.class);
-        expectedEx.expectMessage(ACCOUNT_ID_FROM);
+        expectedEx.expectMessage(ACCOUNT_ID_TO);
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_ThirdQuery_NullResponse() throws Exception {
-        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_from.json"));
+        mockWebServer.enqueue(TestUtils.generateSuccessMockResponse(this.getClass(), "tx_account_to.json"));
         TestUtils.enqueueEmptyResponse(mockWebServer);
 
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectMessage("transaction");
 
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -304,7 +315,8 @@ public class TransactionSenderTest {
         String tooLongMemo = "memo string can be only 21 characters";
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Memo cannot be longer that 21 bytes(UTF-8 characters)");
-        transactionSender.sendTransaction(account, ACCOUNT_ID_FROM, new BigDecimal("200"), tooLongMemo);
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"), tooLongMemo);
+        transactionSender.sendTransaction(transaction);
         assertThat(mockWebServer.getRequestCount(), equalTo(0));
     }
 
@@ -313,7 +325,8 @@ public class TransactionSenderTest {
     public void sendTransaction_NullAccount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("account");
-        transactionSender.sendTransaction(null, ACCOUNT_ID_TO, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(null, ACCOUNT_ID_TO, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -321,7 +334,8 @@ public class TransactionSenderTest {
     public void sendTransaction_NullPublicAddress() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, null, new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, null, new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -329,21 +343,24 @@ public class TransactionSenderTest {
     public void sendTransaction_NullAmount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("amount");
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, null);
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, null);
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_EmptyPublicAddress() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "", new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, "", new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
     public void sendTransaction_NegativeAmount() throws Exception {
         expectedEx.expect(IllegalArgumentException.class);
         expectedEx.expectMessage("Amount");
-        transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("-200"));
+        Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("-200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -352,7 +369,8 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(FormatException.class));
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "ABCDEF", new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, "ABCDEF", new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @Test
@@ -361,14 +379,15 @@ public class TransactionSenderTest {
         expectedEx.expect(OperationFailedException.class);
         expectedEx.expectCause(isA(FormatException.class));
         expectedEx.expectMessage("public address");
-        transactionSender.sendTransaction(account, "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OG3",
-            new BigDecimal("200"));
+        Transaction transaction = transactionSender.buildTransaction(account, "GDKJAMCTGZGD6KM7RBEII6QUYAHQQUGERXKM3ESHBX2UUNTNAVNB3OG3", new BigDecimal("200"));
+        transactionSender.sendTransaction(transaction);
     }
 
     @SuppressWarnings("SameParameterValue")
     private void testHttpResponseCode(int resCode) {
         try {
-            transactionSender.sendTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+            Transaction transaction = transactionSender.buildTransaction(account, ACCOUNT_ID_TO, new BigDecimal("200"));
+            transactionSender.sendTransaction(transaction);
             fail("Expected OperationFailedException");
         } catch (Exception ex) {
             Assert.assertThat(ex, is(instanceOf(OperationFailedException.class)));

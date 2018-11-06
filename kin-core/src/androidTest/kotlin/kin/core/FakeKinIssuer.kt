@@ -2,10 +2,10 @@ package kin.core
 
 
 import android.util.Log
-import junit.framework.Assert.assertTrue
 import kin.core.IntegConsts.TEST_NETWORK_URL
 import kin.core.IntegConsts.URL_CREATE_ACCOUNT
 import okhttp3.OkHttpClient
+import org.junit.Assert.assertTrue
 import org.stellar.sdk.*
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -49,7 +49,7 @@ constructor() {
         val issuerAccountResponse = server.accounts().account(issuerKeyPair)
         val paymentOperation = PaymentOperation.Builder(destinationKeyPair, kinAsset, amount)
                 .build()
-        val transaction = Transaction.Builder(issuerAccountResponse)
+        val transaction = org.stellar.sdk.Transaction.Builder(issuerAccountResponse)
                 .addOperation(paymentOperation)
                 .build()
         transaction.sign(issuerKeyPair)

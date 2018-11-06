@@ -34,20 +34,23 @@ final class KinAccountImpl extends AbstractKinAccount {
         return null;
     }
 
-    @NonNull
     @Override
-    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount)
-        throws OperationFailedException {
+    public Transaction buildTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount) throws OperationFailedException {
         checkValidAccount();
-        return transactionSender.sendTransaction(account, publicAddress, amount);
+        return transactionSender.buildTransaction(account, publicAddress, amount);
+    }
+
+    @Override
+    public Transaction buildTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount, @Nullable String memo) throws OperationFailedException {
+        checkValidAccount();
+        return transactionSender.buildTransaction(account, publicAddress, amount, memo);
     }
 
     @NonNull
     @Override
-    public TransactionId sendTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal amount,
-        @Nullable String memo) throws OperationFailedException {
+    public TransactionId sendTransactionSync(Transaction transaction) throws OperationFailedException {
         checkValidAccount();
-        return transactionSender.sendTransaction(account, publicAddress, amount, memo);
+        return transactionSender.sendTransaction(transaction);
     }
 
     @NonNull

@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import java.math.BigDecimal;
 import kin.core.KinAccount;
 import kin.core.Request;
+import kin.core.ResultCallback;
+import kin.core.Transaction;
 import kin.core.TransactionId;
 import kin.core.exception.AccountDeletedException;
 import kin.core.exception.OperationFailedException;
@@ -30,7 +33,8 @@ public class TransactionActivity extends BaseActivity {
     private View sendTransaction, progressBar;
 
     private EditText toAddressInput, amountInput, memoInput;
-    private Request<TransactionId> transactionRequest;
+    private Request<Transaction> buildTransactionRequest;
+    private Request<TransactionId> sendTransactionRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,11 +143,25 @@ public class TransactionActivity extends BaseActivity {
                 }
             };
             if (memo == null) {
-                transactionRequest = account.sendTransaction(toAddress, amount);
+                buildTransactionRequest = account.buildTransaction(toAddress, amount);
+
             } else {
-                transactionRequest = account.sendTransaction(toAddress, amount, memo);
+                buildTransactionRequest = account.buildTransaction(toAddress, amount, memo);
             }
-            transactionRequest.run(callback);
+            buildTransactionRequest.run(new ResultCallback<Transaction>() {
+                @Override
+                public void onResult(Transaction transaction) {
+                    Log.d(TAG, "sendTransaction: build transaction " + transaction.getId().id() + " succeeded");
+                    sendTransactionRequest = account.sendTransaction(transaction);
+                    sendTransactionRequest.run(callback);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Utils.logError(e, "sendTransaction");
+                    KinAlertDialog.createErrorDialog(TransactionActivity.this, e.getMessage()).show();
+                }
+            });
         } else {
             progressBar.setVisibility(View.GONE);
             throw new AccountDeletedException();
@@ -153,8 +171,11 @@ public class TransactionActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (transactionRequest != null) {
-            transactionRequest.cancel(false);
+        if (buildTransactionRequest != null) {
+            buildTransactionRequest.cancel(false);
+        }
+        if (sendTransactionRequest != null) {
+            sendTransactionRequest.cancel(false);
         }
         progressBar = null;
     }

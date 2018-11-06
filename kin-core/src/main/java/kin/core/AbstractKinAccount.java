@@ -9,24 +9,32 @@ abstract class AbstractKinAccount implements KinAccount {
 
     @NonNull
     @Override
-    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress,
-        @NonNull final BigDecimal amount) {
-        return new Request<>(new Callable<TransactionId>() {
+    public Request<Transaction> buildTransaction(@NonNull final String publicAddress, @NonNull final BigDecimal amount) {
+        return new Request<>(new Callable<Transaction>() {
             @Override
-            public TransactionId call() throws Exception {
-                return sendTransactionSync(publicAddress, amount, null);
+            public Transaction call() throws Exception {
+                return buildTransactionSync(publicAddress, amount);
+            }
+        });
+    }@NonNull
+    @Override
+    public Request<Transaction> buildTransaction(@NonNull final String publicAddress,
+                                                 @NonNull final BigDecimal amount, @Nullable final String memo) {
+        return new Request<>(new Callable<Transaction>() {
+            @Override
+            public Transaction call() throws Exception {
+                return buildTransactionSync(publicAddress, amount, memo);
             }
         });
     }
 
     @NonNull
     @Override
-    public Request<TransactionId> sendTransaction(@NonNull final String publicAddress, @NonNull final BigDecimal amount,
-        @Nullable final String memo) {
+    public Request<TransactionId> sendTransaction(final Transaction transaction) {
         return new Request<>(new Callable<TransactionId>() {
             @Override
             public TransactionId call() throws Exception {
-                return sendTransactionSync(publicAddress, amount, memo);
+                return sendTransactionSync(transaction);
             }
         });
     }
