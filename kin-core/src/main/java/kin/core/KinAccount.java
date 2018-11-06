@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import java.math.BigDecimal;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
+import kin.core.exception.CryptoException;
 import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;
@@ -172,4 +173,12 @@ public interface KinAccount {
      * @param listener listener object for payment events
      */
     ListenerRegistration addAccountCreationListener(final EventListener<Void> listener);
+
+    /**
+     * Export the account data as a JSON string. The seed is encrypted.
+     *
+     * @param passphrase The passphrase with which to encrypt the seed
+     * @return A JSON representation of the data as a string
+     */
+    String export(@NonNull String passphrase) throws CryptoException;
 }

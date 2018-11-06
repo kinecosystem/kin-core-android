@@ -49,7 +49,7 @@ before_script:
 script:
   - cd ../..
   - ./gradlew :sample:assembleDebug
-  - ./gradlew jacocoTestReport
+#  - ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest --info
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

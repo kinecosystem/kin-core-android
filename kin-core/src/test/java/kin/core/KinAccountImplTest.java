@@ -35,7 +35,8 @@ public class KinAccountImplTest {
 
     private void initWithRandomAccount() {
         expectedRandomAccount = KeyPair.random();
-        kinAccount = new KinAccountImpl(expectedRandomAccount, mockTransactionSender, mockAccountActivator,
+        kinAccount = new KinAccountImpl(expectedRandomAccount, new FakeBackupRestore(), mockTransactionSender,
+            mockAccountActivator,
             mockAccountInfoRetriever, mockBlockchainEventsCreator);
     }
 
