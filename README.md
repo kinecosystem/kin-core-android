@@ -382,7 +382,7 @@ $ ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notCl
 ```
 
 Generated report can be found at:  
-`kin-core/build/reports/jacoco/jacocoTestReport/html/index.html`.
+`kin-sdk/build/reports/jacoco/jacocoTestReport/html/index.html`.
 
 
 ## Contributing

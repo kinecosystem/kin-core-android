@@ -38,7 +38,7 @@ echo "Emulator is ready"
 #---------------------
 ./gradlew jacocoTestReport
 if [ $? -eq 0 ]; then
-    open kin-core/build/reports/jacoco/jacocoTestReport/html/index.html
+    open kin-sdk/build/reports/jacoco/jacocoTestReport/html/index.html
 else
     echo Build failed!
 fi

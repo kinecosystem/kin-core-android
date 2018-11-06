@@ -6,7 +6,7 @@
     android:padding="@dimen/activity_padding"
     android:background="@color/white"
     android:orientation="vertical"
-    tools:context="kin.core.sample.CreateWalletActivity">
+    tools:context="kin.sdk.sample.CreateWalletActivity">
 
     <View
         android:layout_width="match_parent"

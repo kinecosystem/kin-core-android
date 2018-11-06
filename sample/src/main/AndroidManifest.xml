@@ -10,13 +10,13 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="kin.core.sample.KinClientSampleApplication"
+        android:name="kin.sdk.sample.KinClientSampleApplication"
         android:roundIcon="@mipmap/ic_launcher_rounded"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
-            android:name="kin.core.sample.ChooseNetworkActivity"
+            android:name="kin.sdk.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,32 +24,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="kin.core.sample.CreateWalletActivity"
-            android:parentActivityName="kin.core.sample.ChooseNetworkActivity"
+            android:name="kin.sdk.sample.CreateWalletActivity"
+            android:parentActivityName="kin.sdk.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="kin.core.sample.WebWrapperActivity"
-            android:parentActivityName="kin.core.sample.ChooseNetworkActivity"
+            android:name="kin.sdk.sample.WebWrapperActivity"
+            android:parentActivityName="kin.sdk.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="kin.core.sample.WalletActivity"
-            android:parentActivityName="kin.core.sample.ChooseNetworkActivity"
+            android:name="kin.sdk.sample.WalletActivity"
+            android:parentActivityName="kin.sdk.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name="kin.core.sample.TransactionActivity"
-            android:parentActivityName="kin.core.sample.WalletActivity"
+            android:name="kin.sdk.sample.TransactionActivity"
+            android:parentActivityName="kin.sdk.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
-            android:name="kin.core.sample.PaymentListenerActivity"
-            android:parentActivityName="kin.core.sample.WalletActivity"
+            android:name="kin.sdk.sample.PaymentListenerActivity"
+            android:parentActivityName="kin.sdk.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
-            android:name="kin.core.sample.ExportKeystoreActivity"
-            android:parentActivityName="kin.core.sample.WalletActivity"
+            android:name="kin.sdk.sample.ExportKeystoreActivity"
+            android:parentActivityName="kin.sdk.sample.WalletActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
 

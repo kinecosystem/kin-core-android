@@ -39,6 +39,6 @@ dependencies {
     })
     implementation 'com.android.support:appcompat-v7:26.+'
     testImplementation 'junit:junit:4.12'
-    api project(':kin-core')
+    api project(':kin-sdk')
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
 }
