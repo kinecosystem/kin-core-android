@@ -22,7 +22,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 
 @RunWith(RobolectricTestRunner.class)

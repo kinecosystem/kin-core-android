@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import kin.sdk.exception.CryptoException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 public class FakeBackupRestore implements BackupRestore {
 

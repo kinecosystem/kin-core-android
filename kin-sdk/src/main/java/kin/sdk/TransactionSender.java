@@ -14,14 +14,14 @@ import kin.sdk.exception.AccountNotFoundException;
 import kin.sdk.exception.InsufficientKinException;
 import kin.sdk.exception.OperationFailedException;
 import kin.sdk.exception.TransactionFailedException;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Memo;
-import org.stellar.sdk.PaymentOperation;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.Transaction.Builder;
-import org.stellar.sdk.responses.AccountResponse;
-import org.stellar.sdk.responses.HttpResponseException;
-import org.stellar.sdk.responses.SubmitTransactionResponse;
+import kin.base.KeyPair;
+import kin.base.Memo;
+import kin.base.PaymentOperation;
+import kin.base.Server;
+import kin.base.Transaction.Builder;
+import kin.base.responses.AccountResponse;
+import kin.base.responses.HttpResponseException;
+import kin.base.responses.SubmitTransactionResponse;
 
 class TransactionSender {
 
@@ -50,7 +50,7 @@ class TransactionSender {
 
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
         AccountResponse sourceAccount = loadSourceAccount(from);
-        org.stellar.sdk.Transaction stellarTransaction = buildStellarTransaction(from, amount, addressee, sourceAccount, memo);
+        kin.base.Transaction stellarTransaction = buildStellarTransaction(from, amount, addressee, sourceAccount, memo);
         TransactionId id = new TransactionIdImpl(Utils.byteArrayToHex(stellarTransaction.hash()));
         return new Transaction(addressee, from, amount, memo, id, stellarTransaction);
     }
@@ -118,7 +118,7 @@ class TransactionSender {
     }
 
     @NonNull
-    private org.stellar.sdk.Transaction buildStellarTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
+    private kin.base.Transaction buildStellarTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
                                                                 AccountResponse sourceAccount, @Nullable String memo) {
         Builder transactionBuilder = new Builder(sourceAccount)
             .addOperation(
@@ -126,7 +126,7 @@ class TransactionSender {
         if (memo != null) {
             transactionBuilder.addMemo(Memo.text(memo));
         }
-        org.stellar.sdk.Transaction transaction = transactionBuilder.build();
+        kin.base.Transaction transaction = transactionBuilder.build();
         transaction.sign(from);
         return transaction;
     }
@@ -170,7 +170,7 @@ class TransactionSender {
     }
 
     @NonNull
-    private TransactionId sendTransaction(org.stellar.sdk.Transaction transaction) throws OperationFailedException {
+    private TransactionId sendTransaction(kin.base.Transaction transaction) throws OperationFailedException {
         try {
             SubmitTransactionResponse response = server.submitTransaction(transaction);
             if (response == null) {

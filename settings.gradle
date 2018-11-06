@@ -1,5 +1,5 @@
 include ':sample', ':kin-sdk'
 if (!System.env.JITPACK) {
-    include ':android-stellar-sdk'
-    project(":android-stellar-sdk").projectDir = file("android-stellar-sdk/android-stellar-sdk")
+    include ':kin-base'
+    project(":kin-base").projectDir = file("android-stellar-sdk/kin-base")
 }

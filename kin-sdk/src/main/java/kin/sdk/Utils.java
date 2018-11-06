@@ -4,8 +4,8 @@ package kin.sdk;
 import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import kin.sdk.exception.TransactionFailedException;
-import org.stellar.sdk.responses.SubmitTransactionResponse;
-import org.stellar.sdk.responses.SubmitTransactionResponse.Extras.ResultCodes;
+import kin.base.responses.SubmitTransactionResponse;
+import kin.base.responses.SubmitTransactionResponse.Extras.ResultCodes;
 
 final class Utils {
 

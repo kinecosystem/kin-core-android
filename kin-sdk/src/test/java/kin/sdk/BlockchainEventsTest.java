@@ -27,12 +27,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.requests.TransactionsRequestBuilder;
-import org.stellar.sdk.responses.GsonSingleton;
-import org.stellar.sdk.responses.TransactionResponse;
+import kin.base.KeyPair;
+import kin.base.Network;
+import kin.base.Server;
+import kin.base.requests.TransactionsRequestBuilder;
+import kin.base.responses.GsonSingleton;
+import kin.base.responses.TransactionResponse;
 
 public class BlockchainEventsTest {
 
@@ -80,11 +80,11 @@ public class BlockchainEventsTest {
             }
         }).when(mockServerSentEvent).close();
         when(mockTransactionsRequestBuilder
-            .stream(ArgumentMatchers.<org.stellar.sdk.requests.EventListener<TransactionResponse>>any()))
+            .stream(ArgumentMatchers.<kin.base.requests.EventListener<TransactionResponse>>any()))
             .then(new Answer<Object>() {
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    final org.stellar.sdk.requests.EventListener<TransactionResponse> listener = invocation
+                    final kin.base.requests.EventListener<TransactionResponse> listener = invocation
                         .getArgument(0);
                     new Thread(new Runnable() {
                         @Override

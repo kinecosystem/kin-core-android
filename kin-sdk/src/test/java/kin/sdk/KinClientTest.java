@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 @SuppressWarnings("deprecation")
 public class KinClientTest {

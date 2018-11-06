@@ -8,16 +8,16 @@ import com.here.oksse.ServerSentEvent;
 import java.math.BigDecimal;
 import java.util.List;
 import kin.sdk.Environment.KinAsset;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.LedgerEntryChange;
-import org.stellar.sdk.LedgerEntryChanges;
-import org.stellar.sdk.Memo;
-import org.stellar.sdk.MemoText;
-import org.stellar.sdk.Operation;
-import org.stellar.sdk.PaymentOperation;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.TrustLineLedgerEntryChange;
-import org.stellar.sdk.responses.TransactionResponse;
+import kin.base.KeyPair;
+import kin.base.LedgerEntryChange;
+import kin.base.LedgerEntryChanges;
+import kin.base.Memo;
+import kin.base.MemoText;
+import kin.base.Operation;
+import kin.base.PaymentOperation;
+import kin.base.Server;
+import kin.base.TrustLineLedgerEntryChange;
+import kin.base.responses.TransactionResponse;
 
 /**
  * Provides listeners, for various events happens on the blockchain.
@@ -47,7 +47,7 @@ class BlockchainEvents {
             .transactions()
             .forAccount(accountKeyPair)
             .cursor(CURSOR_FUTURE_ONLY)
-            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
+            .stream(new kin.base.requests.EventListener<TransactionResponse>() {
                 @Override
                 public void onEvent(TransactionResponse transactionResponse) {
                     extractBalanceChangeFromTransaction(transactionResponse, listener);
@@ -99,7 +99,7 @@ class BlockchainEvents {
             .transactions()
             .forAccount(accountKeyPair)
             .cursor(CURSOR_FUTURE_ONLY)
-            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
+            .stream(new kin.base.requests.EventListener<TransactionResponse>() {
                 @Override
                 public void onEvent(TransactionResponse transactionResponse) {
                     extractPaymentsFromTransaction(transactionResponse, listener);
@@ -118,7 +118,7 @@ class BlockchainEvents {
         checkNotNull(listener, "listener");
         ServerSentEvent serverSentEvent = server.transactions()
             .forAccount(accountKeyPair)
-            .stream(new org.stellar.sdk.requests.EventListener<TransactionResponse>() {
+            .stream(new kin.base.requests.EventListener<TransactionResponse>() {
 
                 private boolean eventOccurred = false;
 

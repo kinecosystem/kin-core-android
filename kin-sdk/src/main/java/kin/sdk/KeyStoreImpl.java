@@ -11,7 +11,7 @@ import kin.sdk.exception.DeleteAccountException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 class KeyStoreImpl implements KeyStore {
 

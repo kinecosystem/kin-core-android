@@ -1,6 +1,6 @@
 package kin.sdk;
 
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 import java.math.BigDecimal;
 
@@ -17,10 +17,10 @@ public class Transaction {
      */
     private final TransactionId id;
 
-    private final org.stellar.sdk.Transaction stellarTransaction;
+    private final kin.base.Transaction stellarTransaction;
 
     Transaction(KeyPair destination, KeyPair source, BigDecimal amount,
-                       String memo, TransactionId id, org.stellar.sdk.Transaction stellarTransaction) {
+                       String memo, TransactionId id, kin.base.Transaction stellarTransaction) {
         this.destination = destination;
         this.source = source;
         this.amount = amount;
@@ -50,7 +50,7 @@ public class Transaction {
     }
 
 
-    org.stellar.sdk.Transaction getStellarTransaction() {
+    kin.base.Transaction getStellarTransaction() {
         return stellarTransaction;
     }
 }

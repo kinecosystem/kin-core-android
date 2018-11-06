@@ -8,7 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.libsodium.jni.NaCl;
 import org.libsodium.jni.Sodium;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 class BackupRestoreImpl implements BackupRestore {
 

@@ -8,10 +8,10 @@ import kin.sdk.Environment.KinAsset;
 import kin.sdk.exception.AccountNotActivatedException;
 import kin.sdk.exception.AccountNotFoundException;
 import kin.sdk.exception.OperationFailedException;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.responses.AccountResponse;
-import org.stellar.sdk.responses.HttpResponseException;
+import kin.base.KeyPair;
+import kin.base.Server;
+import kin.base.responses.AccountResponse;
+import kin.base.responses.HttpResponseException;
 
 class AccountInfoRetriever {
 

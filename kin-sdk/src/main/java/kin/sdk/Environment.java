@@ -4,11 +4,11 @@ import static kin.sdk.Utils.checkNotEmpty;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import org.stellar.sdk.Asset;
-import org.stellar.sdk.AssetTypeCreditAlphaNum;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.responses.AccountResponse;
+import kin.base.Asset;
+import kin.base.AssetTypeCreditAlphaNum;
+import kin.base.KeyPair;
+import kin.base.Network;
+import kin.base.responses.AccountResponse;
 
 /**
  * Provides blockchain network details

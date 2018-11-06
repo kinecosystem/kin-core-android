@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import kin.sdk.exception.AccountDeletedException;
 import kin.sdk.exception.CryptoException;
 import kin.sdk.exception.OperationFailedException;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 
 final class KinAccountImpl extends AbstractKinAccount {

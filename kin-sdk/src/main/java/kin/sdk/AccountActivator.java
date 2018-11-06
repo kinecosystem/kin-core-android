@@ -5,13 +5,13 @@ import java.io.IOException;
 import kin.sdk.Environment.KinAsset;
 import kin.sdk.exception.AccountNotFoundException;
 import kin.sdk.exception.OperationFailedException;
-import org.stellar.sdk.ChangeTrustOperation;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.Transaction;
-import org.stellar.sdk.responses.AccountResponse;
-import org.stellar.sdk.responses.HttpResponseException;
-import org.stellar.sdk.responses.SubmitTransactionResponse;
+import kin.base.ChangeTrustOperation;
+import kin.base.KeyPair;
+import kin.base.Server;
+import kin.base.Transaction;
+import kin.base.responses.AccountResponse;
+import kin.base.responses.HttpResponseException;
+import kin.base.responses.SubmitTransactionResponse;
 
 class AccountActivator {
 

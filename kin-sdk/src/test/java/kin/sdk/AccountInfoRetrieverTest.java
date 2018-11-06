@@ -24,8 +24,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.responses.HttpResponseException;
+import kin.base.Server;
+import kin.base.responses.HttpResponseException;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 23, manifest = Config.NONE)

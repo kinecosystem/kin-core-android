@@ -10,9 +10,9 @@ import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.*
 import org.junit.rules.ExpectedException
-import org.stellar.sdk.Memo
-import org.stellar.sdk.MemoText
-import org.stellar.sdk.Server
+import kin.base.Memo
+import kin.base.MemoText
+import kin.base.Server
 import java.io.IOException
 import java.math.BigDecimal
 import java.util.*

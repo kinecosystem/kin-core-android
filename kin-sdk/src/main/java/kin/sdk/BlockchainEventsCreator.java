@@ -2,7 +2,7 @@ package kin.sdk;
 
 
 import kin.sdk.Environment.KinAsset;
-import org.stellar.sdk.Server;
+import kin.base.Server;
 
 class BlockchainEventsCreator {
 

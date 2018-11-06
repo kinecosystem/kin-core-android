@@ -32,10 +32,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.Server;
-import org.stellar.sdk.responses.HttpResponseException;
+import kin.base.KeyPair;
+import kin.base.Network;
+import kin.base.Server;
+import kin.base.responses.HttpResponseException;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 23, manifest = Config.NONE)

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import kin.sdk.exception.CreateAccountException;
 import kin.sdk.exception.CryptoException;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 /**
  * Fake KeyStore for testing, implementing naive in memory store

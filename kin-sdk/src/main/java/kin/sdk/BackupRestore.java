@@ -4,7 +4,7 @@ package kin.sdk;
 import android.support.annotation.NonNull;
 import kin.sdk.exception.CorruptedDataException;
 import kin.sdk.exception.CryptoException;
-import org.stellar.sdk.KeyPair;
+import kin.base.KeyPair;
 
 interface BackupRestore {
 
