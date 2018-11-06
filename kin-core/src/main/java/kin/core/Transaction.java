@@ -6,13 +6,7 @@ import java.math.BigDecimal;
 
 public class Transaction {
 
-    /**
-     * Destination key pair.
-     */
     private final KeyPair destination;
-    /**
-     * Source account key pair.
-     */
     private final KeyPair source;
 
     private final BigDecimal amount;
@@ -25,7 +19,7 @@ public class Transaction {
 
     private final org.stellar.sdk.Transaction stellarTransaction;
 
-    public Transaction(KeyPair destination, KeyPair source, BigDecimal amount,
+    Transaction(KeyPair destination, KeyPair source, BigDecimal amount,
                        String memo, TransactionId id, org.stellar.sdk.Transaction stellarTransaction) {
         this.destination = destination;
         this.source = source;

@@ -173,7 +173,6 @@ class TransactionSender {
     @NonNull
     private TransactionId sendTransaction(org.stellar.sdk.Transaction transaction) throws OperationFailedException {
         try {
-            byte[] hash = transaction.hash();
             SubmitTransactionResponse response = server.submitTransaction(transaction);
             if (response == null) {
                 throw new OperationFailedException("can't get transaction response");
