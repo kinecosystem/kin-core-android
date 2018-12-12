@@ -34,7 +34,7 @@ public class KeyStoreImplTest {
 
     @Test
     public void newAccount() throws Exception {
-        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore(), new FakeBackupRestore());
         KeyPair account = keyStore.newAccount();
         assertNotNull(account);
         assertNotNull(account.getPublicKey());
@@ -47,7 +47,7 @@ public class KeyStoreImplTest {
         when(mockStore.getString(anyString()))
             .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
             .thenReturn("not a real json");
-        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore, new FakeBackupRestore());
 
         expectedEx.expect(CreateAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -60,7 +60,7 @@ public class KeyStoreImplTest {
         fakeStore.saveString(KeyStoreImpl.VERSION_KEY, "some_version");
         fakeStore.saveString(KeyStoreImpl.STORE_KEY_ACCOUNTS,
             "{&quot;accounts&quot;:[{&quot;seed&quot;:&quot;{\\&quot;iv\\&quot;:\\&quot;nVGsoEHgjW4xw2gx\\\\n\\&quot;,\\&quot;cipher\\&quot;:\\&quot;kEC64vaQu\\\\\\/erpFvvnrY+sWm\\\\\\/o4GjmjPfgG31zQTwvp0taxo\\\\\\/04PoaisjfEQxrydRwBGFvG\\\\\\/nG345\\\\ntXMn+x2H0jnaPWWCznPA\\\\n\\&quot;}&quot;,&quot;public_key&quot;:&quot;GBYPGYWPWHWSVTQGTUCH2IICIP2PRLN3QYSUX5NOHHMNDQW26A4WK2IK&quot;}]}");
-        KeyStoreImpl keyStore = new KeyStoreImpl(fakeStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(fakeStore, new FakeBackupRestore());
 
         keyStore.loadAccounts();
         assertThat(fakeStore.getString(KeyStoreImpl.VERSION_KEY), equalTo(KeyStoreImpl.ENCRYPTION_VERSION_NAME));
@@ -69,7 +69,7 @@ public class KeyStoreImplTest {
 
     @Test
     public void loadAccounts() throws Exception {
-        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore(), new FakeBackupRestore());
         KeyPair account1 = keyStore.newAccount();
         KeyPair account2 = keyStore.newAccount();
         List<KeyPair> accounts = keyStore.loadAccounts();
@@ -85,7 +85,7 @@ public class KeyStoreImplTest {
         when(mockStore.getString(anyString()))
             .thenReturn(KeyStoreImpl.ENCRYPTION_VERSION_NAME)
             .thenReturn("not a real json");
-        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(mockStore, new FakeBackupRestore());
 
         expectedEx.expect(LoadAccountException.class);
         expectedEx.expectCause(isA(JSONException.class));
@@ -94,7 +94,7 @@ public class KeyStoreImplTest {
 
     @Test
     public void deleteAccount() throws Exception {
-        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore(), new FakeBackupRestore());
         KeyPair account1 = keyStore.newAccount();
         keyStore.newAccount();
         keyStore.deleteAccount(1);
@@ -111,7 +111,7 @@ public class KeyStoreImplTest {
             .thenCallRealMethod()
             .thenCallRealMethod()
             .thenReturn("not a real json");
-        KeyStoreImpl keyStore = new KeyStoreImpl(stubStore);
+        KeyStoreImpl keyStore = new KeyStoreImpl(stubStore, new FakeBackupRestore());
 
         keyStore.newAccount();
         expectedEx.expect(DeleteAccountException.class);
@@ -121,7 +121,7 @@ public class KeyStoreImplTest {
 
     @Test
     public void clearAllAccounts() throws Exception {
-        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore());
+        KeyStoreImpl keyStore = new KeyStoreImpl(new FakeStore(), new FakeBackupRestore());
         keyStore.newAccount();
         keyStore.newAccount();
         keyStore.clearAllAccounts();

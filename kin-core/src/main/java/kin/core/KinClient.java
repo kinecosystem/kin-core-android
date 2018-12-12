@@ -6,7 +6,9 @@ import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CreateAccountException;
+import kin.core.exception.CryptoException;
 import kin.core.exception.DeleteAccountException;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Network;
@@ -25,6 +27,7 @@ public class KinClient {
     private final AccountActivator accountActivator;
     private final AccountInfoRetriever accountInfoRetriever;
     private final BlockchainEventsCreator blockchainEventsCreator;
+    private final BackupRestore backupRestore;
     @NonNull
     private final List<KinAccountImpl> kinAccounts = new ArrayList<>(1);
 
@@ -38,12 +41,14 @@ public class KinClient {
     public KinClient(@NonNull Context context, @NonNull ServiceProvider provider, @NonNull String storeKey) {
         Utils.checkNotNull(storeKey, "storeKey");
         this.serviceProvider = provider;
+        this.backupRestore = new BackupRestoreImpl();
         Server server = initServer();
         keyStore = initKeyStore(context.getApplicationContext(), storeKey);
         transactionSender = new TransactionSender(server, provider.getKinAsset());
         accountActivator = new AccountActivator(server, provider.getKinAsset());
         accountInfoRetriever = new AccountInfoRetriever(server, provider.getKinAsset());
         blockchainEventsCreator = new BlockchainEventsCreator(server, provider.getKinAsset());
+
         loadAccounts();
     }
 
@@ -60,13 +65,14 @@ public class KinClient {
     @VisibleForTesting
     KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
         AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
-        BlockchainEventsCreator blockchainEventsCreator) {
+        BlockchainEventsCreator blockchainEventsCreator, BackupRestore backupRestore) {
         this.serviceProvider = serviceProvider;
         this.keyStore = keyStore;
         this.transactionSender = transactionSender;
         this.accountActivator = accountActivator;
         this.accountInfoRetriever = accountInfoRetriever;
         this.blockchainEventsCreator = blockchainEventsCreator;
+        this.backupRestore = backupRestore;
         loadAccounts();
     }
 
@@ -78,7 +84,7 @@ public class KinClient {
     private KeyStore initKeyStore(Context context, String id) {
         SharedPrefStore store = new SharedPrefStore(
             context.getSharedPreferences(STORE_NAME_PREFIX + id, Context.MODE_PRIVATE));
-        return new KeyStoreImpl(store);
+        return new KeyStoreImpl(store, backupRestore);
     }
 
     private void loadAccounts() {
@@ -105,6 +111,25 @@ public class KinClient {
     public @NonNull
     KinAccount addAccount() throws CreateAccountException {
         KeyPair account = keyStore.newAccount();
+        return addKeyPair(account);
+    }
+
+    /**
+     * Import an account from a JSON-formatted string.
+     *
+     * @param exportedJson The exported JSON-formatted string.
+     * @param passphrase The passphrase to decrypt the secret key.
+     * @return The imported account
+     */
+    public @NonNull
+    KinAccount importAccount(@NonNull String exportedJson, @NonNull String passphrase)
+        throws CryptoException, CreateAccountException, CorruptedDataException {
+        KeyPair account = keyStore.importAccount(exportedJson, passphrase);
+        return addKeyPair(account);
+    }
+
+    @NonNull
+    private KinAccount addKeyPair(KeyPair account) {
         KinAccountImpl newAccount = createNewKinAccount(account);
         kinAccounts.add(newAccount);
         return newAccount;
@@ -166,7 +191,7 @@ public class KinClient {
 
     @NonNull
     private KinAccountImpl createNewKinAccount(KeyPair account) {
-        return new KinAccountImpl(account, transactionSender, accountActivator, accountInfoRetriever,
+        return new KinAccountImpl(account, backupRestore, transactionSender, accountActivator, accountInfoRetriever,
             blockchainEventsCreator);
     }
 
