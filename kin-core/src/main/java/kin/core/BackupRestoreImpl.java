@@ -18,16 +18,13 @@ class BackupRestoreImpl implements BackupRestore {
     private static final int SALT_LENGTH_BYTES = 16;
     private static final int HASH_LENGTH_BYTES = 32;
     private static final int OUPUT_JSON_INDENT_SPACES = 2;
-
-    BackupRestoreImpl() {
-        //init sodium
-        NaCl.sodium();
-    }
+    private boolean initialized = false;
 
     @Override
     @NonNull
     public String exportWallet(@NonNull KeyPair keyPair, @NonNull String passphrase)
         throws CryptoException {
+        initIfNeeded();
         byte[] saltBytes = generateRandomBytes(SALT_LENGTH_BYTES);
 
         byte[] passphraseBytes = stringToUTF8ByteArray(passphrase);
@@ -41,10 +38,18 @@ class BackupRestoreImpl implements BackupRestore {
         return jsonify(keyPair.getAccountId(), salt, seed);
     }
 
+    private void initIfNeeded() {
+        if (!initialized) {
+            NaCl.sodium();
+            initialized = true;
+        }
+    }
+
     @Override
     @NonNull
     public KeyPair importWallet(@NonNull String exportedJson, @NonNull String passphrase)
         throws CryptoException, CorruptedDataException {
+        initIfNeeded();
         AccountJson accountJson = stringify(exportedJson);
 
         byte[] passphraseBytes = stringToUTF8ByteArray(passphrase);
