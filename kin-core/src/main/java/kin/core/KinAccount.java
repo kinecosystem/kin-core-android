@@ -90,7 +90,6 @@ public interface KinAccount {
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
      * @param publicAddress the account address to send the specified kin amount
-     * @param balance the amount of kin to transfer
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
@@ -98,7 +97,7 @@ public interface KinAccount {
      * @throws OperationFailedException other error occurred
      */
     @NonNull
-    TransactionId sendBurnTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal balance) throws OperationFailedException;
+    TransactionId sendBurnTransactionSync(@NonNull String publicAddress) throws OperationFailedException;
 
     /**
      * Create {@link Request} for getting the current confirmed balance in kin
