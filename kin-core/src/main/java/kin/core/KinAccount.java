@@ -85,6 +85,22 @@ public interface KinAccount {
         throws OperationFailedException;
 
     /**
+     * Create, sign and send a transaction which "burns" the given account and also makes others to not able to send
+     * kin to this account(if sending to tis method the real balance) // TODO maybe rephrase it
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @param balance the amount of kin to transfer
+     * @return TransactionId the transaction identifier
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
+     * @throws OperationFailedException other error occurred
+     */
+    @NonNull
+    TransactionId sendBurnTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal balance) throws OperationFailedException;
+
+    /**
      * Create {@link Request} for getting the current confirmed balance in kin
      * <p> See {@link KinAccount#getBalanceSync()} for possibles errors</p>
      *

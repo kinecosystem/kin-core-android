@@ -12,10 +12,13 @@ import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.InsufficientKinException;
 import kin.core.exception.OperationFailedException;
 import kin.core.exception.TransactionFailedException;
+
+import org.stellar.sdk.ChangeTrustOperation;
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.Memo;
 import org.stellar.sdk.PaymentOperation;
 import org.stellar.sdk.Server;
+import org.stellar.sdk.SetOptionsOperation;
 import org.stellar.sdk.Transaction;
 import org.stellar.sdk.Transaction.Builder;
 import org.stellar.sdk.responses.AccountResponse;
@@ -51,6 +54,16 @@ class TransactionSender {
         verifyAddresseeAccount(addressee);
         AccountResponse sourceAccount = loadSourceAccount(from);
         Transaction transaction = buildTransaction(from, amount, addressee, sourceAccount, memo);
+        return sendTransaction(transaction);
+    }
+
+    @NonNull
+    TransactionId sendBurnTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal balance)
+            throws OperationFailedException {
+        Utils.checkNotNull(from, "account");
+        checkAddressNotEmpty(publicAddress);
+        AccountResponse sourceAccount = loadSourceAccount(from);
+        Transaction transaction = buildBurnTransaction(from, sourceAccount, balance);
         return sendTransaction(transaction);
     }
 
@@ -101,6 +114,16 @@ class TransactionSender {
         if (memo != null) {
             transactionBuilder.addMemo(Memo.text(memo));
         }
+        Transaction transaction = transactionBuilder.build();
+        transaction.sign(from);
+        return transaction;
+    }
+
+    @NonNull
+    private Transaction buildBurnTransaction(@NonNull KeyPair from, AccountResponse sourceAccount, BigDecimal balance) {
+        Builder transactionBuilder = new Builder(sourceAccount)
+                .addOperation(new ChangeTrustOperation.Builder(kinAsset.getStellarAsset(), balance.toString()).build())
+                .addOperation(new SetOptionsOperation.Builder().setMasterKeyWeight(0).build());
         Transaction transaction = transactionBuilder.build();
         transaction.sign(from);
         return transaction;
