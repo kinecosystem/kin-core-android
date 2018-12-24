@@ -62,6 +62,37 @@ class AccountInfoRetriever {
         return balance;
     }
 
+    /**
+     * Check if the account has been "burned".
+     * @param accountId the account ID to check if it is "burned"
+     * @return true if the account is "burned", false otherwise.
+     * @throws AccountNotFoundException if account not created yet
+     * @throws AccountNotActivatedException if account has no Kin trust
+     * @throws OperationFailedException any other error
+     */
+    boolean isAccountBurned(@NonNull String accountId) throws OperationFailedException {
+        Utils.checkNotNull(accountId, "account");
+        boolean isBurned;
+        try {
+            AccountResponse accountResponse = server.accounts().account(KeyPair.fromAccountId(accountId));
+            if (accountResponse == null) {
+                throw new OperationFailedException("can't retrieve data for account " + accountId);
+            }
+            AccountResponse.Signer signer = accountResponse.getSigners()[0];
+            isBurned = signer.getWeight() == 0;
+        } catch (HttpResponseException httpError) {
+            if (httpError.getStatusCode() == 404) {
+                throw new AccountNotFoundException(accountId);
+            } else {
+                throw new OperationFailedException(httpError);
+            }
+        } catch (IOException e) {
+            throw new OperationFailedException(e);
+        }
+
+        return isBurned;
+    }
+
     @AccountStatus
     int getStatus(@NonNull String accountId) throws OperationFailedException {
         try {

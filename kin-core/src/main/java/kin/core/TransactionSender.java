@@ -198,4 +198,5 @@ class TransactionSender {
         List<String> resultCodes = transactionException.getOperationsResultCodes();
         return resultCodes != null && resultCodes.size() > 0 && INSUFFICIENT_KIN_RESULT_CODE.equals(resultCodes.get(0));
     }
+
 }
