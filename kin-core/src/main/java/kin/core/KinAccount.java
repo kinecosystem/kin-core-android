@@ -108,7 +108,6 @@ public interface KinAccount {
      * @return TransactionId the transaction identifier
      * @throws AccountNotFoundException if the sender or destination account was not created
      * @throws AccountNotActivatedException if the sender or destination account is not activated
-     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
      * @throws OperationFailedException other error occurred
      */
     @NonNull
