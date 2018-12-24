@@ -58,7 +58,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @Override
     public TransactionId sendBurnTransactionSync(@NonNull String publicAddress, @NonNull BigDecimal balance) throws OperationFailedException {
         checkValidAccount(); // TODO: 24/12/2018 maybe add some tests to this method 
-        return transactionSender.sendTransaction(account, publicAddress, balance);
+        return transactionSender.sendTransaction(account, publicAddress, getBalanceSync().value());
     }
 
     @NonNull
