@@ -58,8 +58,7 @@ final class KinAccountImpl extends AbstractKinAccount {
     @Override
     public TransactionId sendBurnAccountTransactionSync(@NonNull String publicAddress) throws OperationFailedException {
         checkValidAccount();
-        return transactionSender.sendBurnTransaction(account, publicAddress, getBalanceSync().value());
-        // TODO: 24/12/2018 maybe add some tests to this method
+        return transactionSender.sendBurnTransaction(account, getBalanceSync().value());
     }
 
     @NonNull
@@ -67,7 +66,6 @@ final class KinAccountImpl extends AbstractKinAccount {
     public boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException {
         checkValidAccount();
         return accountInfoRetriever.isAccountBurned(publicAddress);
-        // TODO: 24/12/2018 maybe add some tests to this method
     }
 
     @NonNull

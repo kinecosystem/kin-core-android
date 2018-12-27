@@ -3,9 +3,11 @@ package kin.core;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+
 import kin.core.ServiceProvider.KinAsset;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
@@ -39,15 +41,15 @@ class TransactionSender {
 
     @NonNull
     TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress,
-        @NonNull BigDecimal amount)
-        throws OperationFailedException {
+                                  @NonNull BigDecimal amount)
+            throws OperationFailedException {
         return sendTransaction(from, publicAddress, amount, null);
     }
 
     @NonNull
     TransactionId sendTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
-        @Nullable String memo)
-        throws OperationFailedException {
+                                  @Nullable String memo)
+            throws OperationFailedException {
 
         checkParams(from, publicAddress, amount, memo);
         KeyPair addressee = generateAddresseeKeyPair(publicAddress);
@@ -58,17 +60,16 @@ class TransactionSender {
     }
 
     @NonNull
-    TransactionId sendBurnTransaction(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal balance)
+    TransactionId sendBurnTransaction(@NonNull KeyPair from, @NonNull BigDecimal balance)
             throws OperationFailedException {
         Utils.checkNotNull(from, "account");
-        checkAddressNotEmpty(publicAddress);
         AccountResponse sourceAccount = loadSourceAccount(from);
         Transaction transaction = buildBurnTransaction(from, sourceAccount, balance);
         return sendTransaction(transaction);
     }
 
     private void checkParams(@NonNull KeyPair from, @NonNull String publicAddress, @NonNull BigDecimal amount,
-        @Nullable String memo) {
+                             @Nullable String memo) {
         Utils.checkNotNull(from, "account");
         Utils.checkNotNull(amount, "amount");
         checkAddressNotEmpty(publicAddress);
@@ -106,11 +107,11 @@ class TransactionSender {
 
     @NonNull
     private Transaction buildTransaction(@NonNull KeyPair from, @NonNull BigDecimal amount, KeyPair addressee,
-        AccountResponse sourceAccount, @Nullable String memo) {
+                                         AccountResponse sourceAccount, @Nullable String memo) {
 
         Builder transactionBuilder = new Builder(sourceAccount)
-            .addOperation(
-                new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build());
+                .addOperation(
+                        new PaymentOperation.Builder(addressee, kinAsset.getStellarAsset(), amount.toString()).build());
         if (memo != null) {
             transactionBuilder.addMemo(Memo.text(memo));
         }
@@ -185,7 +186,7 @@ class TransactionSender {
     }
 
     private TransactionId createFailureException(SubmitTransactionResponse response)
-        throws TransactionFailedException, InsufficientKinException {
+            throws TransactionFailedException, InsufficientKinException {
         TransactionFailedException transactionException = Utils.createTransactionException(response);
         if (isInsufficientKinException(transactionException)) {
             throw new InsufficientKinException();
