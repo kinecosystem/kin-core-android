@@ -56,6 +56,20 @@ final class KinAccountImpl extends AbstractKinAccount {
 
     @NonNull
     @Override
+    public TransactionId sendBurnAccountTransactionSync(@NonNull String publicAddress) throws OperationFailedException {
+        checkValidAccount();
+        return transactionSender.sendBurnTransaction(account, getBalanceSync().value());
+    }
+
+    @NonNull
+    @Override
+    public boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException {
+        checkValidAccount();
+        return accountInfoRetriever.isAccountBurned(publicAddress);
+    }
+
+    @NonNull
+    @Override
     public Balance getBalanceSync() throws OperationFailedException {
         checkValidAccount();
         return accountInfoRetriever.getBalance(account.getAccountId());

@@ -85,6 +85,35 @@ public interface KinAccount {
         throws OperationFailedException;
 
     /**
+     * Checks if the account is "burned", which means that this account is not more active.
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @return true if this account is "burned", false otherwise
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
+     * @throws OperationFailedException other error occurred
+     */
+    @NonNull
+    boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException;
+
+    /**
+     * Create, sign and send a transaction which "burns" the given account, which means that this account
+     * will no more be active and will never be.
+     * Also it means that no one can transfer kin to it.
+     * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
+     *
+     * @param publicAddress the account address to send the specified kin amount
+     * @return TransactionId the transaction identifier
+     * @throws AccountNotFoundException if the sender or destination account was not created
+     * @throws AccountNotActivatedException if the sender or destination account is not activated
+     * @throws OperationFailedException other error occurred
+     */
+    @NonNull
+    TransactionId sendBurnAccountTransactionSync(@NonNull String publicAddress) throws OperationFailedException;
+
+    /**
      * Create {@link Request} for getting the current confirmed balance in kin
      * <p> See {@link KinAccount#getBalanceSync()} for possibles errors</p>
      *
