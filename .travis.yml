@@ -41,7 +41,6 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - cd ../..
   - ./gradlew assemble
   - ./gradlew testDebugUnitTest
   #- ./gradlew jacocoTestReport  -Pandroid.testInstrumentationRunnerArguments.notClass=kin.core.KinAccountIntegrationTest --info
