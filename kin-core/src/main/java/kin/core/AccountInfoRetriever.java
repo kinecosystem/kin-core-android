@@ -79,7 +79,7 @@ class AccountInfoRetriever {
                 throw new OperationFailedException("can't retrieve data for account " + accountId);
             }
             AccountResponse.Signer signer = accountResponse.getSigners()[0];
-            isBurned = signer.getWeight() == 0;
+            isBurned = (signer.getWeight() == 0);
         } catch (HttpResponseException httpError) {
             if (httpError.getStatusCode() == 404) {
                 throw new AccountNotFoundException(accountId);

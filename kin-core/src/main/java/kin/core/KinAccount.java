@@ -3,6 +3,8 @@ package kin.core;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import java.math.BigDecimal;
+
+import kin.core.exception.AccountDeletedException;
 import kin.core.exception.AccountNotActivatedException;
 import kin.core.exception.AccountNotFoundException;
 import kin.core.exception.CryptoException;
@@ -85,15 +87,15 @@ public interface KinAccount {
         throws OperationFailedException;
 
     /**
-     * Checks if the account is "burned", which means that this account is not more active.
+     * Checks if the account is "burned", which means that this account is no more active and no kin can be transferred to this account.
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
-     * @param publicAddress the account address to send the specified kin amount
-     * @return true if this account is "burned", false otherwise
-     * @throws AccountNotFoundException if the sender or destination account was not created
-     * @throws AccountNotActivatedException if the sender or destination account is not activated
-     * @throws TransactionFailedException if transaction failed, contains blockchain failure details
-     * @throws OperationFailedException other error occurred
+     * @param publicAddress the account address to send the specified kin amount.
+     * @return true if this account is "burned", false otherwise.
+     * @throws AccountNotFoundException if the sender or destination account was not created.
+     * @throws AccountNotActivatedException if the sender or destination account is not activated.
+     * @throws AccountDeletedException if the account is deleted.
+     * @throws OperationFailedException other error occurred.
      */
     @NonNull
     boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException;
