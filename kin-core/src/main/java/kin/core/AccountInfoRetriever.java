@@ -78,6 +78,7 @@ class AccountInfoRetriever {
             if (accountResponse == null) {
                 throw new OperationFailedException("can't retrieve data for account " + accountId);
             }
+            validateActivation(accountResponse, accountId);
             AccountResponse.Signer signer = accountResponse.getSigners()[0];
             isBurned = (signer.getWeight() == 0);
         } catch (HttpResponseException httpError) {
@@ -91,6 +92,18 @@ class AccountInfoRetriever {
         }
 
         return isBurned;
+    }
+
+    private void validateActivation(@NonNull AccountResponse accountResponse, @NonNull String accountId) throws AccountNotActivatedException {
+        boolean isActivated = false;
+        for (AccountResponse.Balance assetBalance : accountResponse.getBalances()) {
+            if (kinAsset.isKinAsset(assetBalance.getAsset())) {
+                isActivated = true;
+            }
+        }
+        if (!isActivated) {
+            throw new AccountNotActivatedException(accountId);
+        }
     }
 
     @AccountStatus

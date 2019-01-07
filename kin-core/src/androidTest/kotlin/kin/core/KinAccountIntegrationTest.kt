@@ -83,6 +83,17 @@ class KinAccountIntegrationTest {
 
     @Test
     @LargeTest
+    fun isAccountBurned_AccountNotActivated_AccountNotActivatedException() {
+        val kinAccount = kinClient.addAccount()
+        fakeKinIssuer.createAccount(kinAccount.publicAddress.orEmpty())
+
+        expectedEx.expect(AccountNotActivatedException::class.java)
+        expectedEx.expectMessage(kinAccount.publicAddress.orEmpty())
+        kinAccount.isAccountBurnedSync
+    }
+
+    @Test
+    @LargeTest
     @Throws(Exception::class)
     fun getStatusSync_AccountNotActivated_StatusNotActivated() {
         val kinAccount = kinClient.addAccount()

@@ -90,7 +90,6 @@ public interface KinAccount {
      * Checks if the account is "burned", which means that this account is no more active and no kin can be transferred to this account.
      * <p><b>Note:</b> This method accesses the network, and should not be called on the android main thread.</p>
      *
-     * @param publicAddress the account address to send the specified kin amount.
      * @return true if this account is "burned", false otherwise.
      * @throws AccountNotFoundException if the sender or destination account was not created.
      * @throws AccountNotActivatedException if the sender or destination account is not activated.
@@ -98,7 +97,7 @@ public interface KinAccount {
      * @throws OperationFailedException other error occurred.
      */
     @NonNull
-    boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException;
+    boolean isAccountBurnedSync() throws OperationFailedException;
 
     /**
      * Create, sign and send a transaction which "burns" the given account, which means that this account

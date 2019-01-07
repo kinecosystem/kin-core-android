@@ -63,9 +63,9 @@ final class KinAccountImpl extends AbstractKinAccount {
 
     @NonNull
     @Override
-    public boolean isAccountBurnedSync(@NonNull String publicAddress) throws OperationFailedException {
+    public boolean isAccountBurnedSync() throws OperationFailedException {
         checkValidAccount();
-        return accountInfoRetriever.isAccountBurned(publicAddress);
+        return accountInfoRetriever.isAccountBurned(account.getAccountId());
     }
 
     @NonNull
