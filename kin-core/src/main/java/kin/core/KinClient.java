@@ -2,17 +2,21 @@ package kin.core;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+
+import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.Network;
+import org.stellar.sdk.Server;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import kin.core.exception.CorruptedDataException;
 import kin.core.exception.CreateAccountException;
 import kin.core.exception.CryptoException;
 import kin.core.exception.DeleteAccountException;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.Network;
-import org.stellar.sdk.Server;
 
 /**
  * An account manager for a {@link KinAccount}.
@@ -34,7 +38,7 @@ public class KinClient {
     /**
      * KinClient is an account manager for a {@link KinAccount}.
      *
-     * @param context the android application context
+     * @param context  the android application context
      * @param provider the service provider - provides blockchain network parameters
      * @param storeKey the key for storing this client data, different keys will store a different accounts
      */
@@ -55,7 +59,7 @@ public class KinClient {
     /**
      * KinClient is an account manager for a {@link KinAccount}.
      *
-     * @param context the android application context
+     * @param context  the android application context
      * @param provider the service provider - provides blockchain network parameters
      */
     public KinClient(@NonNull Context context, @NonNull ServiceProvider provider) {
@@ -64,8 +68,8 @@ public class KinClient {
 
     @VisibleForTesting
     KinClient(ServiceProvider serviceProvider, KeyStore keyStore, TransactionSender transactionSender,
-        AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
-        BlockchainEventsCreator blockchainEventsCreator, BackupRestore backupRestore) {
+              AccountActivator accountActivator, AccountInfoRetriever accountInfoRetriever,
+              BlockchainEventsCreator blockchainEventsCreator, BackupRestore backupRestore) {
         this.serviceProvider = serviceProvider;
         this.keyStore = keyStore;
         this.transactionSender = transactionSender;
@@ -83,7 +87,7 @@ public class KinClient {
 
     private KeyStore initKeyStore(Context context, String id) {
         SharedPrefStore store = new SharedPrefStore(
-            context.getSharedPreferences(STORE_NAME_PREFIX + id, Context.MODE_PRIVATE));
+                context.getSharedPreferences(STORE_NAME_PREFIX + id, Context.MODE_PRIVATE));
         return new KeyStoreImpl(store, backupRestore);
     }
 
@@ -125,7 +129,20 @@ public class KinClient {
     KinAccount importAccount(@NonNull String exportedJson, @NonNull String passphrase)
         throws CryptoException, CreateAccountException, CorruptedDataException {
         KeyPair account = keyStore.importAccount(exportedJson, passphrase);
-        return addKeyPair(account);
+        KinAccount kinAccount = getAccountByPublicAddress(account.getAccountId());
+        return kinAccount != null ? kinAccount : addKeyPair(account);
+    }
+
+    @Nullable
+    private KinAccount getAccountByPublicAddress(String accountId) {
+        KinAccount kinAccount = null;
+        for (int i = 0; i < kinAccounts.size(); i++) {
+            final KinAccount account = kinAccounts.get(0);
+            if (accountId.equals(account.getPublicAddress())) {
+                kinAccount = account;
+            }
+        }
+        return kinAccount;
     }
 
     @NonNull
@@ -192,7 +209,7 @@ public class KinClient {
     @NonNull
     private KinAccountImpl createNewKinAccount(KeyPair account) {
         return new KinAccountImpl(account, backupRestore, transactionSender, accountActivator, accountInfoRetriever,
-            blockchainEventsCreator);
+                blockchainEventsCreator);
     }
 
 }
