@@ -310,6 +310,33 @@ public class KinClientIntegrationTest {
         }
     }
 
+    @Test
+    public void importAccount_AddOnlyIfNotExists() throws Exception {
+        kinClient.addAccount();
+        kinClient.addAccount();
+        kinClient.addAccount();
+        KinAccount kinAccount = kinClient.addAccount();
+        String passphrase = UUID.randomUUID().toString();
+        String exported = kinAccount.export(passphrase);
+        kinClient.importAccount(exported, passphrase);
+        assertEquals(4, kinClient.getAccountCount());
+    }
+
+    @Test
+    public void importAccount_AddNewAccount() throws Exception {
+        KinAccount kinAccount = kinClient.addAccount();
+        String passphrase = UUID.randomUUID().toString();
+        String exported = kinAccount.export(passphrase);
+        kinClient.importAccount(exported, passphrase);
+        assertEquals(1, kinClient.getAccountCount());
+
+        kinClient.clearAllAccounts();
+        assertEquals(0, kinClient.getAccountCount());
+
+        kinClient.importAccount(exported, passphrase);
+        assertEquals(1, kinClient.getAccountCount());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void initKinClient_NullId_Exception() {
         kinClient = createNewKinClient(null);

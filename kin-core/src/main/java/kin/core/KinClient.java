@@ -2,6 +2,7 @@ package kin.core;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +126,20 @@ public class KinClient {
     KinAccount importAccount(@NonNull String exportedJson, @NonNull String passphrase)
         throws CryptoException, CreateAccountException, CorruptedDataException {
         KeyPair account = keyStore.importAccount(exportedJson, passphrase);
-        return addKeyPair(account);
+        KinAccount kinAccount = getAccountByPublicAddress(account.getAccountId());
+        return kinAccount != null ? kinAccount : addKeyPair(account);
+    }
+
+    @Nullable
+    private KinAccount getAccountByPublicAddress(String accountId) {
+        KinAccount kinAccount = null;
+        for (int i = 0; i < kinAccounts.size(); i++) {
+            final KinAccount account = kinAccounts.get(i);
+            if (accountId.equals(account.getPublicAddress())) {
+                kinAccount = account;
+            }
+        }
+        return kinAccount;
     }
 
     @NonNull
