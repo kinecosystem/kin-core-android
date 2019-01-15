@@ -312,25 +312,28 @@ public class KinClientIntegrationTest {
 
     @Test
     public void importAccount_AddOnlyIfNotExists() throws Exception {
+        kinClient.addAccount();
+        kinClient.addAccount();
+        kinClient.addAccount();
         KinAccount kinAccount = kinClient.addAccount();
-        String uuid = UUID.randomUUID().toString();
-        String exported = kinAccount.export(uuid);
-        kinClient.importAccount(exported, uuid);
-        assertEquals(1, kinClient.getAccountCount());
+        String passphrase = UUID.randomUUID().toString();
+        String exported = kinAccount.export(passphrase);
+        kinClient.importAccount(exported, passphrase);
+        assertEquals(4, kinClient.getAccountCount());
     }
 
     @Test
     public void importAccount_AddNewAccount() throws Exception {
         KinAccount kinAccount = kinClient.addAccount();
-        String uuid = UUID.randomUUID().toString();
-        String exported = kinAccount.export(uuid);
-        kinClient.importAccount(exported, uuid);
+        String passphrase = UUID.randomUUID().toString();
+        String exported = kinAccount.export(passphrase);
+        kinClient.importAccount(exported, passphrase);
         assertEquals(1, kinClient.getAccountCount());
 
         kinClient.clearAllAccounts();
         assertEquals(0, kinClient.getAccountCount());
 
-        kinClient.importAccount(exported, uuid);
+        kinClient.importAccount(exported, passphrase);
         assertEquals(1, kinClient.getAccountCount());
     }
 
