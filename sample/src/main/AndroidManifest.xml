@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_rounded"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name="kin.core.sample.ChooseNetworkActivity"
             android:screenOrientation="portrait">
