@@ -311,4 +311,4 @@ these tests are marked as `@LargeTest`, because they are time consuming, and dep
 Please review our [CONTRIBUTING.md](CONTRIBUTING.md) guide before opening issues and pull requests.
 
 ## License
-The kin-core-android library is licensed under [MIT license](LICENSE.md).
+The kin-core-android library is licensed under [Kin Ecosystem SDK License](LICENSE.pdf).
