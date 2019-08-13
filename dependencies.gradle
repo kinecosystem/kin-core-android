@@ -11,7 +11,7 @@ ext {
     hamcrestVersion = '1.3'
     gsonVersion = '2.4'
     jacocoVersion = '0.8.0'
-    multiDexVersion = '1.0.3'
+    multiDexVersion = '1.0.2'
 
     //Packages
     supportPackage = 'com.android.support'
@@ -52,7 +52,7 @@ ext {
             hamcrest         : buildDependency(hamcrestPackage, 'hamcrest-library', hamcrestVersion),
             gson             : buildDependency(gsonPackage, 'gson', gsonVersion),
             multidex         : buildDependency(supportPackage, 'multidex', multiDexVersion),
-            kotlin           : buildDependency(kotlinPackage, 'kotlin-stdlib-jre7', kotlin_version),
+            kotlin           : buildDependency(kotlinPackage, 'kotlin-stdlib-jdk7', kotlin_version),
             kotlinJUnitTest  : buildDependency(kotlinPackage, 'kotlin-test-junit', kotlin_version)
     ]
 }
