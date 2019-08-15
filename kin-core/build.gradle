@@ -9,7 +9,6 @@ group = 'com.github.kinecosystem'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 16
